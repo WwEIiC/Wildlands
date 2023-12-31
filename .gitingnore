@@ -1,7 +1,0 @@
-#Directories to ingnore
-.vs/
-bin/
-bin-int/
-
-//Files
-*.user

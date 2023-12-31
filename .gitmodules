@@ -1,0 +1,3 @@
+[submodule "Wildlands/Externals/spdlog"]
+	path = Wildlands/Externals/spdlog
+	url = https://github.com/gabime/spdlog
