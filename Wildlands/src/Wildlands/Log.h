@@ -1,9 +1,8 @@
 #pragma once
 #include "Core.h"
-#include <memory.h>
 
 #include "spdlog/spdlog.h"
-#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/fmt/ostr.h"
 
 namespace Wildlands
 {

@@ -14,6 +14,9 @@ project "Wildlands"
 	targetdir ("bin/" .. outputDir .."/%{prj.name}")
 	objdir ("bin-int/" .. outputDir .."/%{prj.name}")
 
+	pchheader "WLPCH.h"						--even this located on a different path relative to project
+	pchsource "Wildlands/src/WLPCH.cpp"		--the relative path to this lua file(used for vs to create pch)
+
 	--the files this project needed to load
 	files {
 		"%{prj.name}/src/**.h",
@@ -21,7 +24,8 @@ project "Wildlands"
 	}
 
 	includedirs {
-		"%{prj.name}/Externals/spdlog/include"
+		"%{prj.name}/Externals/spdlog/include",
+		"%{prj.name}/src"
 	}
 
 	filter "system:windows"

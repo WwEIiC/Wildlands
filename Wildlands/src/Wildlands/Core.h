@@ -9,3 +9,5 @@
 #else
 	#error Wildlands only supports Windows now!
 #endif//WL_PLATFORM_WINDOW
+
+#define BIT(x) (1 << x)
