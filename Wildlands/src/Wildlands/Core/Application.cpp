@@ -2,13 +2,15 @@
 
 #include "Application.h"
 #include "Log.h"
-#include "Events/ApplicationEvent.h"
+#include "Wildlands/Events/ApplicationEvent.h"
 
 namespace Wildlands
 {
 	Application::Application()
 	{
-
+		Log::Init();
+		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_Running = true;
 	}
 
 	Application::~Application()
@@ -18,13 +20,9 @@ namespace Wildlands
 
 	void Application::Run()
 	{
-		Log::Init();
-		WindowResizeEvent e(1280, 720);
-		WL_TRACE(e);
-
-		while (true)
+		while (m_Running)
 		{
-
+			m_Window->Update();
 		}
 	}
 }

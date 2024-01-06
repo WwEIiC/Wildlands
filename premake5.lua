@@ -6,6 +6,14 @@ workspace "Wildlands"
 --eg. Debug-windows-x64
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+--An include directories set, relative to the root folder(.lua as well)\
+IncludeDirs = {}
+IncludeDirs["SPDLOG"] = "Wildlands/Externals/spdlog/include"
+IncludeDirs["GLFW"] = "Wildlands/Externals/GLFW/include"
+
+--Premake will looks for a file name "premake5.lua" in the path specified
+include "Wildlands/Externals/GLFW"
+
 project "Wildlands"
 	location "Wildlands"
 	kind "SharedLib"
@@ -24,8 +32,14 @@ project "Wildlands"
 	}
 
 	includedirs {
-		"%{prj.name}/Externals/spdlog/include",
-		"%{prj.name}/src"
+		"%{prj.name}/src",
+		"%{IncludeDirs.SPDLOG}",
+		"%{IncludeDirs.GLFW}"
+	}
+
+	links {
+		"GLFW",			--link the GLFW project(make by premake5.lua in ./Wildlands/Externals/GLFW) to Wildlands
+		"opengl32.lib"
 	}
 
 	filter "system:windows"
@@ -43,7 +57,10 @@ project "Wildlands"
 		}
 
 	filter "configurations:Debug"
-		defines {"WL_DEBUG"}
+		defines {
+			"WL_DEBUG",
+			"WL_ENABLE_ASSERTS"
+		}
 		symbols "On"			-- make sure the debug symbols can be used
 
 	filter "configurations:Release"
@@ -69,7 +86,7 @@ project "Sandbox"
 
 	includedirs {
 		"Wildlands/src",
-		"Wildlands/Externals/spdlog/include"
+		"%{IncludeDirs.SPDLOG}"
 	}
 
 	--link the Wildlands project to this project

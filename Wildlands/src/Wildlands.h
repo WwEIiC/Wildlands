@@ -1,9 +1,9 @@
 #pragma once
 //This will just be used by applications that use WildlandsEngine.
 
-#include "Wildlands/Application.h"
-#include "Wildlands/Log.h"
+#include "Wildlands/Core/Application.h"
+#include "Wildlands/Core/Log.h"
 
 //--------------Entry Point-------------------------
-#include "Wildlands/EntryPoint.h"
+#include "Wildlands/Core/EntryPoint.h"
 //--------------------------------------------------
