@@ -113,3 +113,8 @@ project "Sandbox"
 	filter "configurations:Dist"
 		defines {"WL_DIST"}
 		optimize "On"
+
+
+		
+workspace "Wildlands"
+	startproject "Sandbox"
