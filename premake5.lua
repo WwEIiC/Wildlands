@@ -44,7 +44,7 @@ project "Wildlands"
 
 	filter "system:windows"
 		cppdialect "C++20"
-		staticruntime "On"
+		staticruntime "Off"
 		systemversion "latest"
 
 		defines{
@@ -61,14 +61,17 @@ project "Wildlands"
 			"WL_DEBUG",
 			"WL_ENABLE_ASSERTS"
 		}
+		buildoptions "/MDd"
 		symbols "On"			-- make sure the debug symbols can be used
 
 	filter "configurations:Release"
 		defines {"WL_RELEASE"}
+		buildoptions "/MD"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines {"WL_DIST"}
+		buildoptions "/MD"
 		optimize "On"
 
 project "Sandbox"
@@ -96,7 +99,7 @@ project "Sandbox"
 
 	filter "system:windows"
 		cppdialect "C++20"
-		staticruntime "On"
+		staticruntime "Off"
 		systemversion "latest"
 
 		defines{
@@ -105,13 +108,16 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines {"WL_DEBUG"}
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines {"WL_RELEASE"}
+		buildoptions "/MD"
 		optimize "On"
 	filter "configurations:Dist"
 		defines {"WL_DIST"}
+		buildoptions "/MD"
 		optimize "On"
 
 

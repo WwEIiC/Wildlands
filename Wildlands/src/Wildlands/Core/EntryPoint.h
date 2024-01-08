@@ -8,6 +8,7 @@ extern Wildlands::Application* Wildlands::CreateApplication();
 
 int main(int argc, char** argv)
 {
+	Wildlands::Log::Init();
 	auto app = Wildlands::CreateApplication();
 	app->Run();
 	delete app;

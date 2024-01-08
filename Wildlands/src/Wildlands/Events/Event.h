@@ -33,18 +33,15 @@ namespace Wildlands
 
 	class WL_API Event
 	{
-		friend class EventDispatcher;
-
 	public:
+		bool Handled = false;
+
 		virtual EventType GetEventType() const = 0;
 		virtual int GetEventCategory() const = 0;
 		virtual const char* GetName() const = 0;
 		virtual std::string ToString() const { return GetName(); }
 
 		inline bool IsInCategory(EventCategory category) { return static_cast<int>(category) & GetEventCategory(); }
-
-	protected:
-		bool m_Handled = false;
 	};
 
 	inline std::ostream& operator<<(std::ostream& os, const Event& event)
@@ -67,7 +64,7 @@ namespace Wildlands
 		{
 			if (m_Event.GetEventType() == T::GetStaticType())
 			{
-				m_Event.m_Handled = func(*dynamic_cast<T*>(&m_Event));
+				m_Event.Handled = func(*dynamic_cast<T*>(&m_Event));
 				return true;
 			}
 
