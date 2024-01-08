@@ -14,6 +14,12 @@ namespace Wildlands
 		virtual ~Application();
 
 		void Run();
+
+		void OnEvents(Event& e);
+
+	private:
+		bool OnWindowClose(class WindowCloseEvent& event);
+
 	private:
 		std::unique_ptr<Window> m_Window;
 		bool m_Running;
