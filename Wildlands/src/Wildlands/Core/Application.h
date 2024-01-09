@@ -3,8 +3,8 @@
 #include "Wildlands/Core/Core.h"
 
 #include "Wildlands/Core/Window.h"
-#include "Wildlands/Events/Event.h"
 #include "Wildlands/Core/LayerStack.h"
+#include "Wildlands/Events/Event.h"
 
 namespace Wildlands
 {
@@ -23,6 +23,8 @@ namespace Wildlands
 		void PopLayer(Layer* layer);
 		void PushOverLayer(Layer* overlayer);
 		void PopOverLayer(Layer* overlayer);
+
+		inline Window& GetWindow() { return *m_Window; }
 	private:
 		bool OnWindowClose(class WindowCloseEvent& event);
 

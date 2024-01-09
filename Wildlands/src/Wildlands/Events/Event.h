@@ -11,7 +11,7 @@ namespace Wildlands
 		None = 0,
 		WindowFocus, WindowLostFocus, WindowResize, WindowMoved, WindowClose,
 		MouseMoved, MouseButtonDown, MouseButtonUp, MouseScrolled,
-		KeyDown, KeyUp
+		KeyDown, KeyUp, KeyType
 	};
 
 	enum class EventCategory

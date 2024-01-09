@@ -4,11 +4,10 @@
 #include "Wildlands/Core/Log.h"
 #include "Wildlands/Events/ApplicationEvent.h"
 
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 namespace Wildlands
 {
-#define BIND_EVENT_FUNC(x) std::bind(&x, this, std::placeholders::_1)
 	Application::Application()
 	{
 		m_Window = std::unique_ptr<Window>(Window::Create());
@@ -19,7 +18,6 @@ namespace Wildlands
 
 	void Application::OnEvents(Event& e)
 	{
-		//Call when event is received
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(Application::OnWindowClose));
 

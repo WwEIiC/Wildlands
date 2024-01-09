@@ -5,6 +5,8 @@
 #include "Wildlands/Events/KeyEvent.h"
 #include "Wildlands/Events/MouseEvent.h"
 
+#include <glad/glad.h>
+
 namespace Wildlands
 {
 	static bool s_GLFWInitialized = false;
@@ -49,6 +51,8 @@ namespace Wildlands
 		m_Window = glfwCreateWindow((int)data.Width, (int)data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
 		glfwSetWindowUserPointer(m_Window, &m_Data);
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		WL_CORE_ASSERT(status, "Failed to init Glad!");
 
 		//Set up Application events callbacks
 		glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* window, int focused)
@@ -161,6 +165,13 @@ namespace Wildlands
 						break;
 					}
 				}
+			});
+
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, uint keycode)
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				KeyTypeEvent event(keycode);
+				data.EventCallback(event);
 			});
 		
 	}

@@ -30,7 +30,14 @@
 #endif//WL_ENABLE_ASSERTS
 
 //Data
+typedef unsigned short ushort;
 typedef unsigned int uint;
+typedef unsigned long ulong;
+
+
+
 #define BIT(x) (1 << x)
+#define BIND_EVENT_FUNC(func) std::bind(&func, this, std::placeholders::_1)
+
 
 

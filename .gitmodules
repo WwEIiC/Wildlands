@@ -4,3 +4,6 @@
 [submodule "Wildlands/Externals/GLFW"]
 	path = Wildlands/Externals/GLFW
 	url = https://github.com/WwEIiC/GLFW
+[submodule "Wildlands/Externals/ImGui"]
+	path = Wildlands/Externals/ImGui
+	url = https://github.com/WwEIiC/ImGui

@@ -10,9 +10,13 @@ outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDirs = {}
 IncludeDirs["SPDLOG"] = "Wildlands/Externals/spdlog/include"
 IncludeDirs["GLFW"] = "Wildlands/Externals/GLFW/include"
+IncludeDirs["Glad"] = "Wildlands/Externals/Glad/include"
+IncludeDirs["ImGui"] = "Wildlands/Externals/ImGui"
 
 --Premake will looks for a file name "premake5.lua" in the path specified
 include "Wildlands/Externals/GLFW"
+include "Wildlands/Externals/Glad"
+include "Wildlands/Externals/ImGui"
 
 project "Wildlands"
 	location "Wildlands"
@@ -34,11 +38,15 @@ project "Wildlands"
 	includedirs {
 		"%{prj.name}/src",
 		"%{IncludeDirs.SPDLOG}",
-		"%{IncludeDirs.GLFW}"
+		"%{IncludeDirs.GLFW}",
+		"%{IncludeDirs.Glad}",
+		"%{IncludeDirs.ImGui}"
 	}
 
 	links {
 		"GLFW",			--link the GLFW project(make by premake5.lua in ./Wildlands/Externals/GLFW) to Wildlands
+		"Glad",
+		"ImGui",
 		"opengl32.lib"
 	}
 
@@ -49,7 +57,8 @@ project "Wildlands"
 
 		defines{
 			"WL_PLATFORM_WINDOWS",
-			"WL_BUILD_DLL"
+			"WL_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"		--don't include any gl library because glad will provide
 		}
 
 		postbuildcommands { 

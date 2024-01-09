@@ -59,4 +59,24 @@ namespace Wildlands
 
 		EVENT_CLASS_TYPE(KeyUp)
 	};
+	
+	//Arised when user type in something like text box
+	class WL_API KeyTypeEvent : public KeyEvent
+	{
+	public:
+		KeyTypeEvent(int keycode)
+			: KeyEvent(keycode)
+		{
+		}
+
+		virtual std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyDownEvent: " << m_KeyCode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyType)
+	};
+
 }
