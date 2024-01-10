@@ -25,10 +25,13 @@ namespace Wildlands
 		void PopOverLayer(Layer* overlayer);
 
 		inline Window& GetWindow() { return *m_Window; }
+		inline static Application& Get() { return *s_Instance; }
 	private:
 		bool OnWindowClose(class WindowCloseEvent& event);
 
 	private:
+		static Application* s_Instance;
+
 		bool m_Running;
 		std::unique_ptr<Window> m_Window;
 		LayerStack m_LayerStack;

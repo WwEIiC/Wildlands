@@ -5,7 +5,7 @@ class Sandbox : public Wildlands::Application
 public:
 	Sandbox()
 	{
-
+		PushLayer(new Wildlands::ImGuiLayer());
 	}
 	~Sandbox()
 	{

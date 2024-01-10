@@ -26,6 +26,9 @@ namespace Wildlands
 		bool OnKeyDown(class KeyDownEvent& event);
 		bool OnKeyUp(class KeyUpEvent& event);
 		bool OnKeyType(class KeyTypeEvent& event);
+
+	private:
+		void SetImGuiStyle();
 	private:
 		float m_Time = 0.0f;
 	};

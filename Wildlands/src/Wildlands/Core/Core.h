@@ -10,6 +10,10 @@
 	#error Wildlands only supports Windows now!
 #endif//WL_PLATFORM_WINDOW
 
+#ifdef WL_DEBUG
+	#define WL_ENABLE_ASSERTS
+#endif
+
 #ifdef WL_ENABLE_ASSERTS
 	#define WL_CORE_ASSERT(x, ...) {\
 		if(!(x)) {\

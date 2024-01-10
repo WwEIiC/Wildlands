@@ -2,6 +2,7 @@ workspace "Wildlands"
 	architecture "x64"
 
 	configurations { "Debug", "Release", "Dist" }
+	startproject "Sandbox"
 
 --eg. Debug-windows-x64
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -22,6 +23,7 @@ project "Wildlands"
 	location "Wildlands"
 	kind "SharedLib"
 	language "C++"
+	staticruntime "Off"
 
 	targetdir ("bin/" .. outputDir .."/%{prj.name}")
 	objdir ("bin-int/" .. outputDir .."/%{prj.name}")
@@ -52,7 +54,6 @@ project "Wildlands"
 
 	filter "system:windows"
 		cppdialect "C++20"
-		staticruntime "Off"
 		systemversion "latest"
 
 		defines{
@@ -62,31 +63,29 @@ project "Wildlands"
 		}
 
 		postbuildcommands { 
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputDir .. "/Sandbox")
+			("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputDir .. "/Sandbox/\"")
 		}
 
 	filter "configurations:Debug"
-		defines {
-			"WL_DEBUG",
-			"WL_ENABLE_ASSERTS"
-		}
-		buildoptions "/MDd"
+		defines {"WL_DEBUG"}
+		runtime "Debug"
 		symbols "On"			-- make sure the debug symbols can be used
 
 	filter "configurations:Release"
 		defines {"WL_RELEASE"}
-		buildoptions "/MD"
+		runtime "Release"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines {"WL_DIST"}
-		buildoptions "/MD"
+		runtime "Release"
 		optimize "On"
 
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+	staticruntime "Off"
 
 	targetdir ("bin/" .. outputDir .."/%{prj.name}")
 	objdir ("bin-int/" .. outputDir .."/%{prj.name}")
@@ -108,7 +107,6 @@ project "Sandbox"
 
 	filter "system:windows"
 		cppdialect "C++20"
-		staticruntime "Off"
 		systemversion "latest"
 
 		defines{
@@ -117,19 +115,14 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines {"WL_DEBUG"}
-		buildoptions "/MDd"
+		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines {"WL_RELEASE"}
-		buildoptions "/MD"
+		runtime "Release"
 		optimize "On"
 	filter "configurations:Dist"
 		defines {"WL_DIST"}
 		buildoptions "/MD"
 		optimize "On"
-
-
-		
-workspace "Wildlands"
-	startproject "Sandbox"

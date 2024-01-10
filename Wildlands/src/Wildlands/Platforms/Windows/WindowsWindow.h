@@ -12,6 +12,8 @@ namespace Wildlands
 		WindowsWindow(const WindowConstructData& data);
 		virtual ~WindowsWindow();
 
+		inline virtual void* GetNativeWindow() const override { return m_Window; }
+
 		inline uint GetWidth() const override { return m_Data.Width; }
 		inline uint GetHeight() const override { return m_Data.Height; }
 

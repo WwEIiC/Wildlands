@@ -3,13 +3,19 @@
 #include "Application.h"
 #include "Wildlands/Core/Log.h"
 #include "Wildlands/Events/ApplicationEvent.h"
+#include "Wildlands/Core/Input.h"
 
 #include <glad/glad.h>
 
 namespace Wildlands
 {
+	Application* Application::s_Instance = nullptr;
+
 	Application::Application()
 	{
+		WL_CORE_ASSERT(!s_Instance, "Application already exists!");
+		s_Instance = this;
+
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Running = true;
 
@@ -25,11 +31,11 @@ namespace Wildlands
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{
 			(*--it)->OnEvent(e);
-			WL_CORE_TRACE("Event handled by {0}", (*it)->GetName())
+			//WL_CORE_TRACE("Event handled by {0}", (*it)->GetName())
 			if (e.Handled) { break; }
 		}
 
-		WL_CORE_TRACE("{0}", e)
+		//WL_CORE_TRACE("{0}", e)
 	}
 
 	void Application::Run()
