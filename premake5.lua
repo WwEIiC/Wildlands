@@ -13,6 +13,7 @@ IncludeDirs["SPDLOG"] = "Wildlands/Externals/spdlog/include"
 IncludeDirs["GLFW"] = "Wildlands/Externals/GLFW/include"
 IncludeDirs["Glad"] = "Wildlands/Externals/Glad/include"
 IncludeDirs["ImGui"] = "Wildlands/Externals/ImGui"
+IncludeDirs["glm"] = "Wildlands/Externals/glm"
 
 --Premake will looks for a file name "premake5.lua" in the path specified
 include "Wildlands/Externals/GLFW"
@@ -34,7 +35,9 @@ project "Wildlands"
 	--the files this project needed to load
 	files {
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/Externals/glm/glm/**.hpp",
+		"%{prj.name}/Externals/glm/glm/**.inl"
 	}
 
 	includedirs {
@@ -42,7 +45,8 @@ project "Wildlands"
 		"%{IncludeDirs.SPDLOG}",
 		"%{IncludeDirs.GLFW}",
 		"%{IncludeDirs.Glad}",
-		"%{IncludeDirs.ImGui}"
+		"%{IncludeDirs.ImGui}",
+		"%{IncludeDirs.glm}"
 	}
 
 	links {
@@ -81,6 +85,8 @@ project "Wildlands"
 		runtime "Release"
 		optimize "On"
 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
@@ -97,7 +103,8 @@ project "Sandbox"
 
 	includedirs {
 		"Wildlands/src",
-		"%{IncludeDirs.SPDLOG}"
+		"%{IncludeDirs.SPDLOG}",
+		"%{IncludeDirs.glm}"
 	}
 
 	--link the Wildlands project to this project
