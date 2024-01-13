@@ -16,10 +16,12 @@ namespace Wildlands
 		WL_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Running = true;
-
+		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FUNC(Application::OnEvents));
+
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverLayer(m_ImGuiLayer);
 	}
 
 	void Application::OnEvents(Event& e)
@@ -31,10 +33,8 @@ namespace Wildlands
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{
 			(*--it)->OnEvent(e);
-			//WL_CORE_TRACE("Event handled by {0}", (*it)->GetName())
 			if (e.Handled) { break; }
 		}
-
 		//WL_CORE_TRACE("{0}", e)
 	}
 
@@ -45,11 +45,16 @@ namespace Wildlands
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			//Render each layer
+			//WLTODO: Move this to the Render thread.
+			//Render each layers
 			for(Layer* layer : m_LayerStack)
-			{
 				layer->Update();
-			}
+
+			//Render UI for each layers
+			m_ImGuiLayer->Begin();
+			for (Layer* layer : m_LayerStack)
+				layer->UIRender();
+			m_ImGuiLayer->End();
 
 			m_Window->Update();
 		}

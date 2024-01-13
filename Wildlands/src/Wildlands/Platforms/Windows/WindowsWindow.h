@@ -14,8 +14,8 @@ namespace Wildlands
 
 		inline virtual void* GetNativeWindow() const override { return m_Window; }
 
-		inline uint GetWidth() const override { return m_Data.Width; }
-		inline uint GetHeight() const override { return m_Data.Height; }
+		inline uint32_t GetWidth() const override { return m_Data.Width; }
+		inline uint32_t GetHeight() const override { return m_Data.Height; }
 
 		virtual void Update() override;
 		
@@ -30,7 +30,7 @@ namespace Wildlands
 		struct WindowData
 		{
 			std::string Title;
-			uint Width, Height;
+			uint32_t Width, Height;
 			EventCallbackFunc EventCallback;
 		};
 		WindowData m_Data;

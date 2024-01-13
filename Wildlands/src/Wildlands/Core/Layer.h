@@ -1,5 +1,5 @@
 #pragma once
-#include "Wildlands/Core//Core.h"
+#include "Wildlands/Core/Core.h"
 
 #include "Wildlands/Events/Event.h"
 
@@ -14,6 +14,7 @@ namespace Wildlands
 		virtual void Attach() {}
 		virtual void Detach() {}
 		virtual void Update() {}
+		virtual void UIRender() {}
 
 		virtual void OnEvent(Event& event) {}
 

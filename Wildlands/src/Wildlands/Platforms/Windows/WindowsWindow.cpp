@@ -167,7 +167,7 @@ namespace Wildlands
 				}
 			});
 
-		glfwSetCharCallback(m_Window, [](GLFWwindow* window, uint keycode)
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, uint32_t keycode)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				KeyTypeEvent event(keycode);

@@ -10,12 +10,12 @@ namespace Wildlands
 	struct WindowConstructData
 	{
 		std::string Title;
-		uint Width;
-		uint Height;
+		uint32_t Width;
+		uint32_t Height;
 
 		WindowConstructData(const std::string& title = "Wildlands Engine",
-			uint width = 1280,
-			uint height = 720)
+			uint32_t width = 1280,
+			uint32_t height = 720)
 			: Title(title), Width(width), Height(height)
 		{
 		}
@@ -32,8 +32,8 @@ namespace Wildlands
 
 		inline virtual void* GetNativeWindow() const = 0;
 
-		virtual uint GetWidth() const = 0;
-		virtual uint GetHeight() const = 0;
+		virtual uint32_t GetWidth() const = 0;
+		virtual uint32_t GetHeight() const = 0;
 
 		virtual void Update() = 0;
 

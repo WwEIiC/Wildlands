@@ -23,9 +23,9 @@ namespace Wildlands
 		std::vector<Layer*>::iterator target = std::find(m_Layers.begin(), m_Layers.begin() + m_LayerInsertIndex, layer);
 		if (target != m_Layers.begin() + m_LayerInsertIndex)
 		{
-			layer->Detach();
 			m_Layers.erase(target);
 			--m_LayerInsertIndex;
+			layer->Detach();
 		}
 	}
 
@@ -39,8 +39,8 @@ namespace Wildlands
 		std::vector<Layer*>::iterator target = std::find(m_Layers.begin() + m_LayerInsertIndex, m_Layers.end(), overlay);
 		if (target != m_Layers.end())
 		{
-			overlay->Detach();
 			m_Layers.erase(target);
+			overlay->Detach();
 		}
 	}
 }
