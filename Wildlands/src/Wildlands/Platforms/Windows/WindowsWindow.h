@@ -1,7 +1,9 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
 #include "Wildlands/Core/Window.h"
+#include "Wildlands/Renderer/RenderContext.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Wildlands
 {
@@ -36,6 +38,7 @@ namespace Wildlands
 		WindowData m_Data;
 
 		GLFWwindow* m_Window;
+		RenderContext* m_RenderContext;
 	};
 
 }

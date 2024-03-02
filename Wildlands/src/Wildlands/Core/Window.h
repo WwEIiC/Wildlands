@@ -1,7 +1,4 @@
 #pragma once
-#include "WLPCH.h"
-
-#include "Wildlands/Core/Core.h"
 #include "Wildlands/Events/Event.h"
 
 // define the window data struct and interface

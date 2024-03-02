@@ -1,6 +1,4 @@
 #pragma once
-#include "Wildlands/Core/Core.h"
-#include "Wildlands/Events/Event.h"
 #include "Wildlands/Core/Layer.h"
 
 namespace Wildlands

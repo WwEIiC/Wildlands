@@ -1,11 +1,11 @@
 #include "WLPCH.h"
 
 #include "WindowsWindow.h"
+#include "Wildlands/Platforms/OpenGL/OpenGLContext.h"
+
 #include "Wildlands/Events/ApplicationEvent.h"
 #include "Wildlands/Events/KeyEvent.h"
 #include "Wildlands/Events/MouseEvent.h"
-
-#include <glad/glad.h>
 
 namespace Wildlands
 {
@@ -49,10 +49,10 @@ namespace Wildlands
 		}
 
 		m_Window = glfwCreateWindow((int)data.Width, (int)data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
+		m_RenderContext = new OpenGLContext(m_Window);
+		m_RenderContext->Init();
+
 		glfwSetWindowUserPointer(m_Window, &m_Data);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		WL_CORE_ASSERT(status, "Failed to init Glad!");
 
 		//Set up Application events callbacks
 		glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* window, int focused)
@@ -184,6 +184,6 @@ namespace Wildlands
 	void WindowsWindow::Update()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_RenderContext->SwapBuffers();
 	}
 }
