@@ -3,7 +3,7 @@
 
 namespace Wildlands
 {
-	class WL_API WindowFocusEvent : public Event
+	class  WindowFocusEvent : public Event
 	{
 	public:
 		WindowFocusEvent() {}
@@ -11,7 +11,7 @@ namespace Wildlands
 		EVENT_CLASS_TYPE(WindowFocus)
 		EVENT_CLASS_CATEGORY(static_cast<int>(EventCategory::EventCategoryApplication))
 	};
-	class WL_API WindowLostFocusEvent : public Event
+	class  WindowLostFocusEvent : public Event
 	{
 	public:
 		WindowLostFocusEvent() {}
@@ -20,7 +20,7 @@ namespace Wildlands
 		EVENT_CLASS_CATEGORY(static_cast<int>(EventCategory::EventCategoryApplication))
 	};
 
-	class WL_API WindowResizeEvent : public Event
+	class  WindowResizeEvent : public Event
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -42,7 +42,7 @@ namespace Wildlands
 		unsigned int m_Width, m_Height;
 	};
 
-	class WL_API WindowMovedEvent : public Event
+	class  WindowMovedEvent : public Event
 	{
 	public:
 		WindowMovedEvent(unsigned int x, unsigned int y)
@@ -64,7 +64,7 @@ namespace Wildlands
 		unsigned int m_X, m_Y;
 	};
 
-	class WL_API WindowCloseEvent : public Event
+	class  WindowCloseEvent : public Event
 	{
 	public:
 		WindowCloseEvent() {}

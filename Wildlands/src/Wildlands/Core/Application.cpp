@@ -5,7 +5,9 @@
 #include "Wildlands/Events/ApplicationEvent.h"
 #include "Wildlands/Core/Input.h"
 
-#include <glad/glad.h>
+#include "Wildlands/Renderer/Renderer.h"
+
+#include "Wildlands/Common/FileReader.h"
 
 namespace Wildlands
 {
@@ -17,37 +19,11 @@ namespace Wildlands
 		s_Instance = this;
 
 		m_Running = true;
-		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_Window.reset(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FUNC(Application::OnEvents));
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverLayer(m_ImGuiLayer);
-
-		//VAO VBO IBO Shader
-		glGenVertexArrays(1, &m_VAO);
-		glBindVertexArray(m_VAO);
-
-		glGenBuffers(1, &m_VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-
-		float vertices[3 * 3] = {
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.0f,  0.5f, 0.0f
-		};
-
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-		glEnableVertexAttribArray(0);
-
-		glGenBuffers(1, &m_IBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-		
-		unsigned int indices[3] = {
-			0, 1, 2
-		};
-
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	}
 
 	void Application::OnEvents(Event& e)
@@ -68,12 +44,6 @@ namespace Wildlands
 	{
 		while (m_Running)
 		{
-			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			glBindVertexArray(m_VAO);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-
 			//WLTODO: Move this to the Render thread.
 			//Render each layers
 			for(Layer* layer : m_LayerStack)

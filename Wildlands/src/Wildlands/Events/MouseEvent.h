@@ -3,7 +3,7 @@
 
 namespace Wildlands
 {
-	class WL_API MouseMovedEvent : public Event
+	class  MouseMovedEvent : public Event
 	{
 	public:
 		MouseMovedEvent(float x, float y)
@@ -29,7 +29,7 @@ namespace Wildlands
 		float m_MouseX, m_MouseY;
 	};
 
-	class WL_API MouseScrolledEvent : public Event
+	class  MouseScrolledEvent : public Event
 	{
 	public:
 		MouseScrolledEvent(float xOffset, float yOffset)
@@ -55,7 +55,7 @@ namespace Wildlands
 		float m_XOffset, m_YOffset;
 	};
 
-	class WL_API MouseButtonEvent : public Event
+	class  MouseButtonEvent : public Event
 	{
 	public:
 		inline int GetMouseButton() const { return m_Button; }
@@ -72,7 +72,7 @@ namespace Wildlands
 		int m_Button;
 	};
 
-	class WL_API MouseButtonDownEvent : public MouseButtonEvent
+	class  MouseButtonDownEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonDownEvent(int mousebutton)
@@ -90,7 +90,7 @@ namespace Wildlands
 		EVENT_CLASS_TYPE(MouseButtonDown)
 	};
 
-	class WL_API MouseButtonUpEvent : public MouseButtonEvent
+	class  MouseButtonUpEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonUpEvent(int mousebutton)

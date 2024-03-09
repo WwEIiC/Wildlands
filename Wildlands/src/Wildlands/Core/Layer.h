@@ -5,7 +5,7 @@
 
 namespace Wildlands
 {
-	class WL_API Layer
+	class  Layer
 	{
 	public:
 		Layer(const std::string& name = "LayerName");

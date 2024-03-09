@@ -7,9 +7,14 @@
 #include "Wildlands/ImGui/ImGuiLayer.h"
 #include "Wildlands/Events/Event.h"
 
+#include "Wildlands/Renderer/Shader.h"
+#include "Wildlands/Renderer/Buffers.h"
+#include "Wildlands/Renderer/VertexArray.h"
+#include "Wildlands/Renderer/Cameras.h"
+
 namespace Wildlands
 {
-	class WL_API Application
+	class  Application
 	{
 	public:
 		Application();
@@ -40,8 +45,6 @@ namespace Wildlands
 
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
-
-		unsigned int m_VAO, m_VBO, m_IBO;
 	};
 
 	//Will be defined in Client

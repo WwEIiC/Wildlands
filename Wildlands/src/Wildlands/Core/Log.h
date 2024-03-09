@@ -6,7 +6,7 @@
 
 namespace Wildlands
 {
-	class WL_API Log
+	class  Log
 	{
 	public:
 		static void Init();
@@ -25,11 +25,11 @@ namespace Wildlands
 #define WL_CORE_INFO(...)		::Wildlands::Log::GetCoreLogger()->info(__VA_ARGS__);
 #define WL_CORE_WARN(...)		::Wildlands::Log::GetCoreLogger()->warn(__VA_ARGS__);
 #define WL_CORE_ERROR(...)		::Wildlands::Log::GetCoreLogger()->error(__VA_ARGS__);
-#define WL_CORE_FATAL(...)		::Wildlands::Log::GetCoreLogger()->fatal(__VA_ARGS__);
+#define WL_CORE_FATAL(...)		::Wildlands::Log::GetCoreLogger()->critical(__VA_ARGS__);
 
 //Client log macros
 #define WL_TRACE(...)			::Wildlands::Log::GetClientLogger()->trace(__VA_ARGS__);
 #define WL_INFO(...)			::Wildlands::Log::GetClientLogger()->info(__VA_ARGS__);
 #define WL_WARN(...)			::Wildlands::Log::GetClientLogger()->warn(__VA_ARGS__);
 #define WL_ERROR(...)			::Wildlands::Log::GetClientLogger()->error(__VA_ARGS__);
-#define WL_FATAL(...)			::Wildlands::Log::GetClientLogger()->fatal(__VA_ARGS__);
+#define WL_FATAL(...)			::Wildlands::Log::GetClientLogger()->critical(__VA_ARGS__);

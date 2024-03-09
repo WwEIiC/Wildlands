@@ -6,7 +6,7 @@
 
 namespace Wildlands
 {
-	class WL_API Input
+	class  Input
 	{
 	public:
 		inline static bool IsKeyDown(int keycode) { return s_Instance->IsKeyDownInternal(keycode); }

@@ -8,7 +8,7 @@
 namespace Wildlands
 {
 	//The window class in the windows platform
-	class WL_API WindowsWindow : public Window
+	class  WindowsWindow : public Window
 	{
 	public:
 		WindowsWindow(const WindowConstructData& data);

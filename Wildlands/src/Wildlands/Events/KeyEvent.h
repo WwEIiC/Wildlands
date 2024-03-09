@@ -3,7 +3,7 @@
 
 namespace Wildlands
 {
-	class WL_API KeyEvent : public Event
+	class  KeyEvent : public Event
 	{
 	public:
 		inline int GetKeyCode() { return m_KeyCode; }
@@ -19,7 +19,7 @@ namespace Wildlands
 		int m_KeyCode;
 	};
 
-	class WL_API KeyDownEvent : public KeyEvent
+	class  KeyDownEvent : public KeyEvent
 	{
 	public:
 		KeyDownEvent(int keycode, int repeatcount)
@@ -42,7 +42,7 @@ namespace Wildlands
 		int m_RepeatCount;
 	};
 
-	class WL_API KeyUpEvent : public KeyEvent
+	class  KeyUpEvent : public KeyEvent
 	{
 	public:
 		KeyUpEvent(int keycode)
@@ -61,7 +61,7 @@ namespace Wildlands
 	};
 	
 	//Arised when user type in something like text box
-	class WL_API KeyTypeEvent : public KeyEvent
+	class  KeyTypeEvent : public KeyEvent
 	{
 	public:
 		KeyTypeEvent(int keycode)

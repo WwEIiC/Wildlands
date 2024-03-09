@@ -19,7 +19,7 @@ namespace Wildlands
 	};
 
 	//The window interface(implementation in each platforms, only windows now)
-	class WL_API Window
+	class  Window
 	{
 	public:
 		using EventCallbackFunc = std::function<void(Event&)>;

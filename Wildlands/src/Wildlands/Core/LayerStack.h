@@ -3,7 +3,7 @@
 
 namespace Wildlands
 {
-	class WL_API LayerStack
+	class  LayerStack
 	{
 	public:
 		LayerStack() = default;

@@ -16,9 +16,12 @@ IncludeDirs["ImGui"] = "Wildlands/Externals/ImGui"
 IncludeDirs["glm"] = "Wildlands/Externals/glm"
 
 --Premake will looks for a file name "premake5.lua" in the path specified.
-include "Wildlands/Externals/GLFW"
-include "Wildlands/Externals/Glad"
-include "Wildlands/Externals/ImGui"
+group "Dependences"
+	include "Wildlands/Externals/GLFW"
+	include "Wildlands/Externals/Glad"
+	include "Wildlands/Externals/ImGui"
+
+group ""
 
 project "Wildlands"
 	location "Wildlands"
@@ -38,7 +41,9 @@ project "Wildlands"
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/Externals/glm/glm/**.hpp",
-		"%{prj.name}/Externals/glm/glm/**.inl"
+		"%{prj.name}/Externals/glm/glm/**.inl",
+		"%{prj.name}/src/**.frag",
+		"%{prj.name}/src/**.vert"
 	}
 
 	includedirs {
@@ -66,7 +71,6 @@ project "Wildlands"
 
 		defines{
 			"WL_PLATFORM_WINDOWS",
-			"WL_BUILD_DLL",
 			"GLFW_INCLUDE_NONE",		--don't include any gl library because glad will provide.
 			"_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING"		--get rid of some warnings when use C++20.
 		}

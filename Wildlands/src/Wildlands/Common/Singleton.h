@@ -3,13 +3,13 @@
 
 #define SINGLETON(T) friend class Wildlands::Singleton<T>;\
 protected:\
-	T();\
-	virtual ~T();
+	T() = default;\
+	virtual ~T() override = default;
 
 namespace Wildlands
 {
 	template<typename T>
-	class WL_API Singleton
+	class  Singleton
 	{
 	public:
 		static T& Get()

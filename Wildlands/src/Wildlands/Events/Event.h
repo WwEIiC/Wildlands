@@ -31,7 +31,7 @@ namespace Wildlands
 
 #define EVENT_CLASS_CATEGORY(category) virtual int GetEventCategory() const override { return category; }
 
-	class WL_API Event
+	class  Event
 	{
 	public:
 		bool Handled = false;
@@ -49,7 +49,7 @@ namespace Wildlands
 		return os << event.ToString();
 	}
 
-	class WL_API EventDispatcher
+	class  EventDispatcher
 	{
 		template<typename T>
 		using EventFunc = std::function<bool(T&)>;
