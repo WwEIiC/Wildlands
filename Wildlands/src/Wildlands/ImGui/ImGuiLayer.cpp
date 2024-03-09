@@ -53,7 +53,7 @@ namespace Wildlands
 		ImGui::DestroyContext();
 	}
 
-	void ImGuiLayer::Update()
+	void ImGuiLayer::Update(Timestep ts)
 	{
 		
 	}

@@ -3,8 +3,10 @@
 #include "Wildlands/Core/Core.h"
 
 #include "Wildlands/Core/Window.h"
+#include "Wildlands/Core/Timestep.h"
 #include "Wildlands/Core/LayerStack.h"
 #include "Wildlands/ImGui/ImGuiLayer.h"
+
 #include "Wildlands/Events/Event.h"
 
 #include "Wildlands/Renderer/Shader.h"
@@ -45,6 +47,8 @@ namespace Wildlands
 
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
+
+		float m_LastFrameTime;
 	};
 
 	//Will be defined in Client

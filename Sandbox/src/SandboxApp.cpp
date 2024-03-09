@@ -48,7 +48,7 @@ public:
 		WL_INFO("TestLayer Detach!");
 	}
 
-	virtual void Update() override
+	virtual void Update(Wildlands::Timestep ts) override
 	{
 		Wildlands::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Wildlands::RenderCommand::Clear();
@@ -60,15 +60,15 @@ public:
 		Wildlands::Renderer::EndScene();
 
 		glm::vec3 position = m_Camera.GetPosition();
-		if (Wildlands::Input::IsKeyDown(WL_KEY_A))	{	position -= glm::vec3(0.01f, 0.0f, 0.0f);	}	
-		if (Wildlands::Input::IsKeyDown(WL_KEY_D))	{	position += glm::vec3(0.01f, 0.0f, 0.0f);	}
-		if (Wildlands::Input::IsKeyDown(WL_KEY_W))	{	position += glm::vec3(0.0f, 0.01f, 0.0f);	}
-		if (Wildlands::Input::IsKeyDown(WL_KEY_S))	{	position -= glm::vec3(0.0f, 0.01f, 0.0f);	}
+		if (Wildlands::Input::IsKeyDown(WL_KEY_A)) { position.x -= m_CameraMoveSpeed * ts; }
+		if (Wildlands::Input::IsKeyDown(WL_KEY_D)) { position.x += m_CameraMoveSpeed * ts; }
+		if (Wildlands::Input::IsKeyDown(WL_KEY_W)) { position.y += m_CameraMoveSpeed * ts; }
+		if (Wildlands::Input::IsKeyDown(WL_KEY_S)) { position.y -= m_CameraMoveSpeed * ts; }
 		m_Camera.SetPosition(position);
 
 		float rotation = m_Camera.GetRotation();
-		if (Wildlands::Input::IsKeyDown(WL_KEY_Q)) { rotation += 0.1f; }
-		if (Wildlands::Input::IsKeyDown(WL_KEY_E)) { rotation -= 0.1f; }
+		if (Wildlands::Input::IsKeyDown(WL_KEY_Q)) { rotation += m_CameraRotateSpeed * ts; }
+		if (Wildlands::Input::IsKeyDown(WL_KEY_E)) { rotation -= m_CameraRotateSpeed * ts; }
 		m_Camera.SetRotation(rotation);
 	}
 
@@ -89,6 +89,8 @@ private:
 
 	Wildlands::OrthographicCamera m_Camera;
 
+	float m_CameraMoveSpeed = 0.5f;
+	float m_CameraRotateSpeed = 120.0f;
 };
 
 class Sandbox : public Wildlands::Application

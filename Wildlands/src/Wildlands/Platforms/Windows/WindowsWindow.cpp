@@ -37,6 +37,7 @@ namespace Wildlands
 		m_Data.Title = data.Title;
 		m_Data.Width = data.Width;
 		m_Data.Height = data.Height;
+		m_Data.VSync = data.VSync;
 
 		WL_CORE_INFO("Succeed to Creat window {0} ({1}, {2})", data.Title, data.Width, data.Height);
 
@@ -53,6 +54,7 @@ namespace Wildlands
 		m_RenderContext->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
+		SetVSync(m_Data.VSync);
 
 		//Set up Application events callbacks
 		glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* window, int focused)
@@ -185,5 +187,15 @@ namespace Wildlands
 	{
 		glfwPollEvents();
 		m_RenderContext->SwapBuffers();
+	}
+
+	void WindowsWindow::SetVSync(bool enable)
+	{
+		glfwSwapInterval(enable);
+		m_Data.VSync = enable;
+	}
+	bool WindowsWindow::IsVSync() const
+	{
+		return m_Data.VSync;
 	}
 }

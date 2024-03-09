@@ -15,7 +15,9 @@ namespace Wildlands
 		static void EndScene();
 
 		//WLTODO:API change to const std::shared_ptr<Mesh>& when have class Mesh.
-		static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray);
+		static void Submit(const std::shared_ptr<Shader>& shader,
+						const std::shared_ptr<VertexArray>& vertexArray,
+						const glm::mat4& transform = glm::mat4(1.0f));
 
 	private:
 		static glm::mat4 s_VPMatrix;

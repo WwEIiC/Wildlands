@@ -12,7 +12,7 @@ namespace Wildlands
 
 		virtual void Attach() override;
 		virtual void Detach() override;
-		virtual void Update() override;
+		virtual void Update(class Timestep ts) override;
 		virtual void UIRender() override;
 
 		void Begin();

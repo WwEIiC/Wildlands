@@ -13,10 +13,11 @@ namespace Wildlands
     {
     }
 
-    void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray)
+    void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transform)
     {
         shader->Bind();
         shader->SetUniformMat4("u_VPMatrix", s_VPMatrix);
+        shader->SetUniformMat4("u_Transform", transform);
         vertexArray->Bind();
         RenderCommand::DrawIndex(vertexArray);
     }

@@ -9,6 +9,8 @@
 
 #include "Wildlands/Common/FileReader.h"
 
+#include "GLFW/glfw3.h"
+
 namespace Wildlands
 {
 	Application* Application::s_Instance = nullptr;
@@ -44,10 +46,14 @@ namespace Wildlands
 	{
 		while (m_Running)
 		{
+			float time = (float)glfwGetTime();
+			Timestep ts = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+
 			//WLTODO: Move this to the Render thread.
 			//Render each layers
 			for(Layer* layer : m_LayerStack)
-				layer->Update();
+				layer->Update(ts);
 
 			//Render UI for each layers
 			m_ImGuiLayer->Begin();

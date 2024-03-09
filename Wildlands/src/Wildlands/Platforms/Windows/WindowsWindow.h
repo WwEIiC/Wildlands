@@ -21,6 +21,9 @@ namespace Wildlands
 
 		virtual void Update() override;
 		
+		virtual void SetVSync(bool enable) override;
+		virtual bool IsVSync() const override;
+
 		inline virtual void SetEventCallback(const EventCallbackFunc& callback) override { m_Data.EventCallback = callback; }
 
 	private:
@@ -33,6 +36,7 @@ namespace Wildlands
 		{
 			std::string Title;
 			uint32_t Width, Height;
+			bool VSync;
 			EventCallbackFunc EventCallback;
 		};
 		WindowData m_Data;
