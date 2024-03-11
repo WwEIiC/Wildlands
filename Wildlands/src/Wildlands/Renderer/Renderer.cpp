@@ -1,9 +1,16 @@
 #include "WLPCH.h"
 #include "Renderer.h"
 
+#include "Wildlands/Platforms/OpenGL/OpenGLShader.h"
+
 namespace Wildlands
 {
     glm::mat4 Renderer::s_VPMatrix = glm::mat4(1.0f);
+
+    void Renderer::Init()
+    {
+        RenderCommand::Init();
+    }
 
     void Renderer::BeginScene(OrthographicCamera& camera)
     {
@@ -13,11 +20,11 @@ namespace Wildlands
     {
     }
 
-    void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transform)
+    void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform)
     {
         shader->Bind();
-        shader->SetUniformMat4("u_VPMatrix", s_VPMatrix);
-        shader->SetUniformMat4("u_Transform", transform);
+        std::dynamic_pointer_cast<OpenGLShader>(shader)->SetUniformMat4("u_VPMatrix", s_VPMatrix);
+        std::dynamic_pointer_cast<OpenGLShader>(shader)->SetUniformMat4("u_Transform", transform);
         vertexArray->Bind();
         RenderCommand::DrawIndex(vertexArray);
     }

@@ -9,14 +9,16 @@ namespace Wildlands
 	class Renderer
 	{
 	public:
+		static void Init();
+
 		inline static RendererAPI::EAPI GetAPI() { return RendererAPI::GetAPI(); }
 
 		static void BeginScene(OrthographicCamera& camera);
 		static void EndScene();
 
-		//WLTODO:API change to const std::shared_ptr<Mesh>& when have class Mesh.
-		static void Submit(const std::shared_ptr<Shader>& shader,
-						const std::shared_ptr<VertexArray>& vertexArray,
+		//WLTODO:API change to const Ref<Mesh>& when have class Mesh.
+		static void Submit(const Ref<Shader>& shader,
+						const Ref<VertexArray>& vertexArray,
 						const glm::mat4& transform = glm::mat4(1.0f));
 
 	private:

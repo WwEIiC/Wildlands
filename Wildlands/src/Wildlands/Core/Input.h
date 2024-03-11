@@ -8,6 +8,12 @@ namespace Wildlands
 {
 	class  Input
 	{
+	protected:
+		Input() = default;
+	public:
+		Input(const Input&) = delete;
+		Input& operator=(const Input&) = delete;
+
 	public:
 		inline static bool IsKeyDown(int keycode) { return s_Instance->IsKeyDownInternal(keycode); }
 		inline static bool IsMouseButtonDown(int button) { return s_Instance->IsMouseButtonDownInternal(button); }

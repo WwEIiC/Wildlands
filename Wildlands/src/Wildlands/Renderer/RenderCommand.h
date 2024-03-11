@@ -6,6 +6,8 @@ namespace Wildlands
 	class RenderCommand
 	{
 	public:
+		inline static void Init() { s_RendererAPI->Init(); }
+
 		inline static void SetClearColor(const glm::vec4& color = glm::vec4(1.0f, 0.2f, 1.0f, 1.0f))
 		{
 			s_RendererAPI->SetClearColor(color);
@@ -15,7 +17,7 @@ namespace Wildlands
 			s_RendererAPI->Clear();
 		}
 
-		inline static void DrawIndex(const std::shared_ptr<VertexArray>& vertexArray)
+		inline static void DrawIndex(const Ref<VertexArray>& vertexArray)
 		{
 			s_RendererAPI->DrawIndex(vertexArray);
 		}

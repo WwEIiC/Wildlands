@@ -2,6 +2,7 @@ workspace "Wildlands"
 	architecture "x64"
 
 	configurations { "Debug", "Release", "Dist" }
+	flags { "MultiProcessorCompile" }
 	startproject "Sandbox"
 
 --eg. Debug-windows-x64
@@ -14,6 +15,7 @@ IncludeDirs["GLFW"] = "Wildlands/Externals/GLFW/include"
 IncludeDirs["Glad"] = "Wildlands/Externals/Glad/include"
 IncludeDirs["ImGui"] = "Wildlands/Externals/ImGui"
 IncludeDirs["glm"] = "Wildlands/Externals/glm"
+IncludeDirs["stb_image"] = "Wildlands/Externals/stb_image"
 
 --Premake will looks for a file name "premake5.lua" in the path specified.
 group "Dependences"
@@ -42,8 +44,8 @@ project "Wildlands"
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/Externals/glm/glm/**.hpp",
 		"%{prj.name}/Externals/glm/glm/**.inl",
-		"%{prj.name}/src/**.frag",
-		"%{prj.name}/src/**.vert"
+		"%{prj.name}/Externals/stb_image/**.h",
+		"%{prj.name}/Externals/stb_image/**.cpp"
 	}
 
 	includedirs {
@@ -52,7 +54,8 @@ project "Wildlands"
 		"%{IncludeDirs.GLFW}",
 		"%{IncludeDirs.Glad}",
 		"%{IncludeDirs.ImGui}",
-		"%{IncludeDirs.glm}"
+		"%{IncludeDirs.glm}",
+		"%{IncludeDirs.stb_image}"
 	}
 
 	links {
@@ -109,7 +112,10 @@ project "Sandbox"
 
 	files {
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/assets/Shaders/**.frag",
+		"%{prj.name}/assets/Shaders/**.vert",
+		"%{prj.name}/assets/Textures/**.png"
 	}
 
 	includedirs {

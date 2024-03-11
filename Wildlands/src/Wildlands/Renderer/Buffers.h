@@ -42,7 +42,7 @@ namespace Wildlands
 		uint32_t Offset;
 		bool Normalized;
 
-		BufferElement() {}
+		BufferElement() = default;
 		BufferElement(EShaderDataType type, const std::string& name, bool normalized = false)
 			: Type(type), Name(name), Size(SizeOfShaderDataType(type)), Offset(0), Normalized(normalized)
 		{
@@ -75,7 +75,7 @@ namespace Wildlands
 	class BufferLayout
 	{
 	public:
-		BufferLayout() {}
+		BufferLayout() = default;
 		BufferLayout(const std::initializer_list<BufferElement>& elements);
 
 		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
@@ -96,7 +96,7 @@ namespace Wildlands
 	class VertexBuffer
 	{
 	public:
-		static VertexBuffer* Create(float* vectices, uint32_t size);
+		static Ref<VertexBuffer> Create(float* vectices, uint32_t size);
 		virtual ~VertexBuffer() = default;
 
 		virtual void Bind() const = 0;
@@ -109,7 +109,7 @@ namespace Wildlands
 	class IndexBuffer
 	{
 	public:
-		static IndexBuffer* Create(uint32_t* indices, uint32_t size);
+		static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t size);
 		virtual ~IndexBuffer() = default;
 
 		virtual void Bind() const = 0;

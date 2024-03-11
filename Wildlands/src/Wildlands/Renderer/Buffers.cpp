@@ -27,7 +27,7 @@ namespace Wildlands
 	}
 
 
-	VertexBuffer* VertexBuffer::Create(float* vectices, uint32_t size)
+	Ref<VertexBuffer> VertexBuffer::Create(float* vectices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -36,14 +36,14 @@ namespace Wildlands
 			return nullptr;
 
 		case RendererAPI::EAPI::OpenGL:
-			return new OpenGLVertexBuffer(vectices, size);
+			return std::make_shared<OpenGLVertexBuffer>(vectices, size);
 		}
 
 		WL_CORE_ASSERT(false, "Unknown RendererAPI");
 		return nullptr;
 	}
 
-	IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t size)
+	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -52,7 +52,7 @@ namespace Wildlands
 			return nullptr;
 
 		case RendererAPI::EAPI::OpenGL:
-			return new OpenGLIndexBuffer(indices, size);
+			return std::make_shared<OpenGLIndexBuffer>(indices, size);
 		}
 
 		WL_CORE_ASSERT(false, "Unknown RendererAPI");

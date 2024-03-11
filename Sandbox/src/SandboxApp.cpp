@@ -1,6 +1,9 @@
 #include <Wildlands.h>
 #include "imgui.h"
 
+#include "Wildlands/Platforms/OpenGL/OpenGLShader.h"
+#include <glm/gtc/type_ptr.hpp>
+
 class TestLayer : public Wildlands::Layer
 {
 public:
@@ -8,35 +11,39 @@ public:
 		: Layer("TestLayer"), m_Camera({-1.6f, 1.6f, -0.9f, 0.9f})
 	{
 		//VAO VBO IBO Shader
-		m_VertexArray.reset(Wildlands::VertexArray::Create());
+		m_VertexArray = Wildlands::VertexArray::Create();
 
-		float vertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.2f, 1.0f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.2f, 1.0f, 1.0f,
-			 0.0f,  0.5f, 0.0f, 1.0f, 0.2f, 1.0f, 1.0f
+		float vertices[4 * 5] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		};
-		std::shared_ptr<Wildlands::VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(Wildlands::VertexBuffer::Create(vertices, sizeof(vertices)));
+		Wildlands::Ref<Wildlands::VertexBuffer> vertexBuffer;
+		vertexBuffer = (Wildlands::VertexBuffer::Create(vertices, sizeof(vertices)));
 
 		Wildlands::BufferLayout layout = {
 			{ Wildlands::EShaderDataType::Float3, "a_Position"},
-			{ Wildlands::EShaderDataType::Float4, "a_Color"}
+			{ Wildlands::EShaderDataType::Float2, "a_TexCoord"}
 		};
 		vertexBuffer->SetLayout(layout);
 
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 		
-		unsigned int indices[3] = { 0, 1, 2	};
-		std::shared_ptr<Wildlands::IndexBuffer> indexBuffer;
-		indexBuffer.reset(Wildlands::IndexBuffer::Create(indices, 3));
+		unsigned int indices[6] = { 0, 1, 2, 2, 3, 0};
+		Wildlands::Ref<Wildlands::IndexBuffer> indexBuffer;
+		indexBuffer = (Wildlands::IndexBuffer::Create(indices, 6));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
 
-		std::string vertexSrc = Wildlands::FileReader::Get().Read("../Wildlands/src/Wildlands/Renderer/Shaders/VertextShader.vert");
-		std::string fragmentSrc = Wildlands::FileReader::Get().Read("../Wildlands/src/Wildlands/Renderer/Shaders/FragmentShader.frag");
+		m_Shader = (Wildlands::Shader::Create("./assets/Shaders/VertextShader.vert", "./assets/Shaders/FragmentShader.frag"));
+		m_TexShader = (Wildlands::Shader::Create("./assets/Shaders/TexShader.vert", "./assets/Shaders/TexShader.frag"));
 
-		m_Shader.reset(new Wildlands::Shader(vertexSrc, fragmentSrc));
+		//m_Texture = Wildlands::Texture2D::Create("./assets/Textures/Checkerboard.png");
+		m_Texture = Wildlands::Texture2D::Create("./assets/Textures/Texture1.png");
+		m_TexShader->Bind();
 
+		std::dynamic_pointer_cast<Wildlands::OpenGLShader>(m_TexShader)->SetUniformInt("u_Texture", 0);
 	}
 
 	virtual void Attach() override
@@ -55,7 +62,10 @@ public:
 
 		Wildlands::Renderer::BeginScene(m_Camera);
 
-		Wildlands::Renderer::Submit(m_Shader, m_VertexArray);
+		m_Texture->Bind();
+		//std::dynamic_pointer_cast<Wildlands::OpenGLShader>(m_Shader)->SetUniformFloat4("u_Color", color);
+		//Wildlands::Renderer::Submit(m_Shader, m_VertexArray);
+		Wildlands::Renderer::Submit(m_TexShader, m_VertexArray);
 
 		Wildlands::Renderer::EndScene();
 
@@ -75,6 +85,7 @@ public:
 	virtual void UIRender() override
 	{
 		ImGui::Begin("TestUI");
+		ImGui::ColorEdit4("Color", glm::value_ptr(color));
 		ImGui::End();
 	}
 
@@ -84,10 +95,14 @@ public:
 	}
 
 private:
-	std::shared_ptr<Wildlands::Shader> m_Shader;
-	std::shared_ptr<Wildlands::VertexArray> m_VertexArray;
+	Wildlands::Ref<Wildlands::Shader> m_Shader;
+	Wildlands::Ref<Wildlands::Texture> m_Texture;
+	
+	Wildlands::Ref<Wildlands::Shader> m_TexShader;
+	Wildlands::Ref<Wildlands::VertexArray> m_VertexArray;
 
 	Wildlands::OrthographicCamera m_Camera;
+	glm::vec4 color = {0.8f, 0.2f, 0.8f, 1.0f};
 
 	float m_CameraMoveSpeed = 0.5f;
 	float m_CameraRotateSpeed = 120.0f;

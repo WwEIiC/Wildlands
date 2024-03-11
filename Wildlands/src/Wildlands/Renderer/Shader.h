@@ -1,20 +1,30 @@
 #pragma once
 
 #include <string>
-#include <glm/glm.hpp>
+#include <unordered_map>
 
 namespace Wildlands
 {
 	class Shader
 	{
 	public:
-		Shader(const std::string& vertSrc, const std::string& fragSrc);
-		virtual ~Shader();
+		static Ref<Shader> Create(const std::string& name, const std::string& vertPath, const std::string& fragPath);
+		virtual ~Shader() = default;
 
-		virtual void Bind() const;
+		virtual const std::string& GetName() const = 0;
+		virtual void Bind() const = 0;
+	};
 
-		void SetUniformMat4(const std::string& name, const glm::mat4& matrix);
+	class ShaderLib
+	{
+	public:
+		void Add(const Ref<Shader>& shader);
+		Ref<Shader> Load(const std::string& name, const std::string& vertPath, const std::string& fragPath);
+
+		Ref<Shader> Get(const std::string& name);
+
+		bool IsExists(const std::string& name) const;
 	private:
-		uint32_t m_RendererID;//the id of shaderprogram
+		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 	};
 }

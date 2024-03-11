@@ -48,26 +48,25 @@ namespace Wildlands
 	/// bind the layout inside the vertex buffer
 	/// </summary>
 	/// <param name="vertexBuffer"></param>
-	void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer)
+	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
 	{
 		glBindVertexArray(m_RendererID);
 		vertexBuffer->Bind();
 
 		WL_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer layout is Empty");
 
-		int eIndex = 0;
 		const auto& layout = vertexBuffer->GetLayout();
 		for (const auto& element : layout)
 		{
-			glVertexAttribPointer(eIndex, element.GetCount(), EShaderDataTypeToOpenGLType(element.Type),
-				element.Normalized, layout.GetStride(), (void*)element.Offset);
-			glEnableVertexAttribArray(eIndex++);
+			glVertexAttribPointer(m_VertexAttributeIndex, element.GetCount(), EShaderDataTypeToOpenGLType(element.Type),
+				element.Normalized, layout.GetStride(), (void*)(intptr_t)element.Offset);
+			glEnableVertexAttribArray(m_VertexAttributeIndex++);
 		}
 
 		glBindVertexArray(0);
 		m_VertexBuffers.push_back(vertexBuffer);
 	}
-	void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
+	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
 		glBindVertexArray(m_RendererID);
 		indexBuffer->Bind();

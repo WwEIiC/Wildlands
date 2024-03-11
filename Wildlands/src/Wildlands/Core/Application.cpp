@@ -24,6 +24,8 @@ namespace Wildlands
 		m_Window.reset(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FUNC(Application::OnEvents));
 
+		Renderer::Init();
+
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverLayer(m_ImGuiLayer);
 	}

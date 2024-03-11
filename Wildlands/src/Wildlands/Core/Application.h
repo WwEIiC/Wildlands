@@ -43,7 +43,7 @@ namespace Wildlands
 
 	private:
 		bool m_Running;
-		std::unique_ptr<Window> m_Window;
+		Unique<Window> m_Window;
 
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;

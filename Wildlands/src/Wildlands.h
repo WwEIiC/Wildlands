@@ -14,9 +14,11 @@
 #include "Wildlands/Events/MouseEvent.h"
 
 #include "Wildlands/Renderer/Renderer.h"
+#include "Wildlands/Renderer/Shader.h"
+#include "Wildlands/Renderer/Texture.h"
+
 #include "Wildlands/Renderer/Buffers.h"
 #include "Wildlands/Renderer/VertexArray.h"
-#include "Wildlands/Renderer/Shader.h"
 #include "Wildlands/Renderer/Cameras.h"
 
 #include "Wildlands/Common/FileReader.h"

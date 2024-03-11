@@ -23,9 +23,18 @@
 	#define WL_CORE_ASSERT(x, ...)
 #endif//WL_ENABLE_ASSERTS
 
-#include "stdint.h"
+#include <stdint.h>
 #define BIT(x) (1 << x)
 #define BIND_EVENT_FUNC(func) std::bind(&func, this, std::placeholders::_1)
 
+#include <memory>
 
+namespace Wildlands
+{
+	template <typename T>
+	using Ref = std::shared_ptr<T>;
+
+	template <typename T>
+	using Unique = std::unique_ptr<T>;
+}
 

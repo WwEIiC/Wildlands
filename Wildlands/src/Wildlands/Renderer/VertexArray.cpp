@@ -6,7 +6,7 @@
 
 namespace Wildlands
 {
-	VertexArray* VertexArray::Create()
+	Ref<VertexArray> VertexArray::Create()
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -14,7 +14,7 @@ namespace Wildlands
 			WL_CORE_ASSERT(false, "RendererAPI is None");
 			return nullptr;
 		case RendererAPI::EAPI::OpenGL:
-			return new OpenGLVertexArray();
+			return std::make_shared<OpenGLVertexArray>();
 		}
 
 		WL_CORE_ASSERT(false, "Unknown RendererAPI");
