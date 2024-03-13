@@ -20,6 +20,7 @@
 #include "Wildlands/Renderer/Buffers.h"
 #include "Wildlands/Renderer/VertexArray.h"
 #include "Wildlands/Renderer/Cameras.h"
+#include "Wildlands/Renderer/CameraControllers.h"
 
 #include "Wildlands/Common/FileReader.h"
 #include "Wildlands/Common/Singleton.h"

@@ -34,6 +34,7 @@ namespace Wildlands
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(Application::OnWindowClose));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNC(Application::OnWindowResize));
 
 		//Handle event in each layer
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
@@ -54,8 +55,11 @@ namespace Wildlands
 
 			//WLTODO: Move this to the Render thread.
 			//Render each layers
-			for(Layer* layer : m_LayerStack)
-				layer->Update(ts);
+			if (!m_Minimized)
+			{
+				for (Layer* layer : m_LayerStack)
+					layer->Update(ts);
+			}
 
 			//Render UI for each layers
 			m_ImGuiLayer->Begin();
@@ -78,5 +82,16 @@ namespace Wildlands
 	{
 		m_Running = false;
 		return true;
+	}
+	bool Application::OnWindowResize(WindowResizeEvent& event)
+	{
+		if (event.GetWidth() == 0 || event.GetHeight() == 0)
+		{
+			m_Minimized = true;
+			return false;
+		}
+		Renderer::OnWindowResize(event.GetWidth(), event.GetHeight());
+		m_Minimized = false;
+		return false;
 	}
 }

@@ -37,12 +37,14 @@ namespace Wildlands
 
 	private:
 		bool OnWindowClose(class WindowCloseEvent& event);
+		bool OnWindowResize(class WindowResizeEvent& event);
 	private:
 		//WLTODO:Make this a singleton(Template or not).
 		static Application* s_Instance;
 
 	private:
 		bool m_Running;
+		bool m_Minimized = false;
 		Unique<Window> m_Window;
 
 		LayerStack m_LayerStack;

@@ -8,7 +8,7 @@ class TestLayer : public Wildlands::Layer
 {
 public:
 	TestLayer()
-		: Layer("TestLayer"), m_Camera({-1.6f, 1.6f, -0.9f, 0.9f})
+		: Layer("TestLayer"), m_CameraController(1280.f / 720.f)
 	{
 		//VAO VBO IBO Shader
 		m_VertexArray = Wildlands::VertexArray::Create();
@@ -36,11 +36,11 @@ public:
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
 
-		m_Shader = (Wildlands::Shader::Create("./assets/Shaders/VertextShader.vert", "./assets/Shaders/FragmentShader.frag"));
-		m_TexShader = (Wildlands::Shader::Create("./assets/Shaders/TexShader.vert", "./assets/Shaders/TexShader.frag"));
+		m_Shader = (Wildlands::Shader::Create("DefalutShader", "./assets/Shaders/VertextShader.vert", "./assets/Shaders/FragmentShader.frag"));
+		m_TexShader = (Wildlands::Shader::Create("TexShader", "./assets/Shaders/TexShader.vert", "./assets/Shaders/TexShader.frag"));
 
-		//m_Texture = Wildlands::Texture2D::Create("./assets/Textures/Checkerboard.png");
-		m_Texture = Wildlands::Texture2D::Create("./assets/Textures/Texture1.png");
+		m_Texture = Wildlands::Texture2D::Create("./assets/Textures/Checkerboard.png");
+		//m_Texture = Wildlands::Texture2D::Create("./assets/Textures/Texture1.png");
 		m_TexShader->Bind();
 
 		std::dynamic_pointer_cast<Wildlands::OpenGLShader>(m_TexShader)->SetUniformInt("u_Texture", 0);
@@ -57,10 +57,13 @@ public:
 
 	virtual void Update(Wildlands::Timestep ts) override
 	{
+		//Camera
+		m_CameraController.OnUpdate(ts);
+
 		Wildlands::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Wildlands::RenderCommand::Clear();
 
-		Wildlands::Renderer::BeginScene(m_Camera);
+		Wildlands::Renderer::BeginScene(m_CameraController.GetCamera());
 
 		m_Texture->Bind();
 		//std::dynamic_pointer_cast<Wildlands::OpenGLShader>(m_Shader)->SetUniformFloat4("u_Color", color);
@@ -69,17 +72,7 @@ public:
 
 		Wildlands::Renderer::EndScene();
 
-		glm::vec3 position = m_Camera.GetPosition();
-		if (Wildlands::Input::IsKeyDown(WL_KEY_A)) { position.x -= m_CameraMoveSpeed * ts; }
-		if (Wildlands::Input::IsKeyDown(WL_KEY_D)) { position.x += m_CameraMoveSpeed * ts; }
-		if (Wildlands::Input::IsKeyDown(WL_KEY_W)) { position.y += m_CameraMoveSpeed * ts; }
-		if (Wildlands::Input::IsKeyDown(WL_KEY_S)) { position.y -= m_CameraMoveSpeed * ts; }
-		m_Camera.SetPosition(position);
-
-		float rotation = m_Camera.GetRotation();
-		if (Wildlands::Input::IsKeyDown(WL_KEY_Q)) { rotation += m_CameraRotateSpeed * ts; }
-		if (Wildlands::Input::IsKeyDown(WL_KEY_E)) { rotation -= m_CameraRotateSpeed * ts; }
-		m_Camera.SetRotation(rotation);
+		
 	}
 
 	virtual void UIRender() override
@@ -91,7 +84,7 @@ public:
 
 	virtual void OnEvent(Wildlands::Event& event) override
 	{
-		Wildlands::EventDispatcher dispatcher(event);
+		m_CameraController.OnEvent(event);
 	}
 
 private:
@@ -101,11 +94,9 @@ private:
 	Wildlands::Ref<Wildlands::Shader> m_TexShader;
 	Wildlands::Ref<Wildlands::VertexArray> m_VertexArray;
 
-	Wildlands::OrthographicCamera m_Camera;
-	glm::vec4 color = {0.8f, 0.2f, 0.8f, 1.0f};
+	Wildlands::OrthographicCameraController m_CameraController;
 
-	float m_CameraMoveSpeed = 0.5f;
-	float m_CameraRotateSpeed = 120.0f;
+	glm::vec4 color = {0.8f, 0.2f, 0.8f, 1.0f};
 };
 
 class Sandbox : public Wildlands::Application
