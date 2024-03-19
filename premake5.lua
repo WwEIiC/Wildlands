@@ -112,14 +112,12 @@ project "Sandbox"
 
 	files {
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp",
-		"%{prj.name}/assets/Shaders/**.frag",
-		"%{prj.name}/assets/Shaders/**.vert",
-		"%{prj.name}/assets/Textures/**.png"
+		"%{prj.name}/src/**.cpp"
 	}
 
 	includedirs {
 		"Wildlands/src",
+		"Sandbox/src",
 		"%{IncludeDirs.SPDLOG}",
 		"%{IncludeDirs.glm}",
 		"%{IncludeDirs.ImGui}"

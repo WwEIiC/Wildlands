@@ -1,20 +1,27 @@
 #include "WLPCH.h"
 #include "Renderer.h"
+#include "Renderer2D.h"
 
 #include "Wildlands/Platforms/OpenGL/OpenGLShader.h"
 
 namespace Wildlands
 {
-    glm::mat4 Renderer::s_VPMatrix = glm::mat4(1.0f);
+    Unique<Renderer::SceneData> Renderer::s_SceneData = CreateUnique<Renderer::SceneData>();
 
     void Renderer::Init()
     {
         RenderCommand::Init();
+        Renderer2D::Init();
+    }
+
+    void Renderer::Destory()
+    {
+        Renderer2D::Destory();
     }
 
     void Renderer::BeginScene(OrthographicCamera& camera)
     {
-        s_VPMatrix = camera.GetVPMatrix();
+        s_SceneData->VPMatrix = camera.GetVPMatrix();
     }
     void Renderer::EndScene()
     {
@@ -23,8 +30,8 @@ namespace Wildlands
     void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform)
     {
         shader->Bind();
-        std::dynamic_pointer_cast<OpenGLShader>(shader)->SetUniformMat4("u_VPMatrix", s_VPMatrix);
-        std::dynamic_pointer_cast<OpenGLShader>(shader)->SetUniformMat4("u_Transform", transform);
+        shader->SetMat4("u_VPMatrix", s_SceneData->VPMatrix);
+        shader->SetMat4("u_Transform", transform);
         vertexArray->Bind();
         RenderCommand::DrawIndex(vertexArray);
     }

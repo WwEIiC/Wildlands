@@ -30,6 +30,6 @@ namespace Wildlands
 		virtual float GetMouseYInternal() = 0;
 
 	private:
-		static Input* s_Instance;
+		static Unique<Input> s_Instance;
 	};
 }

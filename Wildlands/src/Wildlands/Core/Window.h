@@ -26,7 +26,7 @@ namespace Wildlands
 	public:
 		using EventCallbackFunc = std::function<void(Event&)>;
 
-		static Window* Create(const WindowConstructData& data = WindowConstructData());
+		static Unique<Window> Create(const WindowConstructData& data = WindowConstructData());
 		virtual ~Window() {}
 
 		inline virtual void* GetNativeWindow() const = 0;

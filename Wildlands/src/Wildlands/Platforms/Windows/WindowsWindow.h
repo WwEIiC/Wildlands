@@ -42,7 +42,7 @@ namespace Wildlands
 		WindowData m_Data;
 
 		GLFWwindow* m_Window;
-		RenderContext* m_RenderContext;
+		Unique<RenderContext> m_RenderContext;
 	};
 
 }

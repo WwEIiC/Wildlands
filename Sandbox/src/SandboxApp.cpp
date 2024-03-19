@@ -1,8 +1,10 @@
 #include <Wildlands.h>
-#include "imgui.h"
+#include <Wildlands/Core/EntryPoint.h>
 
-#include "Wildlands/Platforms/OpenGL/OpenGLShader.h"
+#include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "Sandbox2D.h"
 
 class TestLayer : public Wildlands::Layer
 {
@@ -36,14 +38,14 @@ public:
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
 
-		m_Shader = (Wildlands::Shader::Create("DefalutShader", "./assets/Shaders/VertextShader.vert", "./assets/Shaders/FragmentShader.frag"));
+		m_Shader = (Wildlands::Shader::Create("DefalutShader", "./assets/Shaders/FlatColor.vert", "./assets/Shaders/FlatColor.frag"));
 		m_TexShader = (Wildlands::Shader::Create("TexShader", "./assets/Shaders/TexShader.vert", "./assets/Shaders/TexShader.frag"));
 
 		m_Texture = Wildlands::Texture2D::Create("./assets/Textures/Checkerboard.png");
 		//m_Texture = Wildlands::Texture2D::Create("./assets/Textures/Texture1.png");
 		m_TexShader->Bind();
 
-		std::dynamic_pointer_cast<Wildlands::OpenGLShader>(m_TexShader)->SetUniformInt("u_Texture", 0);
+		m_TexShader->SetInt("u_Texture", 0);
 	}
 
 	virtual void Attach() override
@@ -104,7 +106,8 @@ class Sandbox : public Wildlands::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new TestLayer());
+		//PushLayer(new TestLayer());
+		PushLayer(new Sandbox2D());
 	}
 	~Sandbox()
 	{

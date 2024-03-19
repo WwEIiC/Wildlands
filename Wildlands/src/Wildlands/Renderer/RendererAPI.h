@@ -14,6 +14,8 @@ namespace Wildlands
 		};
 
 	public:
+		static Unique<RendererAPI> Create();
+
 		virtual ~RendererAPI() = default;
 		virtual void Init() = 0;
 

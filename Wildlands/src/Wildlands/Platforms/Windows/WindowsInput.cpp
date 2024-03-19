@@ -7,7 +7,7 @@
 
 namespace Wildlands 
 {
-	Input* Input::s_Instance = new WindowsInput();
+	Unique<Input> Input::s_Instance = CreateUnique<WindowsInput>();
 
 	bool WindowsInput::IsKeyDownInternal(int keycode)
 	{

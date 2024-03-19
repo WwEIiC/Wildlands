@@ -1,20 +1,21 @@
 #include "WLPCH.h"
-#include "VertexArray.h"
+#include "RenderContext.h"
 
 #include "Wildlands/Renderer/Renderer.h"
-#include "Wildlands/Platforms/OpenGL/OpenGLVertexArray.h"
+#include "Wildlands/Platforms/OpenGL/OpenGLContext.h"
 
 namespace Wildlands
 {
-	Ref<VertexArray> VertexArray::Create()
+	Unique<RenderContext> RenderContext::Create(void* window)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::EAPI::None:
 			WL_CORE_ASSERT(false, "RendererAPI is None");
 			return nullptr;
+
 		case RendererAPI::EAPI::OpenGL:
-			return CreateRef<OpenGLVertexArray>();
+			return CreateUnique<OpenGLContext>(static_cast<GLFWwindow*>(window));
 		}
 
 		WL_CORE_ASSERT(false, "Unknown RendererAPI");

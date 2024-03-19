@@ -5,6 +5,7 @@ namespace Wildlands
 {
 	class OpenGLRendererAPI : public RendererAPI
 	{
+	public:
 		virtual ~OpenGLRendererAPI() = default;
 
 		virtual void Init() override;

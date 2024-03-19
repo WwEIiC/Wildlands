@@ -5,7 +5,6 @@ layout (location = 1) in vec2 a_TexCoord;
 
 uniform mat4 u_VPMatrix;
 uniform mat4 u_Transform;
-uniform vec4 u_Color;
 
 out vec2 v_TexCoord;
 

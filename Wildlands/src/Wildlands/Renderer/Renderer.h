@@ -10,6 +10,7 @@ namespace Wildlands
 	{
 	public:
 		static void Init();
+		static void Destory();
 
 		inline static RendererAPI::EAPI GetAPI() { return RendererAPI::GetAPI(); }
 
@@ -23,7 +24,11 @@ namespace Wildlands
 
 		static void OnWindowResize(uint32_t width, uint32_t height);
 	private:
-		static glm::mat4 s_VPMatrix;
+		struct SceneData
+		{
+			glm::mat4 VPMatrix;
+		};
+		static Unique<SceneData> s_SceneData;
 	};
 }
 

@@ -9,16 +9,16 @@
 
 namespace Wildlands
 {
-	static bool s_GLFWInitialized = false;
+	static uint8_t s_GLFWWindowCount = 0;
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		WL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowConstructData& data)
+	Unique<Window> Window::Create(const WindowConstructData& data)
 	{
-		return new WindowsWindow(data);
+		return CreateUnique<WindowsWindow>(data);
 	}
 
 
@@ -41,16 +41,17 @@ namespace Wildlands
 
 		WL_CORE_INFO("Succeed to Creat window {0} ({1}, {2})", data.Title, data.Width, data.Height);
 
-		if (!s_GLFWInitialized)
+		if (s_GLFWWindowCount == 0)
 		{
 			int success = glfwInit();
 			WL_CORE_ASSERT(success, "GLFW init failed!");
 			glfwSetErrorCallback(GLFWErrorCallback);
-			s_GLFWInitialized = true;
 		}
 
 		m_Window = glfwCreateWindow((int)data.Width, (int)data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		m_RenderContext = new OpenGLContext(m_Window);
+		++s_GLFWWindowCount;
+
+		m_RenderContext = RenderContext::Create(m_Window);
 		m_RenderContext->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -180,6 +181,11 @@ namespace Wildlands
 	void WindowsWindow::Close()
 	{
 		glfwDestroyWindow(m_Window);
+		if (--s_GLFWWindowCount == 0)
+		{
+			WL_CORE_INFO("GLFW Terminated.");
+			glfwTerminate();
+		}
 	}
 
 

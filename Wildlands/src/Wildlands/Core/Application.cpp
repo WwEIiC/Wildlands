@@ -21,13 +21,18 @@ namespace Wildlands
 		s_Instance = this;
 
 		m_Running = true;
-		m_Window.reset(Window::Create());
+		m_Window = Window::Create();
 		m_Window->SetEventCallback(BIND_EVENT_FUNC(Application::OnEvents));
 
 		Renderer::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverLayer(m_ImGuiLayer);
+	}
+
+	Application::~Application()
+	{
+		Renderer::Destory();
 	}
 
 	void Application::OnEvents(Event& e)

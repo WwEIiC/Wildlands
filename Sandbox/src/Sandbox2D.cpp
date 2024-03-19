@@ -1,0 +1,54 @@
+#include "Sandbox2D.h"
+#include "imgui.h"
+#include "glm/gtc/type_ptr.hpp"
+#include "Wildlands/Platforms/OpenGL/OpenGLShader.h"
+
+Sandbox2D::Sandbox2D()
+	: Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f)
+{
+}
+
+
+void Sandbox2D::Attach()
+{
+	WL_INFO("Sandbox2D Layer Attached");
+	texture = Wildlands::Texture2D::Create("./assets/Textures/Checkerboard.png");
+}
+
+void Sandbox2D::Detach()
+{
+	WL_INFO("Sandbox2D Layer Detached");
+}
+
+void Sandbox2D::Update(Wildlands::Timestep ts)
+{
+	//Camera
+		m_CameraController.OnUpdate(ts);
+
+		Wildlands::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+		Wildlands::RenderCommand::Clear();
+
+		Wildlands::Renderer2D::BeginScene(m_CameraController.GetCamera());
+		Wildlands::Renderer2D::DrawQuad(position, size, color);
+
+		glm::vec3 offset = { 1.8f, -0.5f, 0.0f };
+		Wildlands::Renderer2D::DrawQuad(position + offset, size, texture);
+		Wildlands::Renderer2D::DrawQuad({0.0f, 0.0f, -0.1f}, {10.f, 10.f}, texture);
+
+		Wildlands::Renderer2D::EndScene();
+}
+
+void Sandbox2D::UIRender()
+{
+	ImGui::Begin("Settings");
+	ImGui::SliderFloat3("Position", glm::value_ptr(position),-5.f, 5.f );
+	ImGui::SliderFloat2("Size", glm::value_ptr(size),-5.f, 5.f );
+	ImGui::ColorEdit4("Color", glm::value_ptr(color));
+	ImGui::End();
+
+}
+
+void Sandbox2D::OnEvent(Wildlands::Event& event)
+{
+	m_CameraController.OnEvent(event);
+}

@@ -15,17 +15,36 @@ namespace Wildlands
 	void OrthographicCameraController::OnUpdate(Timestep ts)
 	{
 		float speed = m_CameraMoveSpeed * m_ZoomLevel;
+		float rotation = m_Camera.GetRotation();
+
 		glm::vec3 position = m_Camera.GetPosition();
-		if (Input::IsKeyDown(WL_KEY_A)) { position.x -= speed * ts; }
-		if (Input::IsKeyDown(WL_KEY_D)) { position.x += speed * ts; }
-		if (Input::IsKeyDown(WL_KEY_W)) { position.y += speed * ts; }
-		if (Input::IsKeyDown(WL_KEY_S)) { position.y -= speed * ts; }
+		if (Input::IsKeyDown(WL_KEY_A)) 
+		{ 
+			position.x -= cos(glm::radians(rotation)) * speed * ts; 
+			position.y -= sin(glm::radians(rotation)) * speed * ts;
+		}
+		if (Input::IsKeyDown(WL_KEY_D)) 
+		{ 
+			position.x += cos(glm::radians(rotation)) * speed * ts;
+			position.y += sin(glm::radians(rotation)) * speed * ts;
+		}
+		if (Input::IsKeyDown(WL_KEY_W)) 
+		{ 
+			position.x += -sin(glm::radians(rotation)) * speed * ts;
+			position.y += cos(glm::radians(rotation)) * speed * ts;
+		}
+		if (Input::IsKeyDown(WL_KEY_S)) 
+		{ 
+			position.x -= -sin(glm::radians(rotation)) * speed * ts;
+			position.y -= cos(glm::radians(rotation)) * speed * ts;
+		}
 		m_Camera.SetPosition(position);
 
 		speed = m_CameraRotateSpeed * m_ZoomLevel;
-		float rotation = m_Camera.GetRotation();
 		if (Input::IsKeyDown(WL_KEY_Q)) { rotation += speed * ts; }
 		if (Input::IsKeyDown(WL_KEY_E)) { rotation -= speed * ts; }
+		if (rotation > 180.0f) { rotation -= 360.0f; }
+		else if (rotation <= -180.0f) { rotation += 360.0f; }
 		m_Camera.SetRotation(rotation);
 	}
 	void OrthographicCameraController::OnEvent(Event& e)
