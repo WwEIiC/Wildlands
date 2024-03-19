@@ -7,6 +7,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+
 namespace Wildlands
 {
 	struct Renderer2DData
