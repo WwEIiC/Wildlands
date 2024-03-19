@@ -13,6 +13,7 @@ namespace Wildlands
 	{
 		Ref<VertexArray> vertexArray;
 		Ref<Shader> shader;
+		Ref<Texture2D> defaultTexture;
 	};
 
 	static Renderer2DData* s_Data;
@@ -44,6 +45,10 @@ namespace Wildlands
 		s_Data->shader =  Shader::Create("Texture", "assets/shaders/TexShader.vert", "assets/shaders/TexShader.frag");
 		s_Data->shader->Bind();
 		s_Data->shader->SetInt("u_Texture", 0);
+
+		s_Data->defaultTexture = Texture2D::Create(1, 1);
+		uint32_t defaultTextureData = 0xffffffff;
+		s_Data->defaultTexture->SetData(&defaultTextureData, sizeof(uint32_t));
 	}
 	void Renderer2D::Destory()
 	{
@@ -66,6 +71,7 @@ namespace Wildlands
 	{
 		s_Data->shader->Bind();
 		s_Data->shader->SetFloat4("u_Color", color);
+		s_Data->defaultTexture->Bind();
 
 		glm::mat4 transforms = glm::translate(glm::mat4(1.0f), position) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
@@ -85,6 +91,7 @@ namespace Wildlands
 		s_Data->shader->SetFloat4("u_Color", glm::vec4(1.0f));
 
 		texture->Bind(0);
+
 		glm::mat4 transforms = glm::translate(glm::mat4(1.0f), position) *
 			glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 		s_Data->shader->SetMat4("u_Transform", transforms);

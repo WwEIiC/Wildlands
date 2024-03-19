@@ -9,5 +9,5 @@ uniform vec4 u_Color;
 
 void main()
 {
-	Color = texture(u_Texture, v_TexCoord * 10);
+	Color = texture(u_Texture, v_TexCoord * 10) * u_Color;
 }
