@@ -20,6 +20,8 @@ namespace Wildlands
 	}
 	void ImGuiLayer::Attach()
 	{
+		WL_PROFILE_FUNCTION();
+
 		//Init ImGui
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -48,6 +50,8 @@ namespace Wildlands
 	}
 	void ImGuiLayer::Detach()
 	{
+		WL_PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
@@ -66,12 +70,16 @@ namespace Wildlands
 
 	void ImGuiLayer::Begin()
 	{
+		WL_PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 	}
 	void ImGuiLayer::End()
 	{
+		WL_PROFILE_FUNCTION();
+
 		ImGuiIO& io = ImGui::GetIO();
 		auto& app = Application::Get();
 		io.DisplaySize = ImVec2(static_cast<float>(app.GetWindow().GetWidth()), 
@@ -94,6 +102,8 @@ namespace Wildlands
 
 	void ImGuiLayer::SetImGuiStyle()
 	{
+		WL_PROFILE_FUNCTION();
+
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		ImVec4* colors = style.Colors;

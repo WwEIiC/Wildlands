@@ -10,6 +10,8 @@ namespace Wildlands
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertPath, const std::string& fragPath)
 		: m_Name(name)
 	{
+		WL_PROFILE_FUNCTION();
+
 		//set up vertex shader
 		uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -25,8 +27,11 @@ namespace Wildlands
 		}
 
 		std::stringstream vBuffer, fBuffer;
-		vBuffer << vFile.rdbuf();
-		fBuffer << fFile.rdbuf();
+		{
+			WL_PROFILE_SCOPE("Reading shader files - OpenGLShader::OpenGLShader()");
+			vBuffer << vFile.rdbuf();
+			fBuffer << fFile.rdbuf();
+		}
 		std::string vertSrc = vBuffer.str(), fragSrc = fBuffer.str();
 
 
@@ -95,31 +100,39 @@ namespace Wildlands
 	}
 	OpenGLShader::~OpenGLShader()
 	{
+		WL_PROFILE_FUNCTION();
+
 		glDeleteProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Bind() const
 	{
+		WL_PROFILE_FUNCTION();
+
 		glUseProgram(m_RendererID);
 	}
 
 	void OpenGLShader::SetInt(const std::string& name, int value)
 	{
+		WL_PROFILE_FUNCTION();
 		SetUniformInt(name, value);
 	}
 
 	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
+		WL_PROFILE_FUNCTION();
 		SetUniformFloat3(name, value);
 	}
 
 	void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value)
 	{
+		WL_PROFILE_FUNCTION();
 		SetUniformFloat4(name, value);
 	}
 
 	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
 	{
+		WL_PROFILE_FUNCTION();
 		SetUniformMat4(name, value);
 	}
 

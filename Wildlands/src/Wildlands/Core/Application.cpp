@@ -17,6 +17,8 @@ namespace Wildlands
 
 	Application::Application()
 	{
+		WL_PROFILE_FUNCTION();
+
 		WL_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
@@ -32,11 +34,14 @@ namespace Wildlands
 
 	Application::~Application()
 	{
+		WL_PROFILE_FUNCTION();
+
 		Renderer::Destory();
 	}
 
 	void Application::OnEvents(Event& e)
 	{
+		WL_PROFILE_FUNCTION();
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNC(Application::OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNC(Application::OnWindowResize));
@@ -52,8 +57,12 @@ namespace Wildlands
 
 	void Application::Run()
 	{
+		WL_PROFILE_FUNCTION();
+
 		while (m_Running)
 		{
+			WL_PROFILE_SCOPE("Running Loop");
+
 			float time = (float)glfwGetTime();
 			Timestep ts = time - m_LastFrameTime;
 			m_LastFrameTime = time;
@@ -62,25 +71,55 @@ namespace Wildlands
 			//Render each layers
 			if (!m_Minimized)
 			{
-				for (Layer* layer : m_LayerStack)
-					layer->Update(ts);
+				{
+					WL_PROFILE_SCOPE("Layers Update");
+					for (Layer* layer : m_LayerStack)
+						layer->Update(ts);
+				}
+
+				//Render UI for each layers
+				m_ImGuiLayer->Begin();
+				{
+					WL_PROFILE_SCOPE("ImGuiLayers Update");
+					for (Layer* layer : m_LayerStack)
+						layer->UIRender();
+				}
+				m_ImGuiLayer->End();
+
 			}
-
-			//Render UI for each layers
-			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
-				layer->UIRender();
-			m_ImGuiLayer->End();
-
 			m_Window->Update();
 		}
 	}
 
 #pragma region Push and Pop Layer
-	void Application::PushLayer(Layer* layer) { m_LayerStack.PushLayer(layer); }
-	void Application::PopLayer(Layer* layer) { m_LayerStack.PopLayer(layer); }
-	void Application::PushOverLayer(Layer* overlayer) { m_LayerStack.PushOverlay(overlayer); }
-	void Application::PopOverLayer(Layer* overlayer) { m_LayerStack.PopOverlay(overlayer); }
+	void Application::PushLayer(Layer* layer) 
+	{
+		WL_PROFILE_FUNCTION();
+
+		m_LayerStack.PushLayer(layer); 
+		layer->Attach();
+	}
+	void Application::PopLayer(Layer* layer) 
+	{
+		WL_PROFILE_FUNCTION();
+
+		layer->Detach();
+		m_LayerStack.PopLayer(layer); 
+	}
+	void Application::PushOverLayer(Layer* overlayer) 
+	{
+		WL_PROFILE_FUNCTION();
+
+		m_LayerStack.PushOverlay(overlayer); 
+		overlayer->Attach();
+	}
+	void Application::PopOverLayer(Layer* overlayer) 
+	{
+		WL_PROFILE_FUNCTION();
+
+		overlayer->Detach();
+		m_LayerStack.PopOverlay(overlayer); 
+	}
 #pragma endregion
 
 	bool Application::OnWindowClose(WindowCloseEvent& event)
@@ -90,6 +129,8 @@ namespace Wildlands
 	}
 	bool Application::OnWindowResize(WindowResizeEvent& event)
 	{
+		WL_PROFILE_FUNCTION();
+
 		if (event.GetWidth() == 0 || event.GetHeight() == 0)
 		{
 			m_Minimized = true;

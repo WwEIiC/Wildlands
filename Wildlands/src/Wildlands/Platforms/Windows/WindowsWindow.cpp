@@ -24,6 +24,8 @@ namespace Wildlands
 
 	WindowsWindow::WindowsWindow(const WindowConstructData& data)
 	{
+		WL_PROFILE_FUNCTION();
+
 		Init(data);
 	}
 	WindowsWindow::~WindowsWindow()
@@ -34,6 +36,8 @@ namespace Wildlands
 
 	void WindowsWindow::Init(const WindowConstructData& data)
 	{
+		WL_PROFILE_FUNCTION();
+
 		m_Data.Title = data.Title;
 		m_Data.Width = data.Width;
 		m_Data.Height = data.Height;
@@ -43,12 +47,16 @@ namespace Wildlands
 
 		if (s_GLFWWindowCount == 0)
 		{
+			WL_PROFILE_SCOPE("GLFW Init");
 			int success = glfwInit();
 			WL_CORE_ASSERT(success, "GLFW init failed!");
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
-		m_Window = glfwCreateWindow((int)data.Width, (int)data.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		{
+			WL_PROFILE_SCOPE("GLFW Create Window");
+			m_Window = glfwCreateWindow((int)data.Width, (int)data.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		}
 		++s_GLFWWindowCount;
 
 		m_RenderContext = RenderContext::Create(m_Window);
@@ -180,6 +188,8 @@ namespace Wildlands
 	}
 	void WindowsWindow::Close()
 	{
+		WL_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 		if (--s_GLFWWindowCount == 0)
 		{
@@ -191,6 +201,8 @@ namespace Wildlands
 
 	void WindowsWindow::Update()
 	{
+		WL_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		m_RenderContext->SwapBuffers();
 	}

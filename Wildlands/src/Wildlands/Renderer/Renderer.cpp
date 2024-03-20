@@ -10,12 +10,16 @@ namespace Wildlands
 
     void Renderer::Init()
     {
+		WL_PROFILE_FUNCTION();
+
         RenderCommand::Init();
         Renderer2D::Init();
     }
 
     void Renderer::Destory()
     {
+		WL_PROFILE_FUNCTION();
+
         Renderer2D::Destory();
     }
 

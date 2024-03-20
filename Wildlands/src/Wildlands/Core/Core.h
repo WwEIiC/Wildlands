@@ -23,6 +23,9 @@
 	#define WL_CORE_ASSERT(x, ...)
 #endif//WL_ENABLE_ASSERTS
 
+#define CONNECT_INTERNAL(x,y) x##y
+#define CONNECT(x,y) CONNECT_INTERNAL(x,y)
+
 #include <stdint.h>
 #define BIT(x) (1 << x)
 #define BIND_EVENT_FUNC(func) std::bind(&func, this, std::placeholders::_1)

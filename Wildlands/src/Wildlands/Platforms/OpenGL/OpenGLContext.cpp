@@ -15,6 +15,8 @@ namespace Wildlands
 
 	void OpenGLContext::Init()
 	{
+		WL_PROFILE_FUNCTION();
+
 		glfwMakeContextCurrent(m_WindowHandle);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		WL_CORE_ASSERT(status, "Failed to init Glad");
@@ -36,6 +38,8 @@ namespace Wildlands
 
 	void OpenGLContext::SwapBuffers()
 	{
+		WL_PROFILE_FUNCTION();
+
 		glfwSwapBuffers(m_WindowHandle);
 	}
 }

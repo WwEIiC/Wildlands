@@ -5,6 +5,7 @@ namespace Wildlands
 {
 	LayerStack::~LayerStack()
 	{
+		WL_PROFILE_FUNCTION();
 		for (Layer* layer : m_Layers)
 		{
 			layer->Detach();
@@ -16,14 +17,12 @@ namespace Wildlands
 	{
 		m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
 		++m_LayerInsertIndex;
-		layer->Attach();
 	}
 	void LayerStack::PopLayer(Layer* layer)
 	{
 		std::vector<Layer*>::iterator target = std::find(m_Layers.begin(), m_Layers.begin() + m_LayerInsertIndex, layer);
 		if (target != m_Layers.begin() + m_LayerInsertIndex)
 		{
-			layer->Detach();
 			m_Layers.erase(target);
 			--m_LayerInsertIndex;
 		}
@@ -32,7 +31,6 @@ namespace Wildlands
 	void LayerStack::PushOverlay(Layer* overlay)
 	{
 		m_Layers.emplace_back(overlay);
-		overlay->Attach();
 	}
 	void LayerStack::PopOverlay(Layer* overlay)
 	{
@@ -40,7 +38,6 @@ namespace Wildlands
 		if (target != m_Layers.end())
 		{
 			m_Layers.erase(target);
-			overlay->Detach();
 		}
 	}
 }

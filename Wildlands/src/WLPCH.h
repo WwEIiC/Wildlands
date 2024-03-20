@@ -21,4 +21,5 @@
 
 //self
 #include "Wildlands/Core/Log.h"
+#include "Wildlands/Debug/Profiler.h"
 

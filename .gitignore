@@ -3,6 +3,7 @@
 bin/
 bin-int/
 !vendor/bin/premake/
+profile/
 
 #Files
 **.user

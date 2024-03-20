@@ -21,6 +21,8 @@ namespace Wildlands
 
 	void Renderer2D::Init()
 	{
+		WL_PROFILE_FUNCTION();
+
 		s_Data = new Renderer2DData();
 
 		float squareVertices[4 * 5] = {
@@ -53,16 +55,22 @@ namespace Wildlands
 	}
 	void Renderer2D::Destory()
 	{
+		WL_PROFILE_FUNCTION();
+
 		delete s_Data;
 	}
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)
 	{
+		WL_PROFILE_FUNCTION();
+
 		s_Data->shader->Bind();
         s_Data->shader->SetMat4("u_VPMatrix", camera.GetVPMatrix());
 	}
 
 	void Renderer2D::EndScene()
 	{
+		WL_PROFILE_FUNCTION();
+
 	}
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
 	{
@@ -70,6 +78,8 @@ namespace Wildlands
 	}
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 	{
+		WL_PROFILE_FUNCTION();
+
 		s_Data->shader->Bind();
 		s_Data->shader->SetFloat4("u_Color", color);
 		s_Data->defaultTexture->Bind();
@@ -88,6 +98,8 @@ namespace Wildlands
 	}
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture)
 	{
+		WL_PROFILE_FUNCTION();
+
 		s_Data->shader->Bind();
 		s_Data->shader->SetFloat4("u_Color", glm::vec4(1.0f));
 
