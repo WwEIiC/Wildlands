@@ -7,8 +7,6 @@
 
 namespace Wildlands 
 {
-	Unique<Input> Input::s_Instance = CreateUnique<WindowsInput>();
-
 	bool WindowsInput::IsKeyDownInternal(int keycode)
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());

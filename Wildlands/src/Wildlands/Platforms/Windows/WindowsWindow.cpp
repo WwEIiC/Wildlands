@@ -1,6 +1,7 @@
 #include "WLPCH.h"
 
 #include "WindowsWindow.h"
+#include "Wildlands/Renderer/Renderer.h"
 #include "Wildlands/Platforms/OpenGL/OpenGLContext.h"
 
 #include "Wildlands/Events/ApplicationEvent.h"
@@ -14,11 +15,6 @@ namespace Wildlands
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		WL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
-	}
-
-	Unique<Window> Window::Create(const WindowConstructData& data)
-	{
-		return CreateUnique<WindowsWindow>(data);
 	}
 
 
@@ -55,9 +51,15 @@ namespace Wildlands
 
 		{
 			WL_PROFILE_SCOPE("GLFW Create Window");
+#ifdef WL_DEBUG
+			if (Renderer::GetAPI() == RendererAPI::EAPI::OpenGL)
+			{
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			}
+#endif
 			m_Window = glfwCreateWindow((int)data.Width, (int)data.Height, m_Data.Title.c_str(), nullptr, nullptr);
+			++s_GLFWWindowCount;
 		}
-		++s_GLFWWindowCount;
 
 		m_RenderContext = RenderContext::Create(m_Window);
 		m_RenderContext->Init();

@@ -14,6 +14,8 @@
 #include "Wildlands/Renderer/VertexArray.h"
 #include "Wildlands/Renderer/Cameras.h"
 
+int main(int argc, char** argv);
+
 namespace Wildlands
 {
 	class  Application
@@ -22,7 +24,6 @@ namespace Wildlands
 		Application();
 		virtual ~Application();
 
-		void Run();
 
 		void OnEvents(Event& e);
 
@@ -36,6 +37,9 @@ namespace Wildlands
 		void PopOverLayer(Layer* overlayer);
 
 	private:
+		friend int ::main(int argc, char** argv);
+		void Run();
+
 		bool OnWindowClose(class WindowCloseEvent& event);
 		bool OnWindowResize(class WindowResizeEvent& event);
 	private:

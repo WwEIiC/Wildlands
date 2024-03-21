@@ -6,6 +6,7 @@ bin-int/
 profile/
 
 #Files
+*.log
 **.user
 **.sln
 **.filters

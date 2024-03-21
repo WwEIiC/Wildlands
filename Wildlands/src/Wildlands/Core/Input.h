@@ -11,6 +11,8 @@ namespace Wildlands
 	protected:
 		Input() = default;
 	public:
+		static Unique<Input> Craete();
+
 		Input(const Input&) = delete;
 		Input& operator=(const Input&) = delete;
 
