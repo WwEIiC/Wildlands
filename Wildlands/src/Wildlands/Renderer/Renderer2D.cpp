@@ -21,9 +21,11 @@ namespace Wildlands
 
 	struct Renderer2DData
 	{
-		const uint32_t MaxQuads = 10000;
-		const uint32_t MaxVertecies = MaxQuads * 4;
-		const uint32_t MaxIndices = MaxQuads * 6;
+		Renderer2D::Stats stats;
+
+		static const uint32_t MaxQuads = 10000;
+		static const uint32_t MaxVertecies = MaxQuads * 4;
+		static const uint32_t MaxIndices = MaxQuads * 6;
 		static const uint32_t MaxTextures = 32;
 		uint32_t indexCount = 0;
 
@@ -37,6 +39,8 @@ namespace Wildlands
 
 		std::array<Ref<Texture2D>, MaxTextures> textureSlots;
 		uint32_t textureSlotIndex = 1; // 0 = default texture.
+
+		glm::vec4 quadVertexPos[4];
 	};
 	static Renderer2DData s_Data;
 
@@ -85,6 +89,11 @@ namespace Wildlands
 		s_Data.shader->SetIntArray("u_Textures", samplers, s_Data.MaxTextures);
 
 		s_Data.textureSlots[0] = s_Data.defaultTexture;
+
+		s_Data.quadVertexPos[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+		s_Data.quadVertexPos[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
+		s_Data.quadVertexPos[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
+		s_Data.quadVertexPos[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 	}
 	void Renderer2D::Destory()
 	{
@@ -122,6 +131,8 @@ namespace Wildlands
 			s_Data.textureSlots[i]->Bind(i);
 
 		RenderCommand::DrawIndex(s_Data.vertexArray, s_Data.indexCount);
+
+		s_Data.stats.drawCalls++;
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -132,32 +143,38 @@ namespace Wildlands
 	{
 		WL_PROFILE_FUNCTION();
 
-		//----------------------------- set up the data of the quad ------------------------------
+		//the buffer is full, flush it and start next batch.
+		if (s_Data.indexCount >= Renderer2DData::MaxIndices)
+			NextBatch();
+
 		const float textureIndex = 0.f;
 		const float tileFactor = 1.0f;
 
-		s_Data.nextQuadVertex->position = position;
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[0];
 		s_Data.nextQuadVertex->color = color;
 		s_Data.nextQuadVertex->texcoord = { 0.0f, 0.0f };
 		s_Data.nextQuadVertex->textureIndex = textureIndex;
 		s_Data.nextQuadVertex->tileFactor = tileFactor;
 		s_Data.nextQuadVertex++;
 
-		s_Data.nextQuadVertex->position = { position.x + size.x, position.y, position.z };
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[1];
 		s_Data.nextQuadVertex->color = color;
 		s_Data.nextQuadVertex->texcoord = { 1.0f, 0.0f };
 		s_Data.nextQuadVertex->textureIndex = textureIndex;
 		s_Data.nextQuadVertex->tileFactor = tileFactor;
 		s_Data.nextQuadVertex++;
 
-		s_Data.nextQuadVertex->position = { position.x + size.x, position.y + size.y, position.z };
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[2];
 		s_Data.nextQuadVertex->color = color;
 		s_Data.nextQuadVertex->texcoord = { 1.0f, 1.0f };
 		s_Data.nextQuadVertex->textureIndex = textureIndex;
 		s_Data.nextQuadVertex->tileFactor = tileFactor;
 		s_Data.nextQuadVertex++;
 
-		s_Data.nextQuadVertex->position = { position.x, position.y + size.y, position.z };
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[3];
 		s_Data.nextQuadVertex->color = color;
 		s_Data.nextQuadVertex->texcoord = { 0.0f, 1.0f };
 		s_Data.nextQuadVertex->textureIndex = textureIndex;
@@ -165,19 +182,8 @@ namespace Wildlands
 		s_Data.nextQuadVertex++;
 
 		s_Data.indexCount += 6;
-		//----------------------------------------------------------------------------------------
 
-
-		//s_Data.shader->Bind();
-		//s_Data.shader->SetFloat("u_TileFactor", 1.0f);
-		//s_Data.defaultTexture->Bind();
-
-		//glm::mat4 transforms = glm::translate(glm::mat4(1.0f), position) *
-		//	glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		//s_Data.shader->SetMat4("u_Transform", transforms);
-
-		//s_Data.vertexArray->Bind();
-		//RenderCommand::DrawIndex(s_Data.vertexArray);
+		s_Data.stats.quadCount++;
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor)
@@ -188,7 +194,10 @@ namespace Wildlands
 	{
 		WL_PROFILE_FUNCTION();
 
-		//----------------------------- set up the data of the quad ------------------------------
+		//the buffer is full, flush it and start next batch.
+		if (s_Data.indexCount >= Renderer2DData::MaxIndices)
+			NextBatch();
+
 		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f ,1.0f };
 
 		float textureIndex = 0.f;
@@ -206,28 +215,31 @@ namespace Wildlands
 			s_Data.textureSlots[s_Data.textureSlotIndex++] = texture;
 		}
 
-		s_Data.nextQuadVertex->position = position;
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[0];
 		s_Data.nextQuadVertex->color = color;
 		s_Data.nextQuadVertex->texcoord = { 0.0f, 0.0f };
 		s_Data.nextQuadVertex->textureIndex = textureIndex;
 		s_Data.nextQuadVertex->tileFactor = tileFactor;
 		s_Data.nextQuadVertex++;
 
-		s_Data.nextQuadVertex->position = { position.x + size.x, position.y, position.z };
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[1];
 		s_Data.nextQuadVertex->color = color;
 		s_Data.nextQuadVertex->texcoord = { 1.0f, 0.0f };
 		s_Data.nextQuadVertex->textureIndex = textureIndex;
 		s_Data.nextQuadVertex->tileFactor = tileFactor;
 		s_Data.nextQuadVertex++;
 
-		s_Data.nextQuadVertex->position = { position.x + size.x, position.y + size.y, position.z };
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[2];
 		s_Data.nextQuadVertex->color = color;
 		s_Data.nextQuadVertex->texcoord = { 1.0f, 1.0f };
 		s_Data.nextQuadVertex->textureIndex = textureIndex;
 		s_Data.nextQuadVertex->tileFactor = tileFactor;
 		s_Data.nextQuadVertex++;
 
-		s_Data.nextQuadVertex->position = { position.x, position.y + size.y, position.z };
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[3];
 		s_Data.nextQuadVertex->color = color;
 		s_Data.nextQuadVertex->texcoord = { 0.0f, 1.0f };
 		s_Data.nextQuadVertex->textureIndex = textureIndex;
@@ -235,19 +247,144 @@ namespace Wildlands
 		s_Data.nextQuadVertex++;
 
 		s_Data.indexCount += 6;
-		//----------------------------------------------------------------------------------------
 
+		s_Data.stats.quadCount++;
+	}
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	{
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, color);
+	}
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
+	{
+		WL_PROFILE_FUNCTION();
 
-		//s_Data.shader->Bind();
-		//s_Data.shader->SetFloat("u_TileFactor", tileFactor);
+		//the buffer is full, flush it and start next batch.
+		if (s_Data.indexCount >= Renderer2DData::MaxIndices)
+			NextBatch();
 
-		//texture->Bind(0);
+		const float textureIndex = 0.f;
+		const float tileFactor = 1.0f;
 
-		//glm::mat4 transforms = glm::translate(glm::mat4(1.0f), position) *
-		//	glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		//s_Data.shader->SetMat4("u_Transform", transforms);
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-		//s_Data.vertexArray->Bind();
-		//RenderCommand::DrawIndex(s_Data.vertexArray);
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[0];
+		s_Data.nextQuadVertex->color = color;
+		s_Data.nextQuadVertex->texcoord = { 0.0f, 0.0f };
+		s_Data.nextQuadVertex->textureIndex = textureIndex;
+		s_Data.nextQuadVertex->tileFactor = tileFactor;
+		s_Data.nextQuadVertex++;
+
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[1];
+		s_Data.nextQuadVertex->color = color;
+		s_Data.nextQuadVertex->texcoord = { 1.0f, 0.0f };
+		s_Data.nextQuadVertex->textureIndex = textureIndex;
+		s_Data.nextQuadVertex->tileFactor = tileFactor;
+		s_Data.nextQuadVertex++;
+
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[2];
+		s_Data.nextQuadVertex->color = color;
+		s_Data.nextQuadVertex->texcoord = { 1.0f, 1.0f };
+		s_Data.nextQuadVertex->textureIndex = textureIndex;
+		s_Data.nextQuadVertex->tileFactor = tileFactor;
+		s_Data.nextQuadVertex++;
+
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[3];
+		s_Data.nextQuadVertex->color = color;
+		s_Data.nextQuadVertex->texcoord = { 0.0f, 1.0f };
+		s_Data.nextQuadVertex->textureIndex = textureIndex;
+		s_Data.nextQuadVertex->tileFactor = tileFactor;
+		s_Data.nextQuadVertex++;
+
+		s_Data.indexCount += 6;
+
+		s_Data.stats.quadCount++;
+	}
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor)
+	{
+		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tileFactor, texColor);
+	}
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor)
+	{
+		WL_PROFILE_FUNCTION();
+
+		//the buffer is full, flush it and start next batch.
+		if (s_Data.indexCount >= Renderer2DData::MaxIndices)
+			NextBatch();
+
+		constexpr glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		float textureIndex = 0.0f;
+		for (uint32_t i = 1; i < s_Data.textureSlotIndex; i++)
+		{
+			if (*s_Data.textureSlots[i].get() == *texture.get())
+			{
+				textureIndex = (float)i;
+				break;
+			}
+		}
+
+		if (textureIndex == 0.0f)
+		{
+			textureIndex = (float)s_Data.textureSlotIndex;
+			s_Data.textureSlots[s_Data.textureSlotIndex] = texture;
+			s_Data.textureSlotIndex++;
+		}
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[0];
+		s_Data.nextQuadVertex->color = color;
+		s_Data.nextQuadVertex->texcoord = { 0.0f, 0.0f };
+		s_Data.nextQuadVertex->textureIndex = textureIndex;
+		s_Data.nextQuadVertex->tileFactor = tileFactor;
+		s_Data.nextQuadVertex++;
+
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[1];
+		s_Data.nextQuadVertex->color = color;
+		s_Data.nextQuadVertex->texcoord = { 1.0f, 0.0f };
+		s_Data.nextQuadVertex->textureIndex = textureIndex;
+		s_Data.nextQuadVertex->tileFactor = tileFactor;
+		s_Data.nextQuadVertex++;
+
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[2];
+		s_Data.nextQuadVertex->color = color;
+		s_Data.nextQuadVertex->texcoord = { 1.0f, 1.0f };
+		s_Data.nextQuadVertex->textureIndex = textureIndex;
+		s_Data.nextQuadVertex->tileFactor = tileFactor;
+		s_Data.nextQuadVertex++;
+
+		s_Data.nextQuadVertex->position = transform * s_Data.quadVertexPos[3];
+		s_Data.nextQuadVertex->color = color;
+		s_Data.nextQuadVertex->texcoord = { 0.0f, 1.0f };
+		s_Data.nextQuadVertex->textureIndex = textureIndex;
+		s_Data.nextQuadVertex->tileFactor = tileFactor;
+		s_Data.nextQuadVertex++;
+
+		s_Data.indexCount += 6;
+
+		s_Data.stats.quadCount++;
+	}
+	
+	Renderer2D::Stats& Renderer2D::GetStats()
+	{
+		return s_Data.stats;
+	}
+	void Renderer2D::ResetStats()
+	{
+		s_Data.stats.drawCalls = 0;
+		s_Data.stats.quadCount = 0;
+	}
+	void Renderer2D::NextBatch()
+	{
+		EndScene();
+
+		s_Data.indexCount = 0;
+		s_Data.nextQuadVertex = s_Data.quadVerteciesBase;
+
+		s_Data.textureSlotIndex = 1;
 	}
 }
