@@ -27,6 +27,22 @@ namespace Wildlands
 	}
 
 
+	Ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::EAPI::None:
+			WL_CORE_ASSERT(false, "RendererAPI is None");
+			return nullptr;
+
+		case RendererAPI::EAPI::OpenGL:
+			return CreateRef<OpenGLVertexBuffer>(size);
+		}
+
+		WL_CORE_ASSERT(false, "Unknown RendererAPI");
+		return nullptr;
+	}
+
 	Ref<VertexBuffer> VertexBuffer::Create(float* vectices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
@@ -43,7 +59,7 @@ namespace Wildlands
 		return nullptr;
 	}
 
-	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size)
+	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -52,7 +68,7 @@ namespace Wildlands
 			return nullptr;
 
 		case RendererAPI::EAPI::OpenGL:
-			return CreateRef<OpenGLIndexBuffer>(indices, size);
+			return CreateRef<OpenGLIndexBuffer>(indices, count);
 		}
 
 		WL_CORE_ASSERT(false, "Unknown RendererAPI");

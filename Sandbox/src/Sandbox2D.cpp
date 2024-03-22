@@ -35,10 +35,11 @@ void Sandbox2D::Update(Wildlands::Timestep ts)
 
 		Wildlands::Renderer2D::BeginScene(m_CameraController.GetCamera());
 		Wildlands::Renderer2D::DrawQuad(position, size, color);
+		Wildlands::Renderer2D::DrawQuad(position + glm::vec3{-0.8f, 0.8f, 0.0f}, size, {0.2, 0.2, 0.8, 1.0});
 
 		glm::vec3 offset = { 1.8f, -0.5f, 0.0f };
 		Wildlands::Renderer2D::DrawQuad(position + offset, size, texture);
-		Wildlands::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 10.f, 10.f }, texture);
+		Wildlands::Renderer2D::DrawQuad({ -5.0f, -5.0f, -0.1f }, { 10.f, 10.f }, texture);
 
 		Wildlands::Renderer2D::EndScene();
 	}

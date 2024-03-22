@@ -118,6 +118,19 @@ namespace Wildlands
 		SetUniformInt(name, value);
 	}
 
+	void OpenGLShader::SetIntArray(const std::string& name, int* values, uint32_t count)
+	{
+		WL_PROFILE_FUNCTION();
+		
+		SetUniformIntArray(name, values, count);
+	}
+
+	void OpenGLShader::SetFloat(const std::string& name, float value)
+	{
+		WL_PROFILE_FUNCTION();
+		SetUniformFloat(name, value);
+	}
+
 	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
 		WL_PROFILE_FUNCTION();
@@ -140,6 +153,12 @@ namespace Wildlands
 	{
 		int location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1i(location, value);
+	}
+
+	void OpenGLShader::SetUniformIntArray(const std::string& name, int* values, uint32_t count)
+	{
+		int location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1iv(location, count, values);
 	}
 
 	void OpenGLShader::SetUniformFloat(const std::string& name, float value)
