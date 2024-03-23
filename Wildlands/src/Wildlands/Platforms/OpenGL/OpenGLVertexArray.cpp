@@ -66,6 +66,7 @@ namespace Wildlands
 		WL_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer layout is Empty");
 
 		const auto& layout = vertexBuffer->GetLayout();
+		//WLFIXME::when element.type == mat3/4 the offset maybe wrong.
 		for (const auto& element : layout)
 		{
 			glVertexAttribPointer(m_VertexAttributeIndex, element.GetCount(), EShaderDataTypeToOpenGLType(element.Type),

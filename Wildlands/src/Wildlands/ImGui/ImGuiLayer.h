@@ -1,5 +1,5 @@
 #pragma once
-#include "Wildlands/Core/Core.h"
+#include "Wildlands/Core/Base.h"
 #include "Wildlands/Core/Layer.h"
 
 namespace Wildlands
@@ -14,6 +14,7 @@ namespace Wildlands
 		virtual void Detach() override;
 		virtual void Update(class Timestep ts) override;
 		virtual void UIRender() override;
+		virtual void OnEvent(Event& e) override;
 
 		void Begin();
 		void End();

@@ -1,5 +1,5 @@
 #pragma once
-#include "Wildlands/Core/Core.h"
+#include "Wildlands/Core/Base.h"
 
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>

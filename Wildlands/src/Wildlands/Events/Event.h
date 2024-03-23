@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WLPCH.h"
-#include "Wildlands/Core/Core.h" 
+#include "Wildlands/Core/Base.h" 
 
 
 namespace Wildlands

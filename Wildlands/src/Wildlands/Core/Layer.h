@@ -1,5 +1,5 @@
 #pragma once
-#include "Wildlands/Core/Core.h"
+#include "Wildlands/Core/Base.h"
 
 #include "Wildlands/Core/Timestep.h"
 #include "Wildlands/Events/Event.h"

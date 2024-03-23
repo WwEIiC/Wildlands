@@ -49,8 +49,8 @@ namespace Wildlands
 		//Handle event in each layer
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
-			(*it)->OnEvent(e);
 			if (e.Handled) { break; }
+			(*it)->OnEvent(e);
 		}
 		//WL_CORE_TRACE("{0}", e)
 	}

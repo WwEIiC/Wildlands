@@ -1,5 +1,5 @@
 #pragma once
-#include "Wildlands/Core/Core.h"
+#include "Wildlands/Core/Base.h"
 
 #define SINGLETON(T) friend class Wildlands::Singleton<T>;\
 protected:\
