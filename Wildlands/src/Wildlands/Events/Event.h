@@ -34,7 +34,7 @@ namespace Wildlands
 	class  Event
 	{
 	public:
-		bool Handled = false;
+		virtual ~Event() = default;
 
 		virtual EventType GetEventType() const = 0;
 		virtual int GetEventCategory() const = 0;
@@ -42,6 +42,8 @@ namespace Wildlands
 		virtual std::string ToString() const { return GetName(); }
 
 		inline bool IsInCategory(EventCategory category) { return static_cast<int>(category) & GetEventCategory(); }
+
+		bool Handled = false;
 	};
 
 	inline std::ostream& operator<<(std::ostream& os, const Event& event)
