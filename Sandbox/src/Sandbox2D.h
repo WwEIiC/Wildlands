@@ -13,13 +13,13 @@ public:
 	virtual void Update(Wildlands::Timestep ts) override;
 	virtual void UIRender() override;
 
-	virtual void OnEvent(Wildlands::Event& event) override; 
+	virtual void OnEvent(Wildlands::Event& event) override;
 private:
 	Wildlands::OrthographicCameraController m_CameraController;
-	Wildlands::Ref<Wildlands::Texture2D> texture;
+	Wildlands::Ref<Wildlands::Texture2D> m_Texture;
 
-	glm::vec4 color = {0.8f, 0.2f, 0.8f, 1.0f};
-	glm::vec3 position = { 0.0f, 0.0f, 0.0f };
-	glm::vec2 size = { 1.0f, 1.0f };
+	glm::vec4 m_Color = { 0.8f, 0.2f, 0.8f, 1.0f };
+	glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
+	glm::vec2 m_Size = { 1.0f, 1.0f };
 };
 

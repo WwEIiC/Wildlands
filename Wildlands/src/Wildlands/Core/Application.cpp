@@ -15,7 +15,7 @@ namespace Wildlands
 {
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
+	Application::Application(const std::string& name)
 	{
 		WL_PROFILE_FUNCTION();
 
@@ -23,7 +23,7 @@ namespace Wildlands
 		s_Instance = this;
 
 		m_Running = true;
-		m_Window = Window::Create();
+		m_Window = Window::Create(WindowConstructData(name));
 		m_Window->SetEventCallback(BIND_EVENT_FUNC(Application::OnEvents));
 
 		Renderer::Init();
@@ -37,6 +37,11 @@ namespace Wildlands
 		WL_PROFILE_FUNCTION();
 
 		Renderer::Destory();
+	}
+
+	void Application::Close()
+	{
+		m_Running = false;
 	}
 
 	void Application::OnEvents(Event& e)
@@ -124,7 +129,7 @@ namespace Wildlands
 
 	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
-		m_Running = false;
+		Close();
 		return true;
 	}
 	bool Application::OnWindowResize(WindowResizeEvent& event)

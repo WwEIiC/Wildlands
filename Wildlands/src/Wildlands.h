@@ -19,6 +19,7 @@
 
 #include "Wildlands/Renderer/Texture.h"
 #include "Wildlands/Renderer/Shader.h"
+#include "Wildlands/Renderer/FrameBuffer.h"
 #include "Wildlands/Renderer/Buffers.h"
 #include "Wildlands/Renderer/VertexArray.h"
 

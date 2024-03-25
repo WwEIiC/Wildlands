@@ -3,7 +3,7 @@ workspace "Wildlands"
 
 	configurations { "Debug", "Release", "Dist" }
 	flags { "MultiProcessorCompile" }
-	startproject "Sandbox"
+	startproject "WLEditor"
 
 --eg. Debug-windows-x64
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -97,8 +97,61 @@ project "Wildlands"
 		runtime "Release"
 		optimize "on"
 
+------------------------------------------------------------- WLEditor  ---------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------
+project "WLEditor"
+	location "WLEditor"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++20"
+	staticruntime "on"
+
+	targetdir ("bin/" .. outputDir .."/%{prj.name}")
+	objdir ("bin-int/" .. outputDir .."/%{prj.name}")
+
+	files {
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs {
+		"Wildlands/src",
+		"Sandbox/src",
+		"%{IncludeDirs.SPDLOG}",
+		"%{IncludeDirs.glm}",
+		"%{IncludeDirs.ImGui}"
+	}
+
+	--link the Wildlands project to this project.
+	links {
+		"Wildlands"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+		defines{
+			"WL_PLATFORM_WINDOWS",
+			"_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING"		--get rid of some warnings when use C++20.
+		}
+
+	filter "configurations:Debug"
+		defines {"WL_DEBUG"}
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		defines {"WL_RELEASE"}
+		runtime "Release"
+		optimize "on"
+
+	filter "configurations:Dist"
+		defines {"WL_DIST"}
+		runtime "Release"
+		optimize "on"
 
 
+------------------------------------------------------------- Sandbox  ----------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 project "Sandbox"
 	location "Sandbox"

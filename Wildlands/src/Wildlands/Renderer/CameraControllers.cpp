@@ -57,6 +57,13 @@ namespace Wildlands
 		dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FUNC(OrthographicCameraController::OnMouseScrolled));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNC(OrthographicCameraController::OnWindowResized));
 	}
+
+	void OrthographicCameraController::ResizeViewport(float width, float height)
+	{
+		m_AspectRatio = width / height;
+		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+	}
+
 	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
 		WL_PROFILE_FUNCTION();
@@ -69,9 +76,8 @@ namespace Wildlands
 	bool OrthographicCameraController::OnWindowResized(WindowResizeEvent& e)
 	{
 		WL_PROFILE_FUNCTION();
-
-		m_AspectRatio = (float)e.GetWidth() / (float)e.GetHeight();
-		m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+		
+		ResizeViewport((float)e.GetWidth(), (float)e.GetHeight());
 		return false;
 	}
 }

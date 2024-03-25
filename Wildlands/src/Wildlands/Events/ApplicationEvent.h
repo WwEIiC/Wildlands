@@ -23,11 +23,11 @@ namespace Wildlands
 	class  WindowResizeEvent : public Event
 	{
 	public:
-		WindowResizeEvent(unsigned int width, unsigned int height)
+		WindowResizeEvent(uint32_t width, uint32_t height)
 			: m_Width(width), m_Height(height) {}
 
-		inline unsigned int GetWidth() const { return m_Width; }
-		inline unsigned int GetHeight() const { return m_Height; }
+		inline uint32_t GetWidth() const { return m_Width; }
+		inline uint32_t GetHeight() const { return m_Height; }
 
 		std::string ToString() const override
 		{
@@ -39,17 +39,17 @@ namespace Wildlands
 		EVENT_CLASS_TYPE(WindowResize)
 		EVENT_CLASS_CATEGORY(static_cast<int>(EventCategory::EventCategoryApplication))
 	private:
-		unsigned int m_Width, m_Height;
+		uint32_t m_Width, m_Height;
 	};
 
 	class  WindowMovedEvent : public Event
 	{
 	public:
-		WindowMovedEvent(unsigned int x, unsigned int y)
+		WindowMovedEvent(uint32_t x, uint32_t y)
 			: m_X(x), m_Y(y) {}
 
-		inline unsigned int GetX() const { return m_X; }
-		inline unsigned int GetY() const { return m_Y; }
+		inline uint32_t GetX() const { return m_X; }
+		inline uint32_t GetY() const { return m_Y; }
 
 		std::string ToString() const override
 		{
@@ -61,7 +61,7 @@ namespace Wildlands
 		EVENT_CLASS_TYPE(WindowMoved)
 		EVENT_CLASS_CATEGORY(static_cast<int>(EventCategory::EventCategoryApplication))
 	private:
-		unsigned int m_X, m_Y;
+		uint32_t m_X, m_Y;
 	};
 
 	class  WindowCloseEvent : public Event

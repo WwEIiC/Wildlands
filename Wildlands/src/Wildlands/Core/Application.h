@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Wildlands/Core/Core.h"
+#include "Wildlands/Core/Base.h"
 
 #include "Wildlands/Core/Window.h"
 #include "Wildlands/Core/Timestep.h"
@@ -21,9 +21,10 @@ namespace Wildlands
 	class  Application
 	{
 	public:
-		Application();
+		Application(const std::string& name = "Wildlands Application");
 		virtual ~Application();
 
+		void Close();
 
 		void OnEvents(Event& e);
 
