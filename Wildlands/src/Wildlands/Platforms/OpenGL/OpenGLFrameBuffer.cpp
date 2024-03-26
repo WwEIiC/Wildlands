@@ -32,6 +32,13 @@ namespace Wildlands
 
 	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
 	{
+		static uint32_t MaxFrameBufferSize = 1024 * 8;
+		if (width == 0 || height == 0 || width > MaxFrameBufferSize || height > MaxFrameBufferSize)
+		{
+			WL_CORE_WARN("Attempted to resize framebuffer to ({0}, {1})", width, height);
+			return;
+		}
+
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 
