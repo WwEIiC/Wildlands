@@ -31,6 +31,8 @@ namespace Wildlands
 		inline Window& GetWindow() { return *m_Window; }
 		inline static Application& Get() { return *s_Instance; }
 
+		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+
 		// Push and Pop Layer to m_LayerStack
 		void PushLayer(Layer* layer);
 		void PopLayer(Layer* layer);
