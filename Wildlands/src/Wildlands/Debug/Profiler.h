@@ -104,7 +104,7 @@ namespace Wildlands
 	private:
 		void WriteHeader()
 		{
-			m_OutputStream << "{\"otherData\": {},\"traceEvents\":[";
+			m_OutputStream << "{\"otherData\": {},\"traceEvents\":[{}";
 			m_OutputStream.flush();
 		}
 

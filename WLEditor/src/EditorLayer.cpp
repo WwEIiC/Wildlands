@@ -11,7 +11,7 @@ namespace Wildlands
     }
 
 
-    void EditorLayer::Attach()
+    void EditorLayer::Attach()  
     {
         WL_PROFILE_FUNCTION();
         WL_INFO("Sandbox2D Layer Attached");
@@ -55,23 +55,27 @@ namespace Wildlands
 
             glm::vec3 offset = { 1.8f, -0.5f, 0.0f };
             Renderer2D::DrawQuad(m_Position + offset, m_Size, m_Texture);
-            Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 30.f, 30.f }, m_Texture);
+            Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 50.f, 50.f }, m_Texture);
 
             //Renderer2D::EndScene();
 
             //Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-            /*float quadOffset = 0.1f;
-            int quadNum = 40;
-            float halfLength = ((quadNum - 1) * quadOffset + quadNum ) * 0.5f;
-            for (float x = -halfLength; x < halfLength; x += (1 + quadOffset))
+
+            if (showQuad)
             {
-                for (float y = -halfLength; y < halfLength; y += (1 + quadOffset))
-                {
-                    glm::vec4 quadColor = { (x + halfLength) / (2 * halfLength), 0.4f, (y + halfLength) / (2 * halfLength), 0.6f };
-                    Renderer2D::DrawQuad({ x, y, 0.0f }, { 1.0f, 1.0f }, quadColor);
-                }
-            }*/
+				float quadOffset = 0.1f;
+				int quadNum = 95;
+				float halfLength = ((quadNum - 1) * quadOffset + quadNum ) * 0.5f;
+				for (float x = -halfLength; x < halfLength; x += (1 + quadOffset))
+				{
+					for (float y = -halfLength; y < halfLength; y += (1 + quadOffset))
+					{
+						glm::vec4 quadColor = { (x + halfLength) / (2 * halfLength), 0.4f, (y + halfLength) / (2 * halfLength), 0.6f };
+						Renderer2D::DrawQuad({ x, y, 0.0f }, { 1.0f, 1.0f }, quadColor);
+					}
+				}
+            }
             Renderer2D::EndScene();
             m_FrameBuffer->UnBind();
         }
@@ -132,13 +136,16 @@ namespace Wildlands
             ImGui::EndMenuBar();
         }
 
-
-
         ImGui::Begin("Settings");
 
         ImGui::SliderFloat3("Position", glm::value_ptr(m_Position), -5.f, 5.f);
         ImGui::SliderFloat2("Size", glm::value_ptr(m_Size), -5.f, 5.f);
         ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
+
+		if (ImGui::Button("ShowQuad", ImVec2(100, 50)))
+		{
+			showQuad = !showQuad;
+		}
 
         auto& stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");

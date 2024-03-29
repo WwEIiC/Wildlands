@@ -16,6 +16,7 @@ IncludeDirs["Glad"] = "Wildlands/Externals/Glad/include"
 IncludeDirs["ImGui"] = "Wildlands/Externals/ImGui"
 IncludeDirs["glm"] = "Wildlands/Externals/glm"
 IncludeDirs["stb_image"] = "Wildlands/Externals/stb_image"
+IncludeDirs["entt"] = "Wildlands/Externals/entt/include"
 
 --Premake will looks for a file name "premake5.lua" in the path specified.
 group "Dependences"
@@ -45,7 +46,8 @@ project "Wildlands"
 		"%{prj.name}/Externals/glm/glm/**.hpp",
 		"%{prj.name}/Externals/glm/glm/**.inl",
 		"%{prj.name}/Externals/stb_image/**.h",
-		"%{prj.name}/Externals/stb_image/**.cpp"
+		"%{prj.name}/Externals/stb_image/**.cpp",
+		"%{prj.name}/Externals/entt/**.hpp"
 	}
 
 	includedirs {
@@ -55,7 +57,8 @@ project "Wildlands"
 		"%{IncludeDirs.Glad}",
 		"%{IncludeDirs.ImGui}",
 		"%{IncludeDirs.glm}",
-		"%{IncludeDirs.stb_image}"
+		"%{IncludeDirs.stb_image}",
+		"%{IncludeDirs.entt}"
 	}
 
 	links {
@@ -119,7 +122,8 @@ project "WLEditor"
 		"Sandbox/src",
 		"%{IncludeDirs.SPDLOG}",
 		"%{IncludeDirs.glm}",
-		"%{IncludeDirs.ImGui}"
+		"%{IncludeDirs.ImGui}",
+		"%{IncludeDirs.entt}"
 	}
 
 	--link the Wildlands project to this project.
