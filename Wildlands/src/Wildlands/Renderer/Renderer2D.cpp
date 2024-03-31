@@ -147,15 +147,22 @@ namespace Wildlands
 	{
 		WL_PROFILE_FUNCTION();
 
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		DrawQuad(transform, color);
+	}
+
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	{
+		WL_PROFILE_FUNCTION();
+
 		//the buffer is full, flush it and start next batch.
 		if (s_Data.IndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
 		const float textureIndex = 0.f;
 		const float tileFactor = 1.0f;
-
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 		glm::vec2 textureCoords[4] = {
 			{ 0.0f, 0.0f },
@@ -178,11 +185,22 @@ namespace Wildlands
 		s_Data.stats.quadCount++;
 	}
 
+
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor)
 	{
 		DrawQuad({position.x, position.y, 0.0f}, size, texture, tileFactor, texColor);
 	}
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4&texColor)
+	{
+		WL_PROFILE_FUNCTION();
+
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
+			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+		DrawQuad(transform, texture, tileFactor, texColor);
+	}
+
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor)
 	{
 		WL_PROFILE_FUNCTION();
 
@@ -208,9 +226,6 @@ namespace Wildlands
 			s_Data.TextureSlots[s_Data.TextureSlotIndex++] = texture;
 		}
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
-			* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-
 		glm::vec2 textureCoords[4] = {
 		{ 0.0f, 0.0f },
 		{ 1.0f, 0.0f },
@@ -231,6 +246,7 @@ namespace Wildlands
 		s_Data.IndexCount += 6;
 		s_Data.stats.quadCount++;
 	}
+
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
 		DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, color);

@@ -29,7 +29,7 @@ void Sandbox2D::Update(Wildlands::Timestep ts)
 {
 	WL_PROFILE_FUNCTION();
 	//Camera
-	m_CameraController.OnUpdate(ts);
+	m_CameraController.Update(ts);
 
 	Wildlands::Renderer2D::ResetStats();
 

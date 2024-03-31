@@ -21,6 +21,10 @@ namespace Wildlands
         framebufferSpec.Width = 1280;
         framebufferSpec.Height = 720;
         m_FrameBuffer = FrameBuffer::Create(framebufferSpec);
+
+        m_ActiveScene = CreateRef<Scene>();
+        m_SquareEntity = m_ActiveScene->CreateEntity("Square");
+        m_SquareEntity.AddComponent<SpriteComponent>(glm::vec4{0.2f, 0.3f, 0.8f, 1.0f});
     }
 
     void EditorLayer::Detach()
@@ -32,12 +36,12 @@ namespace Wildlands
     void EditorLayer::Update(Timestep ts)
     {
         WL_PROFILE_FUNCTION();
-        //Camera
+
+        // Camera
         if (m_ViewportFocused)
-            m_CameraController.OnUpdate(ts);
+            m_CameraController.Update(ts);
 
         Renderer2D::ResetStats();
-
         {
             WL_PROFILE_SCOPE("Render Pre");
             m_FrameBuffer->Bind();
@@ -49,33 +53,10 @@ namespace Wildlands
             WL_PROFILE_SCOPE("Renderer Draw");
 
             Renderer2D::BeginScene(m_CameraController.GetCamera());
-            Renderer2D::DrawQuad(m_Position, m_Size, m_Color);
-            Renderer2D::DrawQuad(m_Position, m_Size, m_Color);
-            Renderer2D::DrawRotatedQuad(m_Position + glm::vec3{ -0.8f, 0.8f, 0.0f }, m_Size, 45.f, { 0.2, 0.2, 0.8, 1.0 });
 
-            glm::vec3 offset = { 1.8f, -0.5f, 0.0f };
-            Renderer2D::DrawQuad(m_Position + offset, m_Size, m_Texture);
-            Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 50.f, 50.f }, m_Texture);
+			// Scene Update
+			m_ActiveScene->Update(ts);
 
-            //Renderer2D::EndScene();
-
-            //Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-
-            if (showQuad)
-            {
-				float quadOffset = 0.1f;
-				int quadNum = 95;
-				float halfLength = ((quadNum - 1) * quadOffset + quadNum ) * 0.5f;
-				for (float x = -halfLength; x < halfLength; x += (1 + quadOffset))
-				{
-					for (float y = -halfLength; y < halfLength; y += (1 + quadOffset))
-					{
-						glm::vec4 quadColor = { (x + halfLength) / (2 * halfLength), 0.4f, (y + halfLength) / (2 * halfLength), 0.6f };
-						Renderer2D::DrawQuad({ x, y, 0.0f }, { 1.0f, 1.0f }, quadColor);
-					}
-				}
-            }
             Renderer2D::EndScene();
             m_FrameBuffer->UnBind();
         }
@@ -140,7 +121,15 @@ namespace Wildlands
 
         ImGui::SliderFloat3("Position", glm::value_ptr(m_Position), -5.f, 5.f);
         ImGui::SliderFloat2("Size", glm::value_ptr(m_Size), -5.f, 5.f);
-        ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
+
+        if (m_SquareEntity)
+        {
+            ImGui::Separator();
+            ImGui::Text("%s", m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
+            glm::vec4& color = m_SquareEntity.GetComponent<SpriteComponent>().Color;
+            ImGui::ColorEdit4("Color", glm::value_ptr(color));
+            ImGui::Separator();
+        }
 
 		if (ImGui::Button("ShowQuad", ImVec2(100, 50)))
 		{

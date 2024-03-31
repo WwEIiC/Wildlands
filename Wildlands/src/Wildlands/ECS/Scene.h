@@ -1,19 +1,27 @@
 #pragma once
 
-#include "entt.hpp"
+#include <entt.hpp>
+#include "Wildlands/Core/Timestep.h"
 
 namespace Wildlands
 {
+	class Entity;
+
 	class Scene
 	{
 	public:
 		Scene();
 		~Scene();
 
-		entt::registry& Registry() { return m_Registry; }
+		void Update(Timestep ts);
+		void UIRender();
 
-		void OnUpdate(float deltaTime);
-		void OnRender();
+		Entity CreateEntity(const std::string& name = std::string());
+
+	private:
+		entt::registry m_Registry;
+
+	friend class Entity;
 	};
 }
 

@@ -14,7 +14,7 @@ namespace Wildlands
 		/// <param name="aspectRatio">width / height</param>
 		OrthographicCameraController(float aspectRatio);
 
-		void OnUpdate(Timestep ts);
+		void Update(Timestep ts);
 		void OnEvent(Event& e);
 
 		OrthographicCamera& GetCamera() { return m_Camera; }

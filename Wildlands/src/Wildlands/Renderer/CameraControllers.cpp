@@ -12,7 +12,7 @@ namespace Wildlands
 	{
 	}
 
-	void OrthographicCameraController::OnUpdate(Timestep ts)
+	void OrthographicCameraController::Update(Timestep ts)
 	{
 		WL_PROFILE_FUNCTION();
 

@@ -28,11 +28,6 @@ namespace Wildlands
 	class Profiler
 	{
 	public:
-		Profiler()
-			: m_CurrentSession(nullptr)
-		{
-		}
-
 		static Profiler& Get()
 		{
 			static Profiler instance;
@@ -127,6 +122,18 @@ namespace Wildlands
 				m_CurrentSession = nullptr;
 			}
 		}
+	private:
+		Profiler()
+			: m_CurrentSession(nullptr)
+		{
+		}
+		~Profiler()
+		{
+			EndSession();
+		}
+
+		Profiler(const Profiler&) = delete;
+		Profiler(Profiler&&) = delete;
 
 	private:
 		std::mutex m_Mutex;

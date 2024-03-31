@@ -177,7 +177,8 @@ project "Sandbox"
 		"Sandbox/src",
 		"%{IncludeDirs.SPDLOG}",
 		"%{IncludeDirs.glm}",
-		"%{IncludeDirs.ImGui}"
+		"%{IncludeDirs.ImGui}",
+		"%{IncludeDirs.entt}"
 	}
 
 	--link the Wildlands project to this project.

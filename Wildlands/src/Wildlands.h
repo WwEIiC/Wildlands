@@ -10,10 +10,19 @@
 
 #include "Wildlands/ImGui/ImGuiLayer.h"
 
+//----- Events -------------------------------------------------
 #include "Wildlands/Events/ApplicationEvent.h"
 #include "Wildlands/Events/KeyEvent.h"
 #include "Wildlands/Events/MouseEvent.h"
+//--------------------------------------------------------------
 
+//----- ECS ----------------------------------------------------
+#include "Wildlands/ECS/Scene.h"
+#include "Wildlands/ECS/Entity.h"
+#include "Wildlands/ECS/Components.h"
+//--------------------------------------------------------------
+
+//----- Renderer -----------------------------------------------
 #include "Wildlands/Renderer/Renderer.h"
 #include "Wildlands/Renderer/Renderer2D.h"
 
@@ -24,6 +33,8 @@
 #include "Wildlands/Renderer/VertexArray.h"
 
 #include "Wildlands/Renderer/Cameras.h"
+//--------------------------------------------------------------
+
 #include "Wildlands/Renderer/CameraControllers.h"
 
 #include "Wildlands/Common/FileReader.h"
