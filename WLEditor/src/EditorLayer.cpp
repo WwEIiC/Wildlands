@@ -29,6 +29,18 @@ namespace Wildlands
 
         m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
         m_CameraEntity.AddComponent<CameraComponent>().IsMain = true;
+
+
+
+        class CameraController : public ScriptableEntity
+        {
+        public:
+            void OnCreate() {  }
+            void OnDestory() {  }
+            void OnUpdate(Timestep ts) { }
+        };
+
+        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
     }
 
     void EditorLayer::Detach()

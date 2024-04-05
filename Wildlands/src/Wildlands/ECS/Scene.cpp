@@ -17,14 +17,30 @@ namespace Wildlands
 
 	void Scene::Update(Timestep ts)
 	{
+		// update scriptable entites
+		{
+			m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& NSComp)
+				{
+					if (!NSComp.Instance)
+					{
+						NSComp.Instance = NSComp.InstantiateScript();
+						NSComp.Instance->m_Entity = Entity(entity, this);
+
+						NSComp.Instance->OnCreate();
+					}
+					NSComp.Instance->OnUpdate (ts);
+				});
+		}
+
+
 		Camera* mainCamera = nullptr;
 		glm::mat4* cameraTransform = nullptr;
 
 		{
 			auto view = m_Registry.view<TransformComponent, CameraComponent>();
-			for (auto& entity : view)
+			for (auto entity : view)
 			{
-				const auto& [transform, camera] = (view.get<TransformComponent, CameraComponent>(entity));
+				auto [transform, camera] = (view.get<TransformComponent, CameraComponent>(entity));
 				if (camera.IsMain)
 				{
 					mainCamera = &camera.Camera;
@@ -39,9 +55,9 @@ namespace Wildlands
 			Renderer2D::BeginScene(*mainCamera, *cameraTransform);
 
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteComponent>);
-			for (auto& entity : group)
+			for (auto entity : group)
 			{
-				const auto& [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
+				auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
 
 				Renderer2D::DrawQuad(transform, sprite.Color);
 			}

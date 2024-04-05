@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "Wildlands/Renderer/Cameras.h"
+#include "Wildlands/ECS/ScriptableEntity.h"
 
 namespace Wildlands
 {
@@ -47,5 +48,23 @@ namespace Wildlands
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent& spriteComp) = default;
+	};
+
+	/// <summary>
+	/// use cpp to script
+	/// </summary>
+	struct NativeScriptComponent
+	{
+		ScriptableEntity* Instance = nullptr;
+
+		ScriptableEntity* (*InstantiateScript)();
+		void(*DestoryScript)(ScriptableEntity*);
+
+		template <typename T>
+		void Bind()
+		{
+			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+			DestoryScript = [](ScriptableEntity* instance) { delete instance; instance = nullptr; };
+		}
 	};
 }

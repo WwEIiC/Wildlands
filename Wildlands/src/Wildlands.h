@@ -19,6 +19,7 @@
 //----- ECS ----------------------------------------------------
 #include "Wildlands/ECS/Scene.h"
 #include "Wildlands/ECS/Entity.h"
+#include "Wildlands/ECS/ScriptableEntity.h"
 #include "Wildlands/ECS/Components.h"
 //--------------------------------------------------------------
 

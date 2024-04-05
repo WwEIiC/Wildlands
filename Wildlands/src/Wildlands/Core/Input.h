@@ -1,8 +1,7 @@
 #pragma once
-#include "Wildlands/Core/Base.h"
 
+#include <glm/glm.hpp>
 #include "Wildlands/Core/WL_KMCode.h"
-#include <utility>
 
 namespace Wildlands
 {
@@ -11,7 +10,7 @@ namespace Wildlands
 	public:
 		static bool IsKeyDown(int keycode);
 		static bool IsMouseButtonDown(int button);
-		static std::pair<float, float> GetMousePosition();
+		static glm::vec2 GetMousePosition();
 		static float GetMouseX();
 		static float GetMouseY();
 	};

@@ -9,7 +9,11 @@ namespace Wildlands
 	{
 	public:
 		Entity() = default;
-		Entity(entt::entity eHandle, Scene* sHandle);
+		Entity(entt::entity eHandle, Scene* sHandle)
+			: m_EntityHandle(eHandle), m_SceneHandle(sHandle)
+		{
+		}
+
 
 		template<typename Comp>
 		bool HasComponent()
