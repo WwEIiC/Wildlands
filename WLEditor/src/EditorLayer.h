@@ -17,7 +17,6 @@ namespace Wildlands
 
 		virtual void OnEvent(Event& event) override;
 	private:
-		OrthographicCameraController m_CameraController;
 		Ref<Texture2D> m_Texture;
 		Ref<FrameBuffer> m_FrameBuffer;
 

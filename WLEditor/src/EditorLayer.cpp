@@ -6,7 +6,7 @@
 namespace Wildlands
 {
     EditorLayer::EditorLayer()
-        : Layer("Sandbox2D"), m_CameraController(1280.0f / 720.0f)
+        : Layer("Sandbox2D")
     {
     }
 
@@ -28,7 +28,7 @@ namespace Wildlands
         m_SquareEntity.AddComponent<SpriteComponent>(glm::vec4{0.2f, 0.3f, 0.8f, 1.0f});
 
         m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
-        m_CameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.f, 16.f, -9.f, 9.f, -1.f, 1.f));
+        m_CameraEntity.AddComponent<CameraComponent>().IsMain = true;
     }
 
     void EditorLayer::Detach()
@@ -40,10 +40,6 @@ namespace Wildlands
     void EditorLayer::Update(Timestep ts)
     {
         WL_PROFILE_FUNCTION();
-
-        // Camera
-        if (m_ViewportFocused)
-            m_CameraController.Update(ts);
 
         Renderer2D::ResetStats();
         {
@@ -131,6 +127,16 @@ namespace Wildlands
             ImGui::ColorEdit4("Color", glm::value_ptr(color));
             ImGui::Separator();
         }
+        
+        if (m_CameraEntity)
+        {
+            ImGui::Separator();
+            ImGui::Text("%s", m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
+            float orthoSize = m_CameraEntity.GetComponent<CameraComponent>().Camera.GetOrthoSize();
+            ImGui::SliderFloat("Ortho Size", &orthoSize, 0.1f, 10.0f);
+            m_CameraEntity.GetComponent<CameraComponent>().Camera.SetOrthoSize(orthoSize);
+            ImGui::Separator();
+        }
 
         auto& stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
@@ -153,12 +159,13 @@ namespace Wildlands
             m_FrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             m_ViewportSize = { viewportSize.x, viewportSize.y };
 
-            m_CameraController.ResizeViewport(viewportSize.x, viewportSize.y);
+            //m_CameraController.ResizeViewport(viewportSize.x, viewportSize.y);
+            m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+
         }
         //ImGuiCoord :: (0, 0) is the left top and (1, 1) is the right bottom
         //OpenGLCoord:: (0, 0) is the left bottom and (1, 1) is the right top
         ImGui::Image((void*)m_FrameBuffer->GetColorAttachmentRendererID(), ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
-        //ImGui::Image((void*)m_FrameBuffer->GetColorAttachmentRendererID(), ImVec2(1280, 720), ImVec2(0, 1), ImVec2(1, 0));
         ImGui::End();//"Viewport"
         ImGui::PopStyleVar();
 
@@ -168,7 +175,6 @@ namespace Wildlands
 
     void EditorLayer::OnEvent(Event& event)
     {
-        m_CameraController.OnEvent(event);
     }
 }
 

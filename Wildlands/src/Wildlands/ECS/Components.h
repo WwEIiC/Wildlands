@@ -41,12 +41,11 @@ namespace Wildlands
 
 	struct CameraComponent
 	{
-		Camera Camera;
-		bool IsMain = true;
+		SceneCamera Camera;
+		bool IsMain = false;
+		bool FixedAspectRatio = false;
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent& spriteComp) = default;
-		CameraComponent(const glm::mat4& projection)
-			: Camera(projection) {}
 	};
 }
