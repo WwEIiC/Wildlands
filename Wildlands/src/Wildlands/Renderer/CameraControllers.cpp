@@ -20,22 +20,22 @@ namespace Wildlands
 		float rotation = m_Camera.GetRotation();
 
 		glm::vec3 position = m_Camera.GetPosition();
-		if (Input::IsKeyDown(WL_KEY_A)) 
+		if (Input::IsKeyDown(Key::A)) 
 		{ 
 			position.x -= cos(glm::radians(rotation)) * speed * ts; 
 			position.y -= sin(glm::radians(rotation)) * speed * ts;
 		}
-		if (Input::IsKeyDown(WL_KEY_D)) 
+		if (Input::IsKeyDown(Key::D)) 
 		{ 
 			position.x += cos(glm::radians(rotation)) * speed * ts;
 			position.y += sin(glm::radians(rotation)) * speed * ts;
 		}
-		if (Input::IsKeyDown(WL_KEY_W)) 
+		if (Input::IsKeyDown(Key::W)) 
 		{ 
 			position.x += -sin(glm::radians(rotation)) * speed * ts;
 			position.y += cos(glm::radians(rotation)) * speed * ts;
 		}
-		if (Input::IsKeyDown(WL_KEY_S)) 
+		if (Input::IsKeyDown(Key::S)) 
 		{ 
 			position.x -= -sin(glm::radians(rotation)) * speed * ts;
 			position.y -= cos(glm::radians(rotation)) * speed * ts;
@@ -43,8 +43,8 @@ namespace Wildlands
 		m_Camera.SetPosition(position);
 
 		speed = m_CameraRotateSpeed * m_ZoomLevel;
-		if (Input::IsKeyDown(WL_KEY_Q)) { rotation += speed * ts; }
-		if (Input::IsKeyDown(WL_KEY_E)) { rotation -= speed * ts; }
+		if (Input::IsKeyDown(Key::Q)) { rotation += speed * ts; }
+		if (Input::IsKeyDown(Key::E)) { rotation -= speed * ts; }
 		if (rotation > 180.0f) { rotation -= 360.0f; }
 		else if (rotation <= -180.0f) { rotation += 360.0f; }
 		m_Camera.SetRotation(rotation);

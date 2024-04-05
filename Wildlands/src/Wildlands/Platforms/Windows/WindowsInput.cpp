@@ -7,16 +7,16 @@
 
 namespace Wildlands 
 {
-	bool Input::IsKeyDown(int keycode)
+	bool Input::IsKeyDown(const KeyCode keycode)
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		int state = glfwGetKey(window, keycode);
+		int state = glfwGetKey(window, static_cast<int32_t>(keycode));
 		return state == GLFW_PRESS;
 	}
-	bool Input::IsMouseButtonDown(int button)
+	bool Input::IsMouseButtonDown(const MouseCode button)
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		int state = glfwGetMouseButton(window, button);
+		int state = glfwGetMouseButton(window, static_cast<int32_t>(button));
 		return state == GLFW_PRESS;
 	}
 	glm::vec2 Input::GetMousePosition()

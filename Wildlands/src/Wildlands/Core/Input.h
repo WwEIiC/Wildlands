@@ -8,8 +8,8 @@ namespace Wildlands
 	class  Input
 	{
 	public:
-		static bool IsKeyDown(int keycode);
-		static bool IsMouseButtonDown(int button);
+		static bool IsKeyDown(KeyCode keycode);
+		static bool IsMouseButtonDown(MouseCode button);
 		static glm::vec2 GetMousePosition();
 		static float GetMouseX();
 		static float GetMouseY();

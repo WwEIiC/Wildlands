@@ -6,23 +6,23 @@ namespace Wildlands
 	class  KeyEvent : public Event
 	{
 	public:
-		inline int GetKeyCode() { return m_KeyCode; }
+		inline KeyCode GetKeyCode() { return m_KeyCode; }
 
 		EVENT_CLASS_CATEGORY(static_cast<int>(EventCategory::EventCategoryInput) 
 			| static_cast<int>(EventCategory::EventCategoryKeyboard))
 	protected:
-		KeyEvent(int keycode)
+		KeyEvent(KeyCode keycode)
 			: m_KeyCode(keycode)
 		{
 		}
 
-		int m_KeyCode;
+		KeyCode m_KeyCode;
 	};
 
 	class  KeyDownEvent : public KeyEvent
 	{
 	public:
-		KeyDownEvent(int keycode, int repeatcount)
+		KeyDownEvent(KeyCode keycode, int repeatcount)
 			: KeyEvent(keycode), m_RepeatCount(repeatcount)
 		{
 		}
@@ -45,7 +45,7 @@ namespace Wildlands
 	class  KeyUpEvent : public KeyEvent
 	{
 	public:
-		KeyUpEvent(int keycode)
+		KeyUpEvent(KeyCode keycode)
 			: KeyEvent(keycode)
 		{
 		}
@@ -64,7 +64,7 @@ namespace Wildlands
 	class  KeyTypeEvent : public KeyEvent
 	{
 	public:
-		KeyTypeEvent(int keycode)
+		KeyTypeEvent(KeyCode keycode)
 			: KeyEvent(keycode)
 		{
 		}

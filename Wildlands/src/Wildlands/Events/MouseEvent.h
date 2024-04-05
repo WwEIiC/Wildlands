@@ -1,5 +1,6 @@
 #pragma once
 #include "Event.h"
+#include "Wildlands/Core/Input.h"
 
 namespace Wildlands
 {
@@ -58,7 +59,7 @@ namespace Wildlands
 	class  MouseButtonEvent : public Event
 	{
 	public:
-		inline int GetMouseButton() const { return m_Button; }
+		inline MouseCode GetMouseButton() const { return m_Button; }
 
 		EVENT_CLASS_CATEGORY(static_cast<int>(EventCategory::EventCategoryInput)
 							| static_cast<int>(EventCategory::EventCategoryMouse))
@@ -69,13 +70,13 @@ namespace Wildlands
 		{
 		}
 
-		int m_Button;
+		MouseCode m_Button;
 	};
 
 	class  MouseButtonDownEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonDownEvent(int mousebutton)
+		MouseButtonDownEvent(MouseCode mousebutton)
 			:MouseButtonEvent(mousebutton)
 		{
 		}
@@ -93,7 +94,7 @@ namespace Wildlands
 	class  MouseButtonUpEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonUpEvent(int mousebutton)
+		MouseButtonUpEvent(MouseCode mousebutton)
 			:MouseButtonEvent(mousebutton)
 		{
 		}

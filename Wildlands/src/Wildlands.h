@@ -40,3 +40,7 @@
 
 #include "Wildlands/Common/FileReader.h"
 #include "Wildlands/Common/Singleton.h"
+
+//----- Debug --------------------------------------------------
+#include "Wildlands/Debug/Profiler.h"
+//--------------------------------------------------------------

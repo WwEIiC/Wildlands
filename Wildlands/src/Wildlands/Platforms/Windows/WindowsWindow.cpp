@@ -4,6 +4,8 @@
 #include "Wildlands/Renderer/Renderer.h"
 #include "Wildlands/Platforms/OpenGL/OpenGLContext.h"
 
+#include "Wildlands/Core/WL_KMCode.h"
+
 #include "Wildlands/Events/ApplicationEvent.h"
 #include "Wildlands/Events/KeyEvent.h"
 #include "Wildlands/Events/MouseEvent.h"
@@ -129,13 +131,13 @@ namespace Wildlands
 				{
 					case GLFW_PRESS:
 					{
-						MouseButtonDownEvent event(button);
+						MouseButtonDownEvent event(static_cast<MouseCode>(button));
 						data.EventCallback(event);
 						break;
 					}
 					case GLFW_RELEASE:
 					{
-						MouseButtonUpEvent event(button);
+						MouseButtonUpEvent event(static_cast<MouseCode>(button));
 						data.EventCallback(event);
 						break;
 					}
@@ -160,20 +162,20 @@ namespace Wildlands
 				{
 					case GLFW_PRESS:
 					{
-						KeyDownEvent event(key, 0);
+						KeyDownEvent event(static_cast<KeyCode>(key), 0);
 						data.EventCallback(event);
 						break;
 					}
 					case GLFW_REPEAT:
 					{
-						KeyDownEvent event(key, 1);
+						KeyDownEvent event(static_cast<KeyCode>(key), 1);
 						data.EventCallback(event);
 						break;
 
 					}
 					case GLFW_RELEASE:
 					{
-						KeyUpEvent event(key);
+						KeyUpEvent event(static_cast<KeyCode>(key));
 						data.EventCallback(event);
 						break;
 					}
@@ -183,7 +185,7 @@ namespace Wildlands
 		glfwSetCharCallback(m_Window, [](GLFWwindow* window, uint32_t keycode)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				KeyTypeEvent event(keycode);
+				KeyTypeEvent event(static_cast<KeyCode>(keycode));
 				data.EventCallback(event);
 			});
 		
