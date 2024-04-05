@@ -23,8 +23,12 @@ namespace Wildlands
         m_FrameBuffer = FrameBuffer::Create(framebufferSpec);
 
         m_ActiveScene = CreateRef<Scene>();
+
         m_SquareEntity = m_ActiveScene->CreateEntity("Square");
         m_SquareEntity.AddComponent<SpriteComponent>(glm::vec4{0.2f, 0.3f, 0.8f, 1.0f});
+
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
+        m_CameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.f, 16.f, -9.f, 9.f, -1.f, 1.f));
     }
 
     void EditorLayer::Detach()
@@ -52,12 +56,9 @@ namespace Wildlands
         {
             WL_PROFILE_SCOPE("Renderer Draw");
 
-            Renderer2D::BeginScene(m_CameraController.GetCamera());
-
 			// Scene Update
 			m_ActiveScene->Update(ts);
 
-            Renderer2D::EndScene();
             m_FrameBuffer->UnBind();
         }
     }
@@ -130,11 +131,6 @@ namespace Wildlands
             ImGui::ColorEdit4("Color", glm::value_ptr(color));
             ImGui::Separator();
         }
-
-		if (ImGui::Button("ShowQuad", ImVec2(100, 50)))
-		{
-			showQuad = !showQuad;
-		}
 
         auto& stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");

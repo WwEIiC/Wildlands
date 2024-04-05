@@ -3,6 +3,17 @@
 
 namespace Wildlands
 {
+	class Camera
+	{
+	public:
+		Camera(const glm::mat4 m_projectMatrix)
+			: m_ProjectionMatrix(m_projectMatrix) {}
+
+		const glm::mat4& GetProjection() const { return m_ProjectionMatrix; }
+	private:
+		glm::mat4 m_ProjectionMatrix;
+	};
+
 	class OrthographicCamera
 	{
 	public:

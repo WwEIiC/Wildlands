@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "Wildlands/Renderer/Cameras.h"
+
 namespace Wildlands
 {
 	struct TransformComponent
@@ -35,5 +37,16 @@ namespace Wildlands
 		SpriteComponent(const SpriteComponent& spriteComp) = default;
 		SpriteComponent(const glm::vec4& color)
 			: Color(color) {}
+	};
+
+	struct CameraComponent
+	{
+		Camera Camera;
+		bool IsMain = true;
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent& spriteComp) = default;
+		CameraComponent(const glm::mat4& projection)
+			: Camera(projection) {}
 	};
 }

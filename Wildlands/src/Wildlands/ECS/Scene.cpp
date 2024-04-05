@@ -17,13 +17,37 @@ namespace Wildlands
 
 	void Scene::Update(Timestep ts)
 	{
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteComponent>);
-		for (auto& entity : group)
-		{
-			auto tuple = group.get<TransformComponent, SpriteComponent>(entity);
-			auto& [transform, sprite] = tuple;
+		Camera* mainCamera = nullptr;
+		glm::mat4* cameraTransform = nullptr;
 
-			Renderer2D::DrawQuad(transform, sprite.Color);
+		{
+			//auto group = m_Registry.group<TransformComponent>(entt::get<CameraComponent>);
+			auto group = m_Registry.view<TransformComponent, CameraComponent>();
+			for (auto& entity : group)
+			{
+				const auto& [transform, camera] = (group.get<TransformComponent, CameraComponent>(entity));
+				if (camera.IsMain)
+				{
+					mainCamera = &camera.Camera;
+					cameraTransform = &transform.Transform;
+					break;
+				}
+			}
+		}
+
+		if (mainCamera)
+		{
+			Renderer2D::BeginScene(*mainCamera, *cameraTransform);
+
+			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteComponent>);
+			for (auto& entity : group)
+			{
+				const auto& [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
+
+				Renderer2D::DrawQuad(transform, sprite.Color);
+			}
+
+			Renderer2D::EndScene();
 		}
 	}
 	void Scene::UIRender()

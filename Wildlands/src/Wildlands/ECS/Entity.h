@@ -28,7 +28,7 @@ namespace Wildlands
 		template<typename Comp, typename... Args>
 		Comp& AddComponent(Args&&... args)
 		{
-			WL_CORE_ASSERT(!HasComponent<Comp>, "Entity already has component");
+			WL_CORE_ASSERT(!HasComponent<Comp>(), "Entity already has component");
 
 			return m_SceneHandle->m_Registry.emplace<Comp>(m_EntityHandle, std::forward<Args>(args)...);
 		}

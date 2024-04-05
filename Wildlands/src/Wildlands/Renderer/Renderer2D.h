@@ -10,6 +10,7 @@ namespace Wildlands
 		static void Init();
 		static void Destory();
 
+		static void BeginScene(const Camera& camera, const glm::mat4& cTransform);
 		static void BeginScene(const OrthographicCamera& camera);
 		static void EndScene();
 		static void Flush();
