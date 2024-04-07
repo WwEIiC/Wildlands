@@ -1,5 +1,6 @@
 #pragma once
 #include "Wildlands.h"
+#include "Panels/SceneHierarchyPanel.h"
 
 namespace Wildlands
 {
@@ -29,6 +30,9 @@ namespace Wildlands
 
 		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 		glm::vec2 m_Size = { 1.0f, 1.0f };
+
+	private:
+		SceneHierarchyPanel m_HierarchyPanel;
 	};
 }
 

@@ -30,17 +30,7 @@ namespace Wildlands
         m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
         m_CameraEntity.AddComponent<CameraComponent>().IsMain = true;
 
-
-
-        class CameraController : public ScriptableEntity
-        {
-        public:
-            void OnCreate() {  }
-            void OnDestory() {  }
-            void OnUpdate(Timestep ts) { }
-        };
-
-        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+        m_HierarchyPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::Detach()
@@ -126,39 +116,11 @@ namespace Wildlands
             ImGui::EndMenuBar();
         }
 
-        ImGui::Begin("Settings");
+        // Scene Hierarchy Panel
+        m_HierarchyPanel.OnImGuiRender();
+        ImGui::ShowDemoWindow();
 
-        ImGui::SliderFloat3("Position", glm::value_ptr(m_Position), -5.f, 5.f);
-        ImGui::SliderFloat2("Size", glm::value_ptr(m_Size), -5.f, 5.f);
-
-        if (m_SquareEntity)
-        {
-            ImGui::Separator();
-            ImGui::Text("%s", m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
-            glm::vec4& color = m_SquareEntity.GetComponent<SpriteComponent>().Color;
-            ImGui::ColorEdit4("Color", glm::value_ptr(color));
-            ImGui::Separator();
-        }
         
-        if (m_CameraEntity)
-        {
-            ImGui::Separator();
-            ImGui::Text("%s", m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
-            float orthoSize = m_CameraEntity.GetComponent<CameraComponent>().Camera.GetOrthoSize();
-            ImGui::SliderFloat("Ortho Size", &orthoSize, 0.1f, 10.0f);
-            m_CameraEntity.GetComponent<CameraComponent>().Camera.SetOrthoSize(orthoSize);
-            ImGui::Separator();
-        }
-
-        auto& stats = Renderer2D::GetStats();
-        ImGui::Text("Renderer2D Stats:");
-        ImGui::Text("Draw Calls: %d", stats.drawCalls);
-        ImGui::Text("Quad Count: %d", stats.quadCount);
-        ImGui::Text("Vertices: %d", stats.GetVertexCount());
-        ImGui::Text("Indices: %d", stats.GetIndexCount());
-
-        ImGui::End();//"settings"
-
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
         ImGui::Begin("Viewport");
         m_ViewportFocused = ImGui::IsWindowFocused();
@@ -171,12 +133,11 @@ namespace Wildlands
             m_FrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             m_ViewportSize = { viewportSize.x, viewportSize.y };
 
-            //m_CameraController.ResizeViewport(viewportSize.x, viewportSize.y);
             m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-
         }
-        //ImGuiCoord :: (0, 0) is the left top and (1, 1) is the right bottom
-        //OpenGLCoord:: (0, 0) is the left bottom and (1, 1) is the right top
+
+        // ImGuiCoord :: (0, 0) is the left top and (1, 1) is the right bottom
+        // OpenGLCoord:: (0, 0) is the left bottom and (1, 1) is the right top
         ImGui::Image((void*)m_FrameBuffer->GetColorAttachmentRendererID(), ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
         ImGui::End();//"Viewport"
         ImGui::PopStyleVar();

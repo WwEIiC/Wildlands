@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "Wildlands/Renderer/Cameras.h"
+#include "Wildlands/ECS/SceneCamera.h"
 #include "Wildlands/ECS/ScriptableEntity.h"
 
 namespace Wildlands
@@ -43,7 +44,7 @@ namespace Wildlands
 	struct CameraComponent
 	{
 		SceneCamera Camera;
-		bool IsMain = false;
+		bool Primary = false;
 		bool FixedAspectRatio = false;
 
 		CameraComponent() = default;

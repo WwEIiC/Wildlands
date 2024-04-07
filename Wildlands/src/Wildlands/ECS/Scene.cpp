@@ -41,7 +41,7 @@ namespace Wildlands
 			for (auto entity : view)
 			{
 				auto [transform, camera] = (view.get<TransformComponent, CameraComponent>(entity));
-				if (camera.IsMain)
+				if (camera.Primary)
 				{
 					mainCamera = &camera.Camera;
 					cameraTransform = &transform.Transform;

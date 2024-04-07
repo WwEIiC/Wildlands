@@ -16,26 +16,6 @@ namespace Wildlands
 		glm::mat4 m_ProjectionMatrix = glm::mat4(1.0f);
 	};
 
-	class SceneCamera : public Camera
-	{
-	public:
-		SceneCamera();
-		virtual ~SceneCamera() = default;
-
-		void SetOrthographic(float oSize, float oNear, float oFar);
-		void SetViewportSize(uint32_t width, uint32_t height);
-
-		float GetOrthoSize() const { return m_OrthoSize; }
-		void SetOrthoSize(float oSize) { m_OrthoSize = oSize; UpdataProjectionMatrix(); }
-
-	private:
-		void UpdataProjectionMatrix();
-	private:
-		float m_AspectRatio = 1.0f;
-		float m_OrthoSize = 10.0f; // height
-		float m_OrthoNear= -1.0f, m_OrthoFar= 1.0f;
-	};
-
 	class OrthographicCamera
 	{
 	public:

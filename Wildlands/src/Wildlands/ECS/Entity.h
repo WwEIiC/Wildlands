@@ -44,9 +44,16 @@ namespace Wildlands
 
 			m_SceneHandle->m_Registry.remove<Comp>(m_EntityHandle);
 		}
-		
+
 	public:
-		operator bool() const {return m_EntityHandle != entt::null; }
+		operator bool() const { return m_EntityHandle != entt::null; }
+		operator uint32_t() const { return (uint32_t)m_EntityHandle; }
+
+		bool operator == (const Entity& other) const 
+		{ 
+			return m_EntityHandle == other.m_EntityHandle && m_SceneHandle == other.m_SceneHandle; 
+		}
+		bool operator != (const Entity& other) const { return !(*this == other); }
 
 	private:
 		entt::entity m_EntityHandle = entt::null; // entt::entity == uint32_t
