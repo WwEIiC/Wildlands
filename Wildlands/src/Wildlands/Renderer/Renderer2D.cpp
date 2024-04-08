@@ -123,19 +123,12 @@ namespace Wildlands
 		s_Data.Shader->Bind();
         s_Data.Shader->SetMat4("u_VPMatrix", camera.GetVPMatrix());
 
-		s_Data.IndexCount = 0;
-		s_Data.NextQuadVertex = s_Data.QuadVerteciesBase;
-
-		s_Data.TextureSlotIndex = 1;
+		StartBatch();
 	}
 
 	void Renderer2D::EndScene()
 	{
 		WL_PROFILE_FUNCTION();
-
-		s_Data.VertexArray->Bind();
-		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.NextQuadVertex - (uint8_t*)s_Data.QuadVerteciesBase);
-		s_Data.VertexBuffer->SetData(s_Data.QuadVerteciesBase, dataSize);
 
 		Flush();
 	}
@@ -144,6 +137,10 @@ namespace Wildlands
 		WL_PROFILE_FUNCTION();
 
 		if (s_Data.IndexCount == 0) { return; }
+
+		s_Data.VertexArray->Bind();
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.NextQuadVertex - (uint8_t*)s_Data.QuadVerteciesBase);
+		s_Data.VertexBuffer->SetData(s_Data.QuadVerteciesBase, dataSize);
 
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 			s_Data.TextureSlots[i]->Bind(i);
@@ -365,13 +362,19 @@ namespace Wildlands
 		s_Data.stats.drawCalls = 0;
 		s_Data.stats.quadCount = 0;
 	}
-	void Renderer2D::NextBatch()
-	{
-		EndScene();
 
+	void Renderer2D::StartBatch()
+	{
 		s_Data.IndexCount = 0;
 		s_Data.NextQuadVertex = s_Data.QuadVerteciesBase;
 
 		s_Data.TextureSlotIndex = 1;
+	}
+	void Renderer2D::NextBatch()
+	{
+		EndScene();
+		
+		Flush();
+		StartBatch();
 	}
 }

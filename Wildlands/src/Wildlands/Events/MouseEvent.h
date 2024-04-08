@@ -50,7 +50,8 @@ namespace Wildlands
 
 		EVENT_CLASS_TYPE(MouseScrolled)
 		EVENT_CLASS_CATEGORY(static_cast<int>(EventCategory::EventCategoryInput)
-							| static_cast<int>(EventCategory::EventCategoryMouse))
+							| static_cast<int>(EventCategory::EventCategoryMouse)
+							| static_cast<int>(EventCategory::EventCategoryMouseButton))
 
 	private:
 		float m_XOffset, m_YOffset;

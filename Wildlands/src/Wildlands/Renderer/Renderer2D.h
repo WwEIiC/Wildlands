@@ -33,14 +33,15 @@ namespace Wildlands
 			uint32_t drawCalls = 0;
 			uint32_t quadCount = 0;
 
-			uint32_t GetVertexCount() { return quadCount * 4; }
-			uint32_t GetIndexCount() { return quadCount * 6; }
+			uint32_t GetVertexCount() const { return quadCount * 4; }
+			uint32_t GetIndexCount() const { return quadCount * 6; }
 		};
 
 		static Stats& GetStats();
 		static void ResetStats();
 
 	private:
+		static void StartBatch();
 		static void NextBatch();
 	};
 }

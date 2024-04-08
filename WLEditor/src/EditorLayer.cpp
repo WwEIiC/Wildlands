@@ -28,7 +28,7 @@ namespace Wildlands
         m_SquareEntity.AddComponent<SpriteComponent>(glm::vec4{0.2f, 0.3f, 0.8f, 1.0f});
 
         m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
-        m_CameraEntity.AddComponent<CameraComponent>().IsMain = true;
+        m_CameraEntity.AddComponent<CameraComponent>().Primary= true;
 
         m_HierarchyPanel.SetContext(m_ActiveScene);
     }
