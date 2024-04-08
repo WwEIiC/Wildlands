@@ -29,6 +29,26 @@ namespace Wildlands
 
         m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
         m_CameraEntity.AddComponent<CameraComponent>().Primary= true;
+        class CameraController : public ScriptableEntity
+        {
+        public:
+            virtual void OnUpdate(Timestep ts) override
+            {
+                auto& translation = GetComponent<TransformComponent>().Position;
+
+                float speed = 5.0f;
+
+                if (Input::IsKeyDown(Key::A))
+                    translation.x -= speed * ts;
+                if (Input::IsKeyDown(Key::D))
+                    translation.x += speed * ts;
+                if (Input::IsKeyDown(Key::W))
+                    translation.y += speed * ts;
+                if (Input::IsKeyDown(Key::S))
+                    translation.y -= speed * ts;
+            }
+        };
+        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         m_HierarchyPanel.SetContext(m_ActiveScene);
     }
@@ -119,6 +139,14 @@ namespace Wildlands
         // Scene Hierarchy Panel
         m_HierarchyPanel.OnImGuiRender();
         ImGui::ShowDemoWindow();
+
+        ImGui::Begin("Render Stats");
+        auto stats = Renderer2D::GetStats();
+        ImGui::Text("Renderer2D Stats:");
+        ImGui::Text("Draw Calls: %d", stats.drawCalls);
+		ImGui::Text("Vertices: %d", stats.GetVertexCount());
+		ImGui::Text("Indices: %d", stats.GetIndexCount());
+        ImGui::End();
 
         
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });

@@ -11,7 +11,7 @@ namespace Wildlands
 	{
 		GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		int state = glfwGetKey(window, static_cast<int32_t>(keycode));
-		return state == GLFW_PRESS;
+		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 	bool Input::IsMouseButtonDown(const MouseCode button)
 	{

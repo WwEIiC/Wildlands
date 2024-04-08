@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 #ifdef WL_DEBUG
 	#define WL_ENABLE_ASSERTS
@@ -30,7 +31,6 @@
 #define BIT(x) (1 << x)
 #define BIND_EVENT_FUNC(func) [this](auto&&... args) -> decltype(auto) { return this->func(std::forward<decltype(args)>(args)...); }
 
-#include <memory>
 
 namespace Wildlands
 {
@@ -50,4 +50,6 @@ namespace Wildlands
 		return std::make_unique<T>(std::forward<Args>(args)...);
 	}
 }
+
+#include "Wildlands/Core/Log.h"
 

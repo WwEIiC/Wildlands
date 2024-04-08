@@ -45,8 +45,8 @@ namespace Wildlands
 		{
 			float orthoLeft		= -m_OrthoSize * m_AspectRatio * 0.5f;
 			float orthoRight	=  m_OrthoSize * m_AspectRatio * 0.5f;
-			float orthoBottom	=  m_OrthoSize * 0.5f;
-			float orthoTop		= -m_OrthoSize * 0.5f;
+			float orthoBottom	= -m_OrthoSize * 0.5f;
+			float orthoTop		=  m_OrthoSize * 0.5f;
 
 			m_ProjectionMatrix = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_OrthoNear, m_OrthoFar);
 		}
