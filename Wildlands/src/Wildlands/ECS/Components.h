@@ -43,13 +43,13 @@ namespace Wildlands
 			: Tag(tag) {}
 	};
 
-	struct SpriteComponent
+	struct SpriteRendererComponent
 	{
 		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-		SpriteComponent() = default;
-		SpriteComponent(const SpriteComponent& spriteComp) = default;
-		SpriteComponent(const glm::vec4& color)
+		SpriteRendererComponent() = default;
+		SpriteRendererComponent(const SpriteRendererComponent& spriteComp) = default;
+		SpriteRendererComponent(const glm::vec4& color)
 			: Color(color) {}
 	};
 

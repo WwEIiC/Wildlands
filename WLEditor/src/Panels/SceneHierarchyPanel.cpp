@@ -29,6 +29,16 @@ namespace Wildlands
 
 		if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()){ m_SelectedEntity = {};}
 
+		// Right-Click on blank space.
+		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
+		{
+			if (ImGui::MenuItem("Create Entity"))
+			{
+				m_Context->CreateEntity("Empty Entity");
+			}
+
+			ImGui::EndPopup();
+		}
 		ImGui::End();
 
 		ImGui::Begin("Properties");
@@ -36,6 +46,27 @@ namespace Wildlands
 		if (m_SelectedEntity)
 		{
 			DrawEntityComponents(m_SelectedEntity);
+
+			if (ImGui::Button("Add Component"))
+				ImGui::OpenPopup("AddComponent");
+
+			if (ImGui::BeginPopup("AddComponent"))
+			{
+				if (ImGui::MenuItem("Sprite Renderer"))
+				{
+					if (!m_SelectedEntity.HasComponent<SpriteRendererComponent>())
+						m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Camera"))
+				{
+					if (!m_SelectedEntity.HasComponent<CameraComponent>())
+						m_SelectedEntity.AddComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
 		}
 
 		ImGui::End();
@@ -103,11 +134,26 @@ namespace Wildlands
 			m_SelectedEntity = entity;
 		}
 
+		bool deleteEntity = false;
+		if (ImGui::BeginPopupContextItem())
+		{
+			if (ImGui::MenuItem("Delete Entity")) { deleteEntity = true; }
+
+			ImGui::EndPopup();
+		}
+
 		if (isOpened)
 		{
 			ImGui::TreePop();
 		}
 
+		if (deleteEntity) 
+		{
+			if (m_SelectedEntity == entity)
+				m_SelectedEntity = {};
+
+			m_Context->DestoryEntity(entity); 
+		}
 	}
 
 	void SceneHierarchyPanel::DrawEntityComponents(Entity& entity)
@@ -187,9 +233,9 @@ namespace Wildlands
 				}
 			});
 		
-		DrawComponent<SpriteComponent>("Sprite", entity, [&]()
+		DrawComponent<SpriteRendererComponent>("Sprite", entity, [&]()
 			{
-				auto& spriteComp = entity.GetComponent<SpriteComponent>();
+				auto& spriteComp = entity.GetComponent<SpriteRendererComponent>();
 				ImGui::ColorEdit4("Color", glm::value_ptr(spriteComp.Color));
 			});
 	}

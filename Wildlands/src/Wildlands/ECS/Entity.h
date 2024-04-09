@@ -34,7 +34,9 @@ namespace Wildlands
 		{
 			WL_CORE_ASSERT(!HasComponent<Comp>(), "Entity already has component");
 
-			return m_SceneHandle->m_Registry.emplace<Comp>(m_EntityHandle, std::forward<Args>(args)...);
+			auto& component = m_SceneHandle->m_Registry.emplace<Comp>(m_EntityHandle, std::forward<Args>(args)...);
+			m_SceneHandle->OnComponentAdded<Comp>(*this, component);
+			return component;
 		}
 
 		template<typename Comp>
@@ -48,6 +50,7 @@ namespace Wildlands
 	public:
 		operator bool() const { return m_EntityHandle != entt::null; }
 		operator uint32_t() const { return (uint32_t)m_EntityHandle; }
+		operator entt::entity() const { return m_EntityHandle; }
 
 		bool operator == (const Entity& other) const 
 		{ 

@@ -10,16 +10,23 @@ namespace Wildlands
 	class Scene
 	{
 	public:
-		Scene();
-		~Scene();
+		Scene() = default;
+		~Scene() = default;
 
 		void Update(Timestep ts);
 		void UIRender();
 
 		Entity CreateEntity(const std::string& name = std::string());
+		void DestoryEntity(Entity entity);
 
-	public:
 		void OnViewportResize(uint32_t width, uint32_t height);
+
+	private:
+		template <typename Comp>
+		void OnComponentAdded(Entity entity, Comp& comp)
+		{
+
+		}
 
 	private:
 		entt::registry m_Registry;
