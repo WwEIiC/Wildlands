@@ -42,38 +42,18 @@ namespace Wildlands
 		ImGui::End();
 
 		ImGui::Begin("Properties");
-
 		if (m_SelectedEntity)
-		{
 			DrawEntityComponents(m_SelectedEntity);
-
-			if (ImGui::Button("Add Component"))
-				ImGui::OpenPopup("AddComponent");
-
-			if (ImGui::BeginPopup("AddComponent"))
-			{
-				if (ImGui::MenuItem("Sprite Renderer"))
-				{
-					if (!m_SelectedEntity.HasComponent<SpriteRendererComponent>())
-						m_SelectedEntity.AddComponent<SpriteRendererComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-				if (ImGui::MenuItem("Camera"))
-				{
-					if (!m_SelectedEntity.HasComponent<CameraComponent>())
-						m_SelectedEntity.AddComponent<CameraComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				ImGui::EndPopup();
-			}
-		}
-
 		ImGui::End();
+
+		DrawWindows();
 	}
 
 	static void DrawVec3Controller(const std::string& name, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.f)
 	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImFont* boldFont = io.Fonts->Fonts[1];
+
 		ImGui::PushID(name.c_str());
 		ImGui::Columns(2);
 
@@ -89,7 +69,9 @@ namespace Wildlands
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushFont(boldFont);
 		if (ImGui::Button("X", buttonSize)) { values.x = resetValue; }
+		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine();
 		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
@@ -100,7 +82,9 @@ namespace Wildlands
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.2f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+		ImGui::PushFont(boldFont);
 		if (ImGui::Button("Y", buttonSize)) { values.y = resetValue; }
+		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine();
 		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
@@ -111,7 +95,9 @@ namespace Wildlands
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+		ImGui::PushFont(boldFont);
 		if (ImGui::Button("Z", buttonSize)) { values.z = resetValue; }
+		ImGui::PopFont();
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine();
 		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
@@ -122,11 +108,50 @@ namespace Wildlands
 		ImGui::PopID();
 	}
 
+	template <typename Comp, typename UIFunction>
+	static void DrawComponent(const std::string& name, Entity& entity, UIFunction uiFunc)
+	{
+		if (entity.HasComponent<Comp>())
+		{
+			auto& component = entity.GetComponent<Comp>();
+			const ImGuiTreeNodeFlags compTreeNodeflags = ImGuiTreeNodeFlags_DefaultOpen 
+				| ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding 
+				| ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
+			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+			ImVec2 availableRegionSize = ImGui::GetContentRegionAvail();
+			ImGui::Separator();
+			bool isOpened = ImGui::TreeNodeEx((void*)typeid(Comp).hash_code(), compTreeNodeflags, name.c_str());
+			ImGui::PopStyleVar();
+			ImGui::SameLine(availableRegionSize.x - lineHeight * 0.5f);
+			if (ImGui::Button("...", ImVec2{ lineHeight, lineHeight }))
+				ImGui::OpenPopup("ComponentSettings");
+
+
+			bool toRemove = false;
+			if (ImGui::BeginPopup("ComponentSettings"))
+			{
+				if (ImGui::MenuItem("Remove Component")) { toRemove = true; }
+				ImGui::EndPopup();
+			}
+
+			if (isOpened)
+			{
+				uiFunc(component);
+				ImGui::TreePop();
+			}
+
+			if (toRemove)
+				entity.RemoveComponent<Comp>();
+		}
+	}
+
 	void SceneHierarchyPanel::DrawEntityNode(Entity& entity)
 	{
 		auto& tagComp = entity.GetComponent<TagComponent>();
 		ImGuiTreeNodeFlags flags = ((entity == m_SelectedEntity) ? ImGuiTreeNodeFlags_Selected : 0)
-			| ImGuiTreeNodeFlags_OpenOnArrow;
+			| ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool isOpened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tagComp.Tag.c_str());
 		if (ImGui::IsItemClicked())
@@ -164,25 +189,46 @@ namespace Wildlands
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
 			strcpy_s(buffer, sizeof(buffer), tag.c_str());
-			if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
+			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
 			}
 		}
+		ImGui::SameLine();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::Button("Add Component"))
+				ImGui::OpenPopup("AddComponent");
 
-		DrawComponent<TransformComponent>("Transform", entity, [&]()
+		if (ImGui::BeginPopup("AddComponent"))
+		{
+			if (ImGui::MenuItem("Sprite Renderer"))
 			{
-				auto& transform = entity.GetComponent<TransformComponent>();
-				DrawVec3Controller("Position", transform.Position);
-				glm::vec3 ratationInDegrees = glm::degrees(transform.Rotation);
+				if (!m_SelectedEntity.HasComponent<SpriteRendererComponent>())
+					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+			if (ImGui::MenuItem("Camera"))
+			{
+				if (!m_SelectedEntity.HasComponent<CameraComponent>())
+					m_SelectedEntity.AddComponent<CameraComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+		ImGui::PopItemWidth();
+
+		DrawComponent<TransformComponent>("Transform", entity, [](auto& transformComp)
+			{
+				DrawVec3Controller("Position", transformComp.Position);
+				glm::vec3 ratationInDegrees = glm::degrees(transformComp.Rotation);
 				DrawVec3Controller("Rotation", ratationInDegrees);
-				transform.Rotation = glm::radians(ratationInDegrees);
-				DrawVec3Controller("Scale", transform.Scale, 1.0f);
+				transformComp.Rotation = glm::radians(ratationInDegrees);
+				DrawVec3Controller("Scale", transformComp.Scale, 1.0f);
 			});
 
-		DrawComponent<CameraComponent>("Camera", entity, [&]()
+		DrawComponent<CameraComponent>("Camera", entity, [](auto& cameraComp)
 			{
-				auto& cameraComp = entity.GetComponent<CameraComponent>();
 				auto& camera = cameraComp.Camera;
 
 				ImGui::Checkbox("Primary", &cameraComp.Primary);
@@ -233,10 +279,22 @@ namespace Wildlands
 				}
 			});
 		
-		DrawComponent<SpriteRendererComponent>("Sprite", entity, [&]()
+		DrawComponent<SpriteRendererComponent>("Sprite", entity, [](auto& spriteComp)
 			{
-				auto& spriteComp = entity.GetComponent<SpriteRendererComponent>();
 				ImGui::ColorEdit4("Color", glm::value_ptr(spriteComp.Color));
 			});
 	}
+
+	void SceneHierarchyPanel::DrawWindows()
+	{
+		if (m_ShowSettingsWindow)
+			ShowSettingsWindow();
+	}
+	void SceneHierarchyPanel::ShowSettingsWindow()
+	{
+		ImGui::Begin("Settings", &m_ShowSettingsWindow);
+        ImGui::ShowFontSelector("Fonts##Selector");
+		ImGui::End();
+	}
+
 }

@@ -12,8 +12,8 @@ namespace Wildlands
 		bool VSync;
 
 		WindowConstructData(const std::string& title = "Wildlands Engine",
-			uint32_t width = 1280,
-			uint32_t height = 720,
+			uint32_t width = 1600,
+			uint32_t height = 900,
 			bool vsync = true)
 			: Title(title), Width(width), Height(height), VSync(vsync)
 		{
