@@ -23,11 +23,7 @@ namespace Wildlands
 
 	private:
 		template <typename Comp>
-		void OnComponentAdded(Entity entity, Comp& comp)
-		{
-
-		}
-
+		void OnComponentAdded(Entity entity, Comp& comp);
 	private:
 		entt::registry m_Registry;
 
@@ -35,6 +31,7 @@ namespace Wildlands
 
 	friend class Entity;
 	friend class SceneHierarchyPanel;
+	friend class SceneSerializer;
 	};
 }
 

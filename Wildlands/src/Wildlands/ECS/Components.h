@@ -9,6 +9,16 @@
 
 namespace Wildlands
 {
+	struct TagComponent
+	{
+		std::string Tag;
+
+		TagComponent() = default;
+		TagComponent(const TagComponent& tagComp) = default;
+		TagComponent(const std::string& tag)
+			: Tag(tag) {}
+	};
+
 	struct TransformComponent
 	{
 		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
@@ -31,16 +41,6 @@ namespace Wildlands
 		}
 
 		operator glm::mat4() const { return GetTransform(); }
-	};
-
-	struct TagComponent
-	{
-		std::string Tag;
-
-		TagComponent() = default;
-		TagComponent(const TagComponent& tagComp) = default;
-		TagComponent(const std::string& tag)
-			: Tag(tag) {}
 	};
 
 	struct SpriteRendererComponent

@@ -7,8 +7,6 @@
 
 #include "Wildlands/Renderer/Renderer.h"
 
-#include "Wildlands/Common/FileReader.h"
-
 #include "GLFW/glfw3.h"
 
 namespace Wildlands

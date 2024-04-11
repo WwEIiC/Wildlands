@@ -38,9 +38,6 @@
 
 #include "Wildlands/Renderer/CameraControllers.h"
 
-#include "Wildlands/Common/FileReader.h"
-#include "Wildlands/Common/Singleton.h"
-
 //----- Debug --------------------------------------------------
 #include "Wildlands/Debug/Profiler.h"
 //--------------------------------------------------------------

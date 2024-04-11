@@ -3,6 +3,9 @@
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Wildlands/ECS/SceneSerializer.h"
+#include "Wildlands/Utils/PlatformUtils.h"
+
 namespace Wildlands
 {
     EditorLayer::EditorLayer()
@@ -23,33 +26,6 @@ namespace Wildlands
         m_FrameBuffer = FrameBuffer::Create(framebufferSpec);
 
         m_ActiveScene = CreateRef<Scene>();
-
-        m_SquareEntity = m_ActiveScene->CreateEntity("Square");
-        m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{0.2f, 0.3f, 0.8f, 1.0f});
-
-        m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
-        m_CameraEntity.AddComponent<CameraComponent>().Primary= true;
-        class CameraController : public ScriptableEntity
-        {
-        public:
-            virtual void OnUpdate(Timestep ts) override
-            {
-                auto& translation = GetComponent<TransformComponent>().Position;
-
-                float speed = 5.0f;
-
-                if (Input::IsKeyDown(Key::A))
-                    translation.x -= speed * ts;
-                if (Input::IsKeyDown(Key::D))
-                    translation.x += speed * ts;
-                if (Input::IsKeyDown(Key::W))
-                    translation.y += speed * ts;
-                if (Input::IsKeyDown(Key::S))
-                    translation.y -= speed * ts;
-            }
-        };
-        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-
         m_HierarchyPanel.SetContext(m_ActiveScene);
     }
 
@@ -134,6 +110,9 @@ namespace Wildlands
             if (ImGui::BeginMenu("File"))
             {
                 if (ImGui::MenuItem("Settings")) { m_HierarchyPanel.m_ShowSettingsWindow = true; }
+                if (ImGui::MenuItem("New Scene", "Ctrl+N")) { NewScene(); }
+                if (ImGui::MenuItem("Save as...", "Ctrl+Shift+S")) { SaveSceneAs(); }
+                if (ImGui::MenuItem("Open...", "Ctrl+O")) { OpenScene(); }
                 if (ImGui::MenuItem("Exit")) { Application::Get().Close(); }
                 ImGui::EndMenu();
             }
@@ -181,6 +160,67 @@ namespace Wildlands
 
     void EditorLayer::OnEvent(Event& event)
     {
+        EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<KeyDownEvent>(BIND_EVENT_FUNC(EditorLayer::OnKeyDownEvent));
+    }
+
+    bool EditorLayer::OnKeyDownEvent(KeyDownEvent& e)
+    {
+        // only deal with the shortcut now.
+        if (e.GetRepeatCount() > 0) { return false; }
+
+
+        bool ctrl = Input::IsKeyDown(Key::LeftControl) || Input::IsKeyDown(Key::RightControl);
+        bool shift = Input::IsKeyDown(Key::LeftShift) || Input::IsKeyDown(Key::RightShift);
+        switch (e.GetKeyCode())
+        {
+			case Key::O:
+			{
+				if (ctrl)
+					NewScene();
+				break;
+			}
+			case Key::S :
+			{
+				if (ctrl && shift)
+					SaveSceneAs();
+				break;
+			}
+			case Key::O:
+			{
+				if (ctrl)
+					OpenScene();
+				break;
+			}
+        }
+    }
+    void EditorLayer::NewScene()
+    {
+        m_ActiveScene = CreateRef<Scene>();
+        m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+        m_HierarchyPanel.SetContext(m_ActiveScene);
+    }
+    void EditorLayer::SaveSceneAs()
+    {
+		std::string filePath = FileDialogs::SaveFile("Wildlands Scene (*.wls)\0*.wls\0");
+		if (!filePath.empty())
+		{
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(filePath);
+		}
+    }
+    void EditorLayer::OpenScene()
+    {
+		std::string filePath = FileDialogs::OpenFile("Wildlands Scene (*.wls)\0*.wls\0");
+		if (!filePath.empty())
+		{
+			m_ActiveScene = CreateRef<Scene>();
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_HierarchyPanel.SetContext(m_ActiveScene);
+
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(filePath);
+		}
     }
 }
 

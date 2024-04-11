@@ -10,3 +10,6 @@
 [submodule "Wildlands/Externals/glm"]
 	path = Wildlands/Externals/glm
 	url = https://github.com/g-truc/glm
+[submodule "Wildlands/Externals/yaml_cpp"]
+	path = Wildlands/Externals/yaml_cpp
+	url = https://github.com/WwEIiC/yaml-cpp

@@ -15,6 +15,7 @@ namespace Wildlands
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& scene)
 	{
 		m_Context = scene;
+		m_SelectedEntity = {};
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
@@ -258,22 +259,22 @@ namespace Wildlands
 					float fov = glm::degrees(camera.GetPerspectiveFOV());
 					if (ImGui::DragFloat("FOV", &fov)) { camera.SetPerspectiveFOV(glm::radians(fov)); }
 
-					float nearClip = camera.GetPerspectiveNear();
-					if (ImGui::DragFloat("Near Clip", &nearClip)) { camera.SetPerspectiveNear(nearClip); }
+					float nearClip = camera.GetPerspectiveNearClip();
+					if (ImGui::DragFloat("Near Clip", &nearClip)) { camera.SetPerspectiveNearClip(nearClip); }
 
-					float farClip = camera.GetPerspectiveFar();
-					if (ImGui::DragFloat("Far Clip", &farClip)) { camera.SetPerspectiveNear(farClip); }
+					float farClip = camera.GetPerspectiveFarClip();
+					if (ImGui::DragFloat("Far Clip", &farClip)) { camera.SetPerspectiveNearClip(farClip); }
 				}
 				else if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
 				{
-					float size = camera.GetOrthoSize();
-					if (ImGui::DragFloat("Size", &size)) { camera.SetOrthoSize(size); }
+					float size = camera.GetOrthographicSize();
+					if (ImGui::DragFloat("Size", &size)) { camera.SetOrthographicSize(size); }
 
-					float nearClip = camera.GetOrthoNearClip();
-					if (ImGui::DragFloat("Near Clip", &nearClip)) { camera.SetOrthoNearClip(nearClip); }
+					float nearClip = camera.GetOrthographicNearClip();
+					if (ImGui::DragFloat("Near Clip", &nearClip)) { camera.SetOrthographicNearClip(nearClip); }
 
-					float farClip = camera.GetOrthoFarClip();
-					if (ImGui::DragFloat("Far Clip", &farClip)) { camera.SetOrthoFarClip(farClip); }
+					float farClip = camera.GetOrthographicFarClip();
+					if (ImGui::DragFloat("Far Clip", &farClip)) { camera.SetOrthographicFarClip(farClip); }
 
 					ImGui::Checkbox("Fixed Aspect Ratio", &cameraComp.FixedAspectRatio);
 				}

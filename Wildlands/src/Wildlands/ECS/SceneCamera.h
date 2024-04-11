@@ -28,25 +28,25 @@ namespace Wildlands
 		/// </summary>
 		void SetPerspectiveFOV(float fov) { m_PerspectiveFOV = fov; UpdataProjectionMatrix();}
 
-		float GetPerspectiveNear() const { return m_PerspectiveNear; }
-		void SetPerspectiveNear(float nearClip) { m_PerspectiveNear = nearClip; UpdataProjectionMatrix();}
+		float GetPerspectiveNearClip() const { return m_PerspectiveNear; }
+		void SetPerspectiveNearClip(float nearClip) { m_PerspectiveNear = nearClip; UpdataProjectionMatrix();}
 
-		float GetPerspectiveFar() const { return m_PerspectiveFar; }
-		void SetPerspectiveFar(float farClip) { m_PerspectiveFar = farClip; UpdataProjectionMatrix();}
+		float GetPerspectiveFarClip() const { return m_PerspectiveFar; }
+		void SetPerspectiveFarClip(float farClip) { m_PerspectiveFar = farClip; UpdataProjectionMatrix();}
 
 		
 		///////////////////////////////////////// Orthographic /////////////////////////////////////////////
 		void SetOrthographic(float oSize, float oNear, float oFar);
 		void SetViewportSize(uint32_t width, uint32_t height);
 
-		float GetOrthoSize() const { return m_OrthoSize; }
-		void SetOrthoSize(float oSize) { m_OrthoSize = oSize; UpdataProjectionMatrix(); }
+		float GetOrthographicSize() const { return m_OrthoSize; }
+		void SetOrthographicSize(float oSize) { m_OrthoSize = oSize; UpdataProjectionMatrix(); }
 
-		float GetOrthoNearClip() const { return m_OrthoNear; }
-		void SetOrthoNearClip(float nearClip) { m_OrthoNear = nearClip; UpdataProjectionMatrix(); }
+		float GetOrthographicNearClip() const { return m_OrthoNear; }
+		void SetOrthographicNearClip(float nearClip) { m_OrthoNear = nearClip; UpdataProjectionMatrix(); }
 
-		float GetOrthoFarClip() const { return m_OrthoFar; }
-		void SetOrthoFarClip(float farClip) { m_OrthoFar = farClip; UpdataProjectionMatrix(); }
+		float GetOrthographicFarClip() const { return m_OrthoFar; }
+		void SetOrthographicFarClip(float farClip) { m_OrthoFar = farClip; UpdataProjectionMatrix(); }
 
 
 	private:

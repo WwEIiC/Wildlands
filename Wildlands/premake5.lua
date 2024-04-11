@@ -29,18 +29,21 @@ project "Wildlands"
 		"%{IncludeDirs.ImGui}",
 		"%{IncludeDirs.glm}",
 		"%{IncludeDirs.stb_image}",
-		"%{IncludeDirs.entt}"
+		"%{IncludeDirs.entt}",
+		"%{IncludeDirs.yaml_cpp}"
 	}
 
 	links {
 		"GLFW",			--link the GLFW project(make by premake5.lua in ./Wildlands/Externals/GLFW) to Wildlands.
 		"Glad",
 		"ImGui",
+		"Yaml_cpp",
 		"opengl32.lib"
 	}
 
 	defines{
-		"_CRT_SECURE_NO_WARNINGS"		-- get rid of some build warnings since some library implement use functions like sscanf instead of using sscanf_s.
+		"_CRT_SECURE_NO_WARNINGS",		-- get rid of some build warnings since some library implement use functions like sscanf instead of using sscanf_s.
+		"YAML_CPP_STATIC_DEFINE"		-- build yaml_cpp as static library.
 	}
 
 	filter "system:windows"

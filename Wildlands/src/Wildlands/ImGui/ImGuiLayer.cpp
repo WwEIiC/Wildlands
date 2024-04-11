@@ -158,10 +158,12 @@ namespace Wildlands
 		colors[ImGuiCol_TabUnfocused]			= ImVec4(0.15f, 0.15f, 0.15f, 0.97f);
 		colors[ImGuiCol_TabUnfocusedActive]		= ImVec4(0.19f, 0.19f, 0.19f, 1.00f);
 
-		colors[ImGuiCol_DockingPreview]			= ImVec4(0.51f, 0.51f, 0.51f, 0.70f);
+		// Navigation
 		colors[ImGuiCol_NavHighlight]			= ImVec4(1.00f, 0.40f, 0.13f, 1.00f);
+
 		colors[ImGuiCol_TextSelectedBg]			= ImVec4(0.45f, 1.00f, 0.85f, 0.35f);
 		colors[ImGuiCol_CheckMark]				= ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+		colors[ImGuiCol_DockingPreview]			= ImVec4(0.51f, 0.51f, 0.51f, 0.70f);
 
 		style.ScrollbarSize						= 10;
 		style.GrabMinSize						= 8;
