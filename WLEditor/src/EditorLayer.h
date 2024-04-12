@@ -18,7 +18,10 @@ namespace Wildlands
 
 		virtual void OnEvent(Event& event) override;
 	private:
-		bool OnKeyDownEvent(KeyTypeEvent& e);
+		bool OnKeyDownEvent(KeyDownEvent& e);
+		void NewScene();
+		void SaveSceneAs();
+		void OpenScene();
 	private:
 		Ref<Texture2D> m_Texture;
 		Ref<FrameBuffer> m_FrameBuffer;

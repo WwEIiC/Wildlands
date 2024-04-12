@@ -174,7 +174,7 @@ namespace Wildlands
         bool shift = Input::IsKeyDown(Key::LeftShift) || Input::IsKeyDown(Key::RightShift);
         switch (e.GetKeyCode())
         {
-			case Key::O:
+			case Key::N:
 			{
 				if (ctrl)
 					NewScene();
@@ -202,24 +202,24 @@ namespace Wildlands
     }
     void EditorLayer::SaveSceneAs()
     {
-		std::string filePath = FileDialogs::SaveFile("Wildlands Scene (*.wls)\0*.wls\0");
-		if (!filePath.empty())
+		auto filePath = FileDialogs::SaveFile("Wildlands Scene (*.wls)\0*.wls\0");
+		if (filePath)
 		{
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(filePath);
+			serializer.Serialize(*filePath);
 		}
     }
     void EditorLayer::OpenScene()
     {
-		std::string filePath = FileDialogs::OpenFile("Wildlands Scene (*.wls)\0*.wls\0");
-		if (!filePath.empty())
+		auto filePath = FileDialogs::OpenFile("Wildlands Scene (*.wls)\0*.wls\0");
+		if (filePath)
 		{
 			m_ActiveScene = CreateRef<Scene>();
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_HierarchyPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(filePath);
+			serializer.Deserialize(*filePath);
 		}
     }
 }
