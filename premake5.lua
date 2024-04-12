@@ -20,6 +20,7 @@ IncludeDirs["glm"] 				= "%{wks.location}/Wildlands/Externals/glm"
 IncludeDirs["stb_image"] 		= "%{wks.location}/Wildlands/Externals/stb_image"
 IncludeDirs["entt"] 			= "%{wks.location}/Wildlands/Externals/entt/include"
 IncludeDirs["yaml_cpp"] 			= "%{wks.location}/Wildlands/Externals/yaml_cpp/include"
+IncludeDirs["ImGuizmo"] 			= "%{wks.location}/Wildlands/Externals/ImGuizmo"
 
 --Premake will looks for a file name "premake5.lua" in the path specified.
 group "Dependences"

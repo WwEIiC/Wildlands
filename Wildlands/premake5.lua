@@ -18,7 +18,9 @@ project "Wildlands"
 		"Externals/glm/glm/**.inl",
 		"Externals/stb_image/**.h",
 		"Externals/stb_image/**.cpp",
-		"Externals/entt/**.hpp"
+		"Externals/entt/**.hpp",
+		"Externals/ImGuizmo/ImGuizmo.h",
+		"Externals/ImGuizmo/ImGuizmo.cpp"
 	}
 
 	includedirs {
@@ -30,7 +32,8 @@ project "Wildlands"
 		"%{IncludeDirs.glm}",
 		"%{IncludeDirs.stb_image}",
 		"%{IncludeDirs.entt}",
-		"%{IncludeDirs.yaml_cpp}"
+		"%{IncludeDirs.yaml_cpp}",
+		"%{IncludeDirs.ImGuizmo}"
 	}
 
 	links {
@@ -45,6 +48,9 @@ project "Wildlands"
 		"_CRT_SECURE_NO_WARNINGS",		-- get rid of some build warnings since some library implement use functions like sscanf instead of using sscanf_s.
 		"YAML_CPP_STATIC_DEFINE"		-- build yaml_cpp as static library.
 	}
+
+	filter "files:Externals/ImGuizmo/**.cpp"	-- we use ImGuizmo as the source code of Wildlands, but the .cpp files of ImGuizmo aren't need to use WLPCH.
+	flags {"NoPCH"}
 
 	filter "system:windows"
 		systemversion "latest"
