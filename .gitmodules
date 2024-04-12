@@ -13,3 +13,7 @@
 [submodule "Wildlands/Externals/yaml_cpp"]
 	path = Wildlands/Externals/yaml_cpp
 	url = https://github.com/WwEIiC/yaml-cpp
+[submodule "Wildlands/Externals/ImGuizmo"]
+	path = Wildlands/Externals/ImGuizmo
+	url = https://github.com/WwEIiC/ImGuizmo
+	branch = master
