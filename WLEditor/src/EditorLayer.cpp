@@ -1,10 +1,13 @@
 #include "EditorLayer.h"
 
 #include <imgui.h>
+#include <ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Wildlands/ECS/SceneSerializer.h"
 #include "Wildlands/Utils/PlatformUtils.h"
+
+#include "Wildlands/Math/Math.h"
 
 namespace Wildlands
 {
@@ -137,7 +140,7 @@ namespace Wildlands
         ImGui::Begin("Viewport");
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
-        Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+        Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
         if (glm::vec2(viewportSize.x, viewportSize.y) != m_ViewportSize)
@@ -151,6 +154,49 @@ namespace Wildlands
         // ImGuiCoord :: (0, 0) is the left top and (1, 1) is the right bottom
         // OpenGLCoord:: (0, 0) is the left bottom and (1, 1) is the right top
         ImGui::Image((void*)m_FrameBuffer->GetColorAttachmentRendererID(), ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+
+        // ImGuizmo
+        Entity selectedEntity = m_HierarchyPanel.GetSelectedEntity();
+        if (selectedEntity && m_GizmoType != -1)
+        {
+            // Set it to Perspective now.
+			ImGuizmo::SetOrthographic(false);
+            ImGuizmo::SetDrawlist();
+            float windowWidth = ImGui::GetWindowWidth();
+            float windowHeight = ImGui::GetWindowHeight();
+            ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+            // Camera
+            Entity primaryCameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+            const auto& camera = primaryCameraEntity.GetComponent<CameraComponent>().Camera;
+            const glm::mat4& cameraProjection = camera.GetProjection();
+            glm::mat4 cameraView = glm::inverse(primaryCameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+            // Selected Entity
+            auto& transformComp = selectedEntity.GetComponent<TransformComponent>();
+            glm::mat4 transform = transformComp.GetTransform();
+
+            // Snapping
+            bool snap = Input::IsKeyDown(Key::LeftControl);
+            float snapValue = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? 15.0f : 0.5f;
+            float snapValues[3] = { snapValue, snapValue, snapValue };
+
+            ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+                (ImGuizmo::OPERATION)m_GizmoType, (ImGuizmo::MODE)m_GizmoMode, glm::value_ptr(transform),
+                nullptr, snap ? snapValues : nullptr);
+
+            if (ImGuizmo::IsUsing())
+            {
+                glm::vec3 position, rotation, scale;
+                Math::DecomposeTransform(transform, position, rotation, scale);
+
+                glm::vec3 deltaRotation = rotation - transformComp.Rotation;
+                transformComp.Position = position;
+                transformComp.Rotation += deltaRotation;
+                transformComp.Scale = scale;
+            }
+        }
+
         ImGui::End();//"Viewport"
         ImGui::PopStyleVar();
 
@@ -192,6 +238,14 @@ namespace Wildlands
 					OpenScene();
 				break;
 			}
+
+            // Gizmos
+            case Key::Q: { m_GizmoType = -1; break; }
+            case Key::W: { m_GizmoType = ImGuizmo::OPERATION::TRANSLATE; break; }
+            case Key::E: { m_GizmoType = ImGuizmo::OPERATION::ROTATE; break; }
+            case Key::R: { m_GizmoType = ImGuizmo::OPERATION::SCALE; break; }
+            case Key::V: { m_GizmoMode = !m_GizmoMode; break; }
+
         }
     }
     void EditorLayer::NewScene()

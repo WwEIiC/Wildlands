@@ -94,6 +94,18 @@ namespace Wildlands
 		}
 	}
 
+	Entity Scene::GetPrimaryCameraEntity()
+	{
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			auto cameraComp = view.get<CameraComponent>(entity);
+			if (cameraComp.Primary)
+				return Entity(entity, this);
+		}
+		return Entity{};
+	}
+
 
 	template<typename Comp>
 	void Scene::OnComponentAdded(Entity entity, Comp& component)

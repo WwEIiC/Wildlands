@@ -21,6 +21,7 @@ namespace Wildlands
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 
+		Entity GetPrimaryCameraEntity();
 	private:
 		template <typename Comp>
 		void OnComponentAdded(Entity entity, Comp& comp);

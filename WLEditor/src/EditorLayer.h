@@ -33,11 +33,10 @@ namespace Wildlands
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 
-		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
-		glm::vec2 m_Size = { 1.0f, 1.0f };
-
 	private:
 		SceneHierarchyPanel m_HierarchyPanel;
+		int m_GizmoType = -1;
+		bool m_GizmoMode = false; // false  = local, true = world.
 	};
 }
 

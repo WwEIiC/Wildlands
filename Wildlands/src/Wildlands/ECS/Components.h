@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "Wildlands/Renderer/Cameras.h"
 #include "Wildlands/ECS/SceneCamera.h"
@@ -34,9 +35,7 @@ namespace Wildlands
 		glm::mat4 GetTransform() const
 		{
 			return glm::translate(glm::mat4(1.0f), Position)
-				* glm::rotate(glm::mat4(1.0f), Rotation.x, { 1, 0, 0 })
-				* glm::rotate(glm::mat4(1.0f), Rotation.y, { 0, 1, 0 })
-				* glm::rotate(glm::mat4(1.0f), Rotation.z, { 0, 0, 1 })
+				* glm::toMat4(glm::quat(Rotation))
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
 
