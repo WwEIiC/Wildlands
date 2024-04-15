@@ -1,10 +1,10 @@
-#version 330 core
+#version 450 core
 
 out vec4 Color;
 
 in vec2 v_TexCoord;
 in vec4 v_Color;
-in float v_TexIndex;
+in flat float v_TexIndex;
 in float v_TileFactor;
 
 uniform sampler2D u_Textures[32];

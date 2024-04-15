@@ -24,6 +24,10 @@ namespace Wildlands
         m_Texture = Texture2D::Create("./assets/Textures/Checkerboard.png");
 
         FrameBufferSpecification framebufferSpec;
+        framebufferSpec.Attachments = {
+            FrameBufferTextureFormat::RGBA8,
+            FrameBufferTextureFormat::Depth
+        };
         framebufferSpec.Width = 1600;
         framebufferSpec.Height = 900;
         m_FrameBuffer = FrameBuffer::Create(framebufferSpec);
@@ -43,8 +47,7 @@ namespace Wildlands
     {
         WL_PROFILE_FUNCTION();
 
-        if (m_ViewportFocused)
-            m_EditorCamera.Update(ts);
+        m_EditorCamera.Update(ts);
 
         Renderer2D::ResetStats();
         {

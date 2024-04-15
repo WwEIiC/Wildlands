@@ -10,7 +10,7 @@ namespace Wildlands
 		virtual ~OpenGLFrameBuffer() override;
 
 		virtual const FrameBufferSpecification& GetSpecification() const override { return m_Specification; }
-		virtual uint32_t GetColorAttachmentRendererID() const override { return m_ColorAttachment; }
+		virtual uint32_t GetColorAttachmentRendererID(uint32_t index) const override { return m_ColorAttachments[index]; }
 
 		virtual void Bind() const override;
 		virtual void UnBind() const override;
@@ -21,7 +21,12 @@ namespace Wildlands
 		void NewFrameBuffer();
 	private:
 		uint32_t m_RendererID;
-		uint32_t m_ColorAttachment, m_DepthAttachment;
 		FrameBufferSpecification m_Specification;
+
+		std::vector<FrameBufferTextureSpecification> m_ColorAttachmentSpecifications;
+		FrameBufferTextureSpecification m_DepthAttachmentSpecification;
+
+		std::vector<uint32_t> m_ColorAttachments;
+		uint32_t m_DepthAttachment = 0;
 	};
 }

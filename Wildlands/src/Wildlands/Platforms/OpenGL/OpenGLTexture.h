@@ -31,7 +31,7 @@ namespace Wildlands
 		uint32_t m_Width, m_Height;
 		uint32_t m_RendererID;
 
-		GLenum m_StorageFormat, m_DataFormat;
+		GLenum m_DataStorageFormat, m_DataAccessFormat;
 	};
 }
 
