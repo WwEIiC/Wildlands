@@ -110,10 +110,18 @@ namespace Wildlands
 		s_Data.Shader->Bind();
 		s_Data.Shader->SetMat4("u_VPMatrix", VPMatrix);
 
-		s_Data.IndexCount = 0;
-		s_Data.NextQuadVertex = s_Data.QuadVerteciesBase;
+		StartBatch();
+	}
 
-		s_Data.TextureSlotIndex = 1;
+	void Renderer2D::BeginScene(const EditorCamera& camera)
+	{
+		WL_PROFILE_FUNCTION();
+
+		glm::mat4 VPMatrix = camera.GetViewProjection();
+		s_Data.Shader->Bind();
+		s_Data.Shader->SetMat4("u_VPMatrix", VPMatrix);
+
+		StartBatch();
 	}
 
 	void Renderer2D::BeginScene(const OrthographicCamera& camera)

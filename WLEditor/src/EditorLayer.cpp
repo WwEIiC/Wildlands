@@ -24,11 +24,12 @@ namespace Wildlands
         m_Texture = Texture2D::Create("./assets/Textures/Checkerboard.png");
 
         FrameBufferSpecification framebufferSpec;
-        framebufferSpec.Width = 1280;
-        framebufferSpec.Height = 720;
+        framebufferSpec.Width = 1600;
+        framebufferSpec.Height = 900;
         m_FrameBuffer = FrameBuffer::Create(framebufferSpec);
 
         m_ActiveScene = CreateRef<Scene>();
+        m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
         m_HierarchyPanel.SetContext(m_ActiveScene);
     }
 
@@ -42,6 +43,9 @@ namespace Wildlands
     {
         WL_PROFILE_FUNCTION();
 
+        if (m_ViewportFocused)
+            m_EditorCamera.Update(ts);
+
         Renderer2D::ResetStats();
         {
             WL_PROFILE_SCOPE("Render Pre");
@@ -54,7 +58,7 @@ namespace Wildlands
             WL_PROFILE_SCOPE("Renderer Draw");
 
 			// Scene Update
-			m_ActiveScene->Update(ts);
+			m_ActiveScene->UpdateEditor(ts, m_EditorCamera);
 
             m_FrameBuffer->UnBind();
         }
@@ -125,7 +129,6 @@ namespace Wildlands
 
         // Scene Hierarchy Panel
         m_HierarchyPanel.OnImGuiRender();
-        ImGui::ShowDemoWindow();
 
         ImGui::Begin("Render Stats");
         auto stats = Renderer2D::GetStats();
@@ -148,6 +151,7 @@ namespace Wildlands
             m_FrameBuffer->Resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
             m_ViewportSize = { viewportSize.x, viewportSize.y };
 
+            m_EditorCamera.SetViewportSize(viewportSize.x, viewportSize.y);
             m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
         }
 
@@ -166,11 +170,16 @@ namespace Wildlands
             float windowHeight = ImGui::GetWindowHeight();
             ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
-            // Camera
-            Entity primaryCameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-            const auto& camera = primaryCameraEntity.GetComponent<CameraComponent>().Camera;
-            const glm::mat4& cameraProjection = camera.GetProjection();
-            glm::mat4 cameraView = glm::inverse(primaryCameraEntity.GetComponent<TransformComponent>().GetTransform());
+            // Camera - Runtime
+            //Entity primaryCameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+            //const auto& camera = primaryCameraEntity.GetComponent<CameraComponent>().Camera;
+            //const glm::mat4& cameraProjection = camera.GetProjection();
+            //glm::mat4 cameraView = glm::inverse(primaryCameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+            //Editor Camera
+            const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
+            glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
+
 
             // Selected Entity
             auto& transformComp = selectedEntity.GetComponent<TransformComponent>();
@@ -206,6 +215,8 @@ namespace Wildlands
 
     void EditorLayer::OnEvent(Event& event)
     {
+        m_EditorCamera.OnEvent(event);
+
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyDownEvent>(BIND_EVENT_FUNC(EditorLayer::OnKeyDownEvent));
     }

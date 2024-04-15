@@ -2,6 +2,7 @@
 
 #include <entt.hpp>
 #include "Wildlands/Core/Timestep.h"
+#include "Wildlands/Renderer/EditorCamera.h"
 
 namespace Wildlands
 {
@@ -13,7 +14,8 @@ namespace Wildlands
 		Scene() = default;
 		~Scene() = default;
 
-		void Update(Timestep ts);
+		void UpdateEditor(Timestep ts, EditorCamera& camera);
+		void UpdateRuntime(Timestep ts);
 		void UIRender();
 
 		Entity CreateEntity(const std::string& name = std::string());

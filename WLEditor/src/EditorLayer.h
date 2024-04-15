@@ -1,5 +1,6 @@
 #pragma once
 #include "Wildlands.h"
+#include "Wildlands/Renderer/EditorCamera.h"
 #include "Panels/SceneHierarchyPanel.h"
 
 namespace Wildlands
@@ -26,14 +27,13 @@ namespace Wildlands
 		Ref<Texture2D> m_Texture;
 		Ref<FrameBuffer> m_FrameBuffer;
 
-		Ref<Scene> m_ActiveScene;
-		Entity m_SquareEntity;
-		Entity m_CameraEntity;
-
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
-
 	private:
+		Ref<Scene> m_ActiveScene;
+
+		EditorCamera m_EditorCamera;
+
 		SceneHierarchyPanel m_HierarchyPanel;
 		int m_GizmoType = -1;
 		bool m_GizmoMode = false; // false  = local, true = world.

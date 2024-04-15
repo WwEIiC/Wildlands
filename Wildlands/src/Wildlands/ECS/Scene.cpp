@@ -8,7 +8,21 @@
 
 namespace Wildlands
 {
-	void Scene::Update(Timestep ts)
+	void Scene::UpdateEditor(Timestep ts, EditorCamera& camera)
+	{
+		Renderer2D::BeginScene(camera);
+
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto entity : group)
+		{
+			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+			Renderer2D::DrawQuad(transform, sprite.Color);
+		}
+
+		Renderer2D::EndScene();
+	}
+	void Scene::UpdateRuntime(Timestep ts)
 	{
 		// update scriptable entites
 		{

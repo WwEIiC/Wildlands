@@ -1,5 +1,6 @@
 #pragma once
 #include "Wildlands/Renderer/Cameras.h"
+#include "Wildlands/Renderer/EditorCamera.h"
 #include "Wildlands/Renderer/Texture.h"
 
 namespace Wildlands
@@ -11,6 +12,7 @@ namespace Wildlands
 		static void Destory();
 
 		static void BeginScene(const Camera& camera, const glm::mat4& cTransform);
+		static void BeginScene(const EditorCamera& camera);
 		static void BeginScene(const OrthographicCamera& camera);
 		static void EndScene();
 		static void Flush();
