@@ -148,6 +148,11 @@ namespace Wildlands
 		}
 	}
 
+	void SceneHierarchyPanel::SetSelectedEntity(Entity entity)
+	{
+		m_SelectedEntity = entity;
+	}
+
 	void SceneHierarchyPanel::DrawEntityNode(Entity& entity)
 	{
 		auto& tagComp = entity.GetComponent<TagComponent>();

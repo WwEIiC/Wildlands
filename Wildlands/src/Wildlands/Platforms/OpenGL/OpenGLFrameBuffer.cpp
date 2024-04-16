@@ -21,15 +21,16 @@ namespace Wildlands
 			glBindTexture(TextureTarget(multisampled), tid);
 		}
 
-		static void AttachColorTexture(uint32_t tid, int samples, GLenum fomat, 
+		static void AttachColorTexture(uint32_t tid, int samples,
+			GLenum storageFormat, GLenum accessFormat,
 			uint32_t width, uint32_t height, int attachIndex)
 		{
 			bool multisampled = samples > 1;
 			if (multisampled)
-				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, fomat, width, height, GL_FALSE);
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, storageFormat, width, height, GL_FALSE);
 			else
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, fomat, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+				glTexImage2D(GL_TEXTURE_2D, 0, storageFormat, width, height, 0, accessFormat, GL_UNSIGNED_BYTE, nullptr);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -38,7 +39,8 @@ namespace Wildlands
 			}
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachIndex, TextureTarget(multisampled), tid, 0);
 		}
-		static void AttachDepthTexture(uint32_t tid, int samples, GLenum fomat, GLenum attachmentType,
+		static void AttachDepthTexture(uint32_t tid, int samples, 
+			GLenum fomat, GLenum attachmentType,
 			uint32_t width, uint32_t height)
 		{
 			bool multisampled = samples > 1;
@@ -65,6 +67,32 @@ namespace Wildlands
 				return true;
 			}
 			return false;
+		}
+
+		static GLenum WLFBTextureFormatToGL(FrameBufferTextureFormat WLFormat)
+		{
+			switch (WLFormat)
+			{
+			case FrameBufferTextureFormat::None:
+				return GL_NONE;
+			case FrameBufferTextureFormat::RGBA8:
+				return GL_RGBA8;
+			case FrameBufferTextureFormat::RGBA16F:
+				return GL_RGBA16F;
+			case FrameBufferTextureFormat::RGBA32F:
+				return GL_RGBA32F;
+			case FrameBufferTextureFormat::RED_INTEGER:
+				return GL_RED_INTEGER;
+			case FrameBufferTextureFormat::RED_UINTEGER:
+				return GL_RED_INTEGER;
+			case FrameBufferTextureFormat::Depth24Stencil8:
+				return GL_DEPTH24_STENCIL8;
+			case FrameBufferTextureFormat::Depth32FStencil8:
+				return GL_DEPTH32F_STENCIL8;
+			default:
+				return GL_FLOAT;
+			}
+
 		}
 	}
 
@@ -115,6 +143,51 @@ namespace Wildlands
 		NewFrameBuffer();
 	}
 
+	int OpenGLFrameBuffer::ReadPixelAsInt(uint32_t attachmentIndex, int x, int y)
+	{
+		WL_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmentIndex out of range");
+
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+		int pixelData;
+		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+		return pixelData;
+	}
+
+	uint32_t OpenGLFrameBuffer::ReadPixelAsUInt(uint32_t attachmentIndex, int x, int y)
+	{
+		WL_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmentIndex out of range");
+
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+		uint32_t pixelData;
+		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &pixelData);
+		return pixelData;
+	}
+
+	void OpenGLFrameBuffer::ClearColorAttachment(uint32_t attachmentIndex, const void* value)
+	{
+		WL_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "attachmentIndex out of range");
+
+		auto& spec = m_ColorAttachmentSpecifications[attachmentIndex];
+
+		// the type of value.
+		// now it is assumed that, for one FBFormat it only provides one type of value.
+		GLenum dataType = GL_FLOAT;
+		switch (spec.TextureFormat)
+		{
+		case FrameBufferTextureFormat::RED_INTEGER:
+			dataType = GL_INT;
+			break;
+		case FrameBufferTextureFormat::RED_UINTEGER:
+			dataType = GL_UNSIGNED_INT;;
+			break;
+		default:
+			break;
+		}
+
+		glClearTexImage(m_ColorAttachments[attachmentIndex], 0,
+			Utils::WLFBTextureFormatToGL(spec.TextureFormat), dataType, value);
+	}
+
 	void OpenGLFrameBuffer::NewFrameBuffer()
 	{
 		if (m_RendererID)
@@ -143,8 +216,21 @@ namespace Wildlands
 				switch (m_ColorAttachmentSpecifications[i].TextureFormat)
 				{
 				case FrameBufferTextureFormat::RGBA8:
-					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RGBA8,
+					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples,
+						GL_RGBA8, GL_RGBA,
 						m_Specification.Width, m_Specification.Height, i);
+					break;
+				case FrameBufferTextureFormat::RED_INTEGER:
+					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples,
+						GL_R32I, GL_RED_INTEGER,
+						m_Specification.Width, m_Specification.Height, i);
+
+					break;
+				case FrameBufferTextureFormat::RED_UINTEGER:
+					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples,
+						GL_R32UI, GL_RED_INTEGER,
+						m_Specification.Width, m_Specification.Height, i);
+
 					break;
 				default:
 					break;

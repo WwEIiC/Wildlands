@@ -10,6 +10,8 @@ namespace Wildlands
 		RGBA8,
 		RGBA16F,
 		RGBA32F,
+		RED_INTEGER,
+		RED_UINTEGER,
 
 		// Depth/Stencil
 		Depth24Stencil8,
@@ -63,5 +65,10 @@ namespace Wildlands
 		virtual void UnBind() const = 0;
 
 		virtual void Resize(uint32_t widht, uint32_t height) = 0;
+
+		virtual int ReadPixelAsInt(uint32_t attachmentIndex, int x, int y) = 0;
+		virtual uint32_t ReadPixelAsUInt(uint32_t attachmentIndex, int x, int y) = 0;
+
+		virtual void ClearColorAttachment(uint32_t attachmentIndex, const void* value) = 0;
 	};
 }

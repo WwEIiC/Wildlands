@@ -26,6 +26,7 @@ namespace Wildlands
         FrameBufferSpecification framebufferSpec;
         framebufferSpec.Attachments = {
             FrameBufferTextureFormat::RGBA8,
+            FrameBufferTextureFormat::RED_UINTEGER,
             FrameBufferTextureFormat::Depth
         };
         framebufferSpec.Width = 1600;
@@ -55,6 +56,10 @@ namespace Wildlands
             m_FrameBuffer->Bind();
             RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
             RenderCommand::Clear();
+
+            // clear the entityID attachment with EntityNull.
+            uint32_t value = (uint32_t)Entity::EntityNull;
+            m_FrameBuffer->ClearColorAttachment(1, &value);
         }
 
         {
@@ -134,6 +139,12 @@ namespace Wildlands
         m_HierarchyPanel.OnImGuiRender();
 
         ImGui::Begin("Render Stats");
+
+        std::string name = "None";
+        if (m_HoveredEntity)
+            name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+        ImGui::Text("Hovered Entity: %s", name.c_str());
+
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
         ImGui::Text("Draw Calls: %d", stats.drawCalls);
@@ -144,6 +155,14 @@ namespace Wildlands
         
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
         ImGui::Begin("Viewport");
+
+        // set up viewport data.
+        auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+        auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+        auto viewportOffset = ImGui::GetWindowPos();
+        m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+        m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+
         m_ViewportFocused = ImGui::IsWindowFocused();
         m_ViewportHovered = ImGui::IsWindowHovered();
         Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHovered);
@@ -158,9 +177,10 @@ namespace Wildlands
             m_ActiveScene->OnViewportResize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
         }
 
-        // ImGuiCoord :: (0, 0) is the left top and (1, 1) is the right bottom
-        // OpenGLCoord:: (0, 0) is the left bottom and (1, 1) is the right top
-        ImGui::Image((void*)m_FrameBuffer->GetColorAttachmentRendererID(), ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+        //-- ImGuiCoord :: (0, 0) is the left top and (1, 1) is the right bottom
+        //-- OpenGLCoord:: (0, 0) is the left bottom and (1, 1) is the right top
+        uint64_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
+        ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
         // ImGuizmo
         Entity selectedEntity = m_HierarchyPanel.GetSelectedEntity();
@@ -169,9 +189,10 @@ namespace Wildlands
             // Set it to Perspective now.
 			ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist();
-            float windowWidth = ImGui::GetWindowWidth();
-            float windowHeight = ImGui::GetWindowHeight();
-            ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+            ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y,
+                m_ViewportBounds[1].x - m_ViewportBounds[0].x,
+                m_ViewportBounds[1].y - m_ViewportBounds[0].y);
 
             // Camera - Runtime
             //Entity primaryCameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
@@ -222,7 +243,13 @@ namespace Wildlands
 
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyDownEvent>(BIND_EVENT_FUNC(EditorLayer::OnKeyDownEvent));
+        dispatcher.Dispatch<MouseButtonDownEvent>(BIND_EVENT_FUNC(EditorLayer::OnMouseButtonDownEvent));
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////// Private Functions ///////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     bool EditorLayer::OnKeyDownEvent(KeyDownEvent& e)
     {
@@ -232,6 +259,7 @@ namespace Wildlands
 
         bool ctrl = Input::IsKeyDown(Key::LeftControl) || Input::IsKeyDown(Key::RightControl);
         bool shift = Input::IsKeyDown(Key::LeftShift) || Input::IsKeyDown(Key::RightShift);
+        bool IsMouseOrGizmoUsing = ImGuizmo::IsUsing() || Input::IsMouseButtonDown(Mouse::ButtonRight);
         switch (e.GetKeyCode())
         {
 			case Key::N:
@@ -254,14 +282,41 @@ namespace Wildlands
 			}
 
             // Gizmos
-            case Key::Q: { m_GizmoType = -1; break; }
-            case Key::W: { m_GizmoType = ImGuizmo::OPERATION::TRANSLATE; break; }
-            case Key::E: { m_GizmoType = ImGuizmo::OPERATION::ROTATE; break; }
-            case Key::R: { m_GizmoType = ImGuizmo::OPERATION::SCALE; break; }
-            case Key::V: { m_GizmoMode = !m_GizmoMode; break; }
+            case Key::Q: { if (!IsMouseOrGizmoUsing) { m_GizmoType = -1; } break; }
+            case Key::W: { if (!IsMouseOrGizmoUsing) { m_GizmoType = ImGuizmo::OPERATION::TRANSLATE; } break; }
+            case Key::E: { if (!IsMouseOrGizmoUsing) { m_GizmoType = ImGuizmo::OPERATION::ROTATE; } break; }
+            case Key::R: { if (!IsMouseOrGizmoUsing) { m_GizmoType = ImGuizmo::OPERATION::SCALE; } break; }
+            case Key::V: { if (!IsMouseOrGizmoUsing) { m_GizmoMode = !m_GizmoMode; } break; }
 
         }
+        return false;
     }
+
+    bool EditorLayer::OnMouseButtonDownEvent(MouseButtonDownEvent& e)
+    {
+        if (e.GetMouseButton() == Mouse::ButtonLeft)
+        {
+            if (m_ViewportHovered && !ImGuizmo::IsOver())
+            {
+                //-- Mouse Picking.
+                //-- Calculate the mouse position relative to the viewport image.
+				auto [mouseX, mouseY] = ImGui::GetMousePos();
+				mouseX -= m_ViewportBounds[0].x;
+				mouseY = m_ViewportBounds[1].y - mouseY;//becouse the different between textureCoord and imguiCoord(flip the y).
+				if (0 <= mouseX && mouseX <= m_ViewportSize.x && 0 <= mouseY && mouseY <= m_ViewportSize.y)
+				{
+                    m_FrameBuffer->Bind();
+					uint32_t pixelData= m_FrameBuffer->ReadPixelAsUInt(1, (int)mouseX, (int)mouseY);
+					m_HoveredEntity = Entity((entt::entity)pixelData, m_ActiveScene.get());
+                    m_FrameBuffer->UnBind();
+				}
+
+				m_HierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+			}
+        }
+        return false;
+    }
+
     void EditorLayer::NewScene()
     {
         m_ActiveScene = CreateRef<Scene>();

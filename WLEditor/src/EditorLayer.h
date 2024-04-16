@@ -20,6 +20,7 @@ namespace Wildlands
 		virtual void OnEvent(Event& event) override;
 	private:
 		bool OnKeyDownEvent(KeyDownEvent& e);
+		bool OnMouseButtonDownEvent(MouseButtonDownEvent& e);
 		void NewScene();
 		void SaveSceneAs();
 		void OpenScene();
@@ -29,6 +30,9 @@ namespace Wildlands
 
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
+
+		/// <summary> left-top and right-bottom </summary>
+		glm::vec2 m_ViewportBounds[2] = { {0.0f, 0.0f}, {0.0f, 0.0f} };
 	private:
 		Ref<Scene> m_ActiveScene;
 
@@ -37,6 +41,7 @@ namespace Wildlands
 		SceneHierarchyPanel m_HierarchyPanel;
 		int m_GizmoType = -1;
 		bool m_GizmoMode = false; // false  = local, true = world.
+		Entity m_HoveredEntity;
 	};
 }
 

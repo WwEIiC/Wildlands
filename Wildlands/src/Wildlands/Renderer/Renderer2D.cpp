@@ -17,6 +17,8 @@ namespace Wildlands
 		glm::vec2 Texcoord;
 		float TextureIndex;
 		float TileFactor;
+		//Editor-only
+		uint32_t EntityID;
 	};
 
 	struct Renderer2DData
@@ -56,7 +58,8 @@ namespace Wildlands
 			{EShaderDataType::Float4, "a_Color"},
 			{EShaderDataType::Float2, "a_TexCoord"},
 			{EShaderDataType::Float,  "a_TexIndex"},
-			{EShaderDataType::Float,  "a_TileFactor"}
+			{EShaderDataType::Float,  "a_TileFactor"},
+			{EShaderDataType::UInt,  "a_EntityID"}
 			});
 		s_Data.VertexArray->AddVertexBuffer(s_Data.VertexBuffer);
 
@@ -172,7 +175,7 @@ namespace Wildlands
 		DrawQuad(transform, color);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, uint32_t entityID)
 	{
 		WL_PROFILE_FUNCTION();
 
@@ -197,6 +200,7 @@ namespace Wildlands
 			s_Data.NextQuadVertex->Texcoord = textureCoords[i];
 			s_Data.NextQuadVertex->TextureIndex = textureIndex;
 			s_Data.NextQuadVertex->TileFactor = tileFactor;
+			s_Data.NextQuadVertex->EntityID = entityID;
 			s_Data.NextQuadVertex++;
 		}
 
@@ -219,7 +223,7 @@ namespace Wildlands
 		DrawQuad(transform, texture, tileFactor, texColor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor, uint32_t entityID)
 	{
 		WL_PROFILE_FUNCTION();
 
@@ -259,6 +263,7 @@ namespace Wildlands
 			s_Data.NextQuadVertex->Texcoord = textureCoords[i];
 			s_Data.NextQuadVertex->TextureIndex = textureIndex;
 			s_Data.NextQuadVertex->TileFactor = tileFactor;
+			s_Data.NextQuadVertex->EntityID = entityID;
 			s_Data.NextQuadVertex++;
 		}
 
@@ -359,6 +364,11 @@ namespace Wildlands
 
 		s_Data.IndexCount += 6;
 		s_Data.stats.quadCount++;
+	}
+
+	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& spriteComp, uint32_t entityID)
+	{
+		DrawQuad(transform, spriteComp.Color, entityID);
 	}
 	
 	Renderer2D::Stats& Renderer2D::GetStats()

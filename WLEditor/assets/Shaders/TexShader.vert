@@ -5,6 +5,7 @@ layout (location = 1) in vec4 a_Color;
 layout (location = 2) in vec2 a_TexCoord;
 layout (location = 3) in float a_TexIndex;
 layout (location = 4) in float a_TileFactor;
+layout (location = 5) in uint a_EntityID;
 
 uniform mat4 u_VPMatrix;
 
@@ -12,6 +13,7 @@ out vec2 v_TexCoord;
 out vec4 v_Color;
 out flat float v_TexIndex;
 out float v_TileFactor;
+out flat uint v_EntityID;
 
 void main()
 {
@@ -19,6 +21,7 @@ void main()
 	v_Color = a_Color;
 	v_TexIndex = a_TexIndex;
 	v_TileFactor = a_TileFactor;
+	v_EntityID = a_EntityID;
 	gl_Position = u_VPMatrix * vec4(a_Position, 1.0f);
 
 

@@ -10,12 +10,21 @@ namespace Wildlands
 		virtual ~OpenGLFrameBuffer() override;
 
 		virtual const FrameBufferSpecification& GetSpecification() const override { return m_Specification; }
-		virtual uint32_t GetColorAttachmentRendererID(uint32_t index) const override { return m_ColorAttachments[index]; }
+		virtual uint32_t GetColorAttachmentRendererID(uint32_t index) const override 
+		{ 
+			WL_CORE_ASSERT(index < m_ColorAttachments.size(), "It hasn't has much attachment.")
+			return m_ColorAttachments[index]; 
+		}
 
 		virtual void Bind() const override;
 		virtual void UnBind() const override;
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
+
+		virtual int ReadPixelAsInt(uint32_t attachmentIndex, int x, int y) override;
+		virtual uint32_t ReadPixelAsUInt(uint32_t attachmentIndex, int x, int y) override;
+
+		virtual void ClearColorAttachment(uint32_t attachmentIndex, const void* value) override;
 
 	private:
 		void NewFrameBuffer();

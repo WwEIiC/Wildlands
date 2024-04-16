@@ -19,6 +19,7 @@ namespace Wildlands
 		case EShaderDataType::Int2:			return GL_INT;
 		case EShaderDataType::Int3:			return GL_INT;
 		case EShaderDataType::Int4:			return GL_INT;
+		case EShaderDataType::UInt:			return GL_UNSIGNED_INT;
 		case EShaderDataType::Bool:			return GL_BOOL;
 		}
 
@@ -69,8 +70,38 @@ namespace Wildlands
 		//WLFIXME::when element.type == mat3/4 the offset maybe wrong.
 		for (const auto& element : layout)
 		{
-			glVertexAttribPointer(m_VertexAttributeIndex, element.GetCount(), EShaderDataTypeToOpenGLType(element.Type),
+			switch (element.Type)
+			{
+			case EShaderDataType::Float:
+			case EShaderDataType::Float2:
+			case EShaderDataType::Float3:
+			case EShaderDataType::Float4:
+			case EShaderDataType::Mat3:
+			case EShaderDataType::Mat4:
+			{
+				glVertexAttribPointer(m_VertexAttributeIndex, element.GetCount(), EShaderDataTypeToOpenGLType(element.Type),
 				element.Normalized, layout.GetStride(), (void*)(intptr_t)element.Offset);
+				break;
+			}
+			case EShaderDataType::Int:
+			case EShaderDataType::UInt:
+			case EShaderDataType::Int2:
+			case EShaderDataType::Int3:
+			case EShaderDataType::Int4:
+			case EShaderDataType::Bool:
+			{
+				glVertexAttribIPointer(m_VertexAttributeIndex,
+					element.GetCount(),
+					EShaderDataTypeToOpenGLType(element.Type),
+					layout.GetStride(),
+					(const void*)(intptr_t)element.Offset);
+				break;
+			}
+
+			default:
+				WL_CORE_ASSERT(false, "Unknown Shader Data type");
+				break;
+			}
 			glEnableVertexAttribArray(m_VertexAttributeIndex++);
 		}
 

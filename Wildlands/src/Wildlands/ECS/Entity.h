@@ -8,6 +8,9 @@ namespace Wildlands
 	class Entity
 	{
 	public:
+		static const entt::entity EntityNull = entt::null;
+
+	public:
 		Entity() = default;
 		Entity(entt::entity eHandle, Scene* sHandle)
 			: m_EntityHandle(eHandle), m_SceneHandle(sHandle)
@@ -48,7 +51,7 @@ namespace Wildlands
 		}
 
 	public:
-		operator bool() const { return m_EntityHandle != entt::null; }
+		operator bool() const { return m_EntityHandle != EntityNull; }
 		operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 		operator entt::entity() const { return m_EntityHandle; }
 
@@ -59,7 +62,7 @@ namespace Wildlands
 		bool operator != (const Entity& other) const { return !(*this == other); }
 
 	private:
-		entt::entity m_EntityHandle = entt::null; // entt::entity == uint32_t
+		entt::entity m_EntityHandle = EntityNull; // entt::entity == uint32_t
 		Scene* m_SceneHandle = nullptr;
 	};
 }
