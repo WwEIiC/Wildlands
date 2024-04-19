@@ -3,16 +3,20 @@
 layout(location = 0) out vec4 Color;
 layout(location = 1) out uint EntityID;
 
-in vec2 v_TexCoord;
-in vec4 v_Color;
-in flat float v_TexIndex;
-in float v_TileFactor;
-in flat uint v_EntityID;
+struct VertexOutput{
+	vec2 TexCoord;
+	vec4 Color;
+	float TexIndex;
+	float TileFactor;
+};
 
-uniform sampler2D u_Textures[32];
+layout (location = 0) in VertexOutput Input;
+layout (location = 4) in flat uint v_EntityID;
+
+layout (binding = 0) uniform sampler2D u_Textures[32];
 
 void main()
 {
-	Color = texture(u_Textures[int(v_TexIndex)], v_TexCoord * v_TileFactor) * v_Color;
+	Color = texture(u_Textures[int(Input.TexIndex)], Input.TexCoord * Input.TileFactor) * Input.Color;
 	EntityID = v_EntityID;
 }

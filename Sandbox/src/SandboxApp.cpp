@@ -9,7 +9,8 @@
 class Sandbox : public Wildlands::Application
 {
 public:
-	Sandbox()
+	Sandbox(Wildlands::ApplicationCommandLineArgs args)
+		: Application("WLEditor", args)
 	{
 		PushLayer(new Sandbox2D());
 	}
@@ -18,7 +19,7 @@ public:
 	}
 };
 
-Wildlands::Application* Wildlands::CreateApplication()
+Wildlands::Application* Wildlands::CreateApplication(Wildlands::ApplicationCommandLineArgs args)
 {
-	return new Sandbox();
+	return new Sandbox(args);
 }

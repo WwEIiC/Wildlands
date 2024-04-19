@@ -7,23 +7,28 @@ layout (location = 3) in float a_TexIndex;
 layout (location = 4) in float a_TileFactor;
 layout (location = 5) in uint a_EntityID;
 
-uniform mat4 u_VPMatrix;
+layout (binding = 0) uniform Camera
+{
+	mat4 u_ViewprojectionMatrix;
+};
 
-out vec2 v_TexCoord;
-out vec4 v_Color;
-out flat float v_TexIndex;
-out float v_TileFactor;
-out flat uint v_EntityID;
+struct VertexOutput{
+	vec2 TexCoord;
+	vec4 Color;
+	float TexIndex;
+	float TileFactor;
+};
+layout (location = 0) out VertexOutput Output;
+layout (location = 4) out flat uint v_EntityID;
+
+
 
 void main()
 {
-	v_TexCoord = a_TexCoord;
-	v_Color = a_Color;
-	v_TexIndex = a_TexIndex;
-	v_TileFactor = a_TileFactor;
+	Output.TexCoord = a_TexCoord;
+	Output.Color = a_Color;
+	Output.TexIndex = a_TexIndex;
+	Output.TileFactor = a_TileFactor;
 	v_EntityID = a_EntityID;
-	gl_Position = u_VPMatrix * vec4(a_Position, 1.0f);
-
-
-
+	gl_Position = u_ViewprojectionMatrix * vec4(a_Position, 1.0f);
 }

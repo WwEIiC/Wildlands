@@ -30,6 +30,8 @@ namespace Wildlands
 	}
 	void SceneCamera::SetViewportSize(uint32_t width, uint32_t height)
 	{
+		WL_CORE_ASSERT(width > 0 && height > 0, "Viewport size must be greater than zero");
+
 		m_AspectRatio = (float)width / (float)height;
 		UpdataProjectionMatrix();
 	}

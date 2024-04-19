@@ -3,9 +3,11 @@
 #include "Wildlands/Renderer/RenderCommand.h"
 
 #include "Wildlands/Renderer/VertexArray.h"
+#include "Wildlands/Renderer/UniformBuffer.h"
 #include "Wildlands/Renderer/Shader.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 namespace Wildlands
@@ -43,6 +45,13 @@ namespace Wildlands
 		uint32_t TextureSlotIndex = 1; // 0 = default texture.
 
 		glm::vec4 QuadVertexPos[4];
+
+		struct CameraData
+		{
+			glm::mat4 ViewProjectionMatrix;
+		};
+		CameraData CameraBuffer;
+		Ref<UniformBuffer> CameraUniformBuffer;
 	};
 	static Renderer2DData s_Data;
 
@@ -88,8 +97,6 @@ namespace Wildlands
 			samplers[i] = i;
 
 		s_Data.Shader =  Shader::Create("Texture", "assets/shaders/TexShader.vert", "assets/shaders/TexShader.frag");
-		s_Data.Shader->Bind();
-		s_Data.Shader->SetIntArray("u_Textures", samplers, s_Data.MaxTextures);
 
 		s_Data.TextureSlots[0] = s_Data.DefaultTexture;
 
@@ -97,6 +104,8 @@ namespace Wildlands
 		s_Data.QuadVertexPos[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPos[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPos[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+
+		s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
 	}
 	void Renderer2D::Destory()
 	{
@@ -109,9 +118,8 @@ namespace Wildlands
 	{
 		WL_PROFILE_FUNCTION();
 
-		glm::mat4 VPMatrix = camera.GetProjection() * glm::inverse(cTransform);
-		s_Data.Shader->Bind();
-		s_Data.Shader->SetMat4("u_VPMatrix", VPMatrix);
+		s_Data.CameraBuffer.ViewProjectionMatrix = camera.GetProjection() * glm::inverse(cTransform);
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
@@ -120,9 +128,8 @@ namespace Wildlands
 	{
 		WL_PROFILE_FUNCTION();
 
-		glm::mat4 VPMatrix = camera.GetViewProjection();
-		s_Data.Shader->Bind();
-		s_Data.Shader->SetMat4("u_VPMatrix", VPMatrix);
+		s_Data.CameraBuffer.ViewProjectionMatrix = camera.GetViewProjection();
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
@@ -156,6 +163,7 @@ namespace Wildlands
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 			s_Data.TextureSlots[i]->Bind(i);
 
+		s_Data.Shader->Bind();
 		RenderCommand::DrawIndex(s_Data.VertexArray, s_Data.IndexCount);
 
 		s_Data.stats.drawCalls++;

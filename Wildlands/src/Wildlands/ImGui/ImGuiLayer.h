@@ -24,7 +24,6 @@ namespace Wildlands
 		void SetImGuiStyle();
 	private:
 		bool m_BlockEvents = true;
-		float m_Time = 0.0f;
 	};
 }
 

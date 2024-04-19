@@ -9,19 +9,26 @@
 
 #include "Wildlands/Events/Event.h"
 
-#include "Wildlands/Renderer/Shader.h"
-#include "Wildlands/Renderer/Buffers.h"
-#include "Wildlands/Renderer/VertexArray.h"
-#include "Wildlands/Renderer/Cameras.h"
-
 int main(int argc, char** argv);
 
 namespace Wildlands
 {
+	struct ApplicationCommandLineArgs
+	{
+		int Count = 0;
+		char** Args = nullptr;
+
+		const char* operator[](int index) const
+		{
+			WL_CORE_ASSERT(index < Count, "ERROR");
+			return Args[index];
+		}
+	};
+
 	class  Application
 	{
 	public:
-		Application(const std::string& name = "Wildlands Application");
+		Application(const std::string& name = "Wildlands Application", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
 		virtual ~Application();
 
 		void Close();
@@ -32,6 +39,8 @@ namespace Wildlands
 		inline static Application& Get() { return *s_Instance; }
 
 		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+
+		ApplicationCommandLineArgs GetCommandLineArgs() const { return m_CommandLineArgs; }
 
 		// Push and Pop Layer to m_LayerStack
 		void PushLayer(Layer* layer);
@@ -53,6 +62,7 @@ namespace Wildlands
 		bool m_Running;
 		bool m_Minimized = false;
 		Unique<Window> m_Window;
+		ApplicationCommandLineArgs m_CommandLineArgs;
 
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
@@ -61,6 +71,6 @@ namespace Wildlands
 	};
 
 	//Will be defined in Client
-	Application* CreateApplication();
+	Application* CreateApplication(ApplicationCommandLineArgs args);
 }
 

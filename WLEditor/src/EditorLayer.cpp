@@ -34,6 +34,15 @@ namespace Wildlands
         m_FrameBuffer = FrameBuffer::Create(framebufferSpec);
 
         m_ActiveScene = CreateRef<Scene>();
+
+        auto commandLineArgs = Application::Get().GetCommandLineArgs();
+        if (commandLineArgs.Count > 1)
+        {
+            auto sceneFilePath = commandLineArgs[1];
+            SceneSerializer serializer(m_ActiveScene);
+            serializer.Deserialize(sceneFilePath);
+        }
+
         m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
         m_HierarchyPanel.SetContext(m_ActiveScene);
     }
@@ -326,23 +335,23 @@ namespace Wildlands
     void EditorLayer::SaveSceneAs()
     {
 		auto filePath = FileDialogs::SaveFile("Wildlands Scene (*.wls)\0*.wls\0");
-		if (filePath)
+		if (!filePath.empty())
 		{
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(*filePath);
+			serializer.Serialize(filePath);
 		}
     }
     void EditorLayer::OpenScene()
     {
 		auto filePath = FileDialogs::OpenFile("Wildlands Scene (*.wls)\0*.wls\0");
-		if (filePath)
+		if (!filePath.empty())
 		{
 			m_ActiveScene = CreateRef<Scene>();
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_HierarchyPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(*filePath);
+			serializer.Deserialize(filePath);
 		}
     }
 }

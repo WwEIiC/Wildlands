@@ -8,8 +8,8 @@ namespace Wildlands
 	class WLEditor : public Application
 	{
 	public:
-		WLEditor()
-			: Application("Wildlands Editor")
+		WLEditor(ApplicationCommandLineArgs args)
+			: Application("WLEditor", args)
 		{
 			PushLayer(new EditorLayer());
 		}
@@ -19,8 +19,8 @@ namespace Wildlands
 		}
 	};
 
-	Application* CreateApplication()
+	Application* CreateApplication(ApplicationCommandLineArgs args)
 	{
-		return new WLEditor();
+		return new WLEditor(args);
 	}
 }

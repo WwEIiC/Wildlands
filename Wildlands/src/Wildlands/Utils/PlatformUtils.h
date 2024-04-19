@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <optional>
 
 namespace Wildlands
 {
@@ -8,8 +7,8 @@ namespace Wildlands
 	{
 	public:
 		/// <returns> return empty string mean cancelled </returns>
-		static std::optional<std::string> OpenFile(const char* filter);
+		static std::string OpenFile(const char* filter);
 		/// <returns> return empty string mean cancelled </returns>
-		static std::optional<std::string> SaveFile(const char* filter);
+		static std::string SaveFile(const char* filter);
 	};
 }
