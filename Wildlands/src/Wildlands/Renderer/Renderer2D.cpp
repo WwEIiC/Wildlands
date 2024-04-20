@@ -138,8 +138,8 @@ namespace Wildlands
 	{
 		WL_PROFILE_FUNCTION();
 
-		s_Data.Shader->Bind();
-        s_Data.Shader->SetMat4("u_VPMatrix", camera.GetVPMatrix());
+		s_Data.CameraBuffer.ViewProjectionMatrix = camera.GetVPMatrix();
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
@@ -376,7 +376,10 @@ namespace Wildlands
 
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& spriteComp, uint32_t entityID)
 	{
-		DrawQuad(transform, spriteComp.Color, entityID);
+		if (spriteComp.Texture)
+			DrawQuad(transform, spriteComp.Texture, spriteComp.TilingFactor, spriteComp.Color, entityID);
+		else
+			DrawQuad(transform, spriteComp.Color, entityID);
 	}
 	
 	Renderer2D::Stats& Renderer2D::GetStats()

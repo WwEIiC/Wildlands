@@ -3,10 +3,14 @@
 #include <imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <filesystem>
+
 #include "Wildlands/ECS/Components.h"
 
 namespace Wildlands
 {
+    extern const std::filesystem::path g_AssetPath;
+
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
 		SetContext(scene);
@@ -16,6 +20,8 @@ namespace Wildlands
 	{
 		m_Context = scene;
 		m_SelectedEntity = {};
+		if (!m_DefaultTexture)
+			m_DefaultTexture = Texture2D::Create("assets/Textures/Checkerboard.png");
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
@@ -285,9 +291,30 @@ namespace Wildlands
 				}
 			});
 		
-		DrawComponent<SpriteRendererComponent>("Sprite", entity, [](auto& spriteComp)
+		DrawComponent<SpriteRendererComponent>("Sprite", entity, [&](auto& spriteComp)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(spriteComp.Color));
+
+				ImGui::Text("Texture");
+				uint32_t textureID = spriteComp.Texture ? spriteComp.Texture->GetRendererID() : m_DefaultTexture->GetRendererID();
+				ImGui::Image((void*)(uint64_t)textureID, ImVec2(64.0f, 64.0f), ImVec2(0, 1), ImVec2(1, 0));
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						const wchar_t* path = (const wchar_t*)payload->Data;
+						std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
+						spriteComp.Texture = Texture2D::Create(texturePath.string());
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("Remove"))
+					spriteComp.Texture = nullptr;
+
+				ImGui::DragFloat("Tiling Factor", &spriteComp.TilingFactor, 0.1f, 0.0f, 100.0f, "%.2f");
 			});
 	}
 

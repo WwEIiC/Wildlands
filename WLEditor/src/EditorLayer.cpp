@@ -11,6 +11,8 @@
 
 namespace Wildlands
 {
+    extern const std::filesystem::path g_AssetPath;
+
     EditorLayer::EditorLayer()
         : Layer("Sandbox2D")
     {
@@ -44,7 +46,8 @@ namespace Wildlands
         }
 
         m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
-        m_HierarchyPanel.SetContext(m_ActiveScene);
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::Detach()
@@ -133,10 +136,12 @@ namespace Wildlands
         {
             if (ImGui::BeginMenu("File"))
             {
-                if (ImGui::MenuItem("Settings")) { m_HierarchyPanel.m_ShowSettingsWindow = true; }
+                if (ImGui::MenuItem("Settings")) { m_SceneHierarchyPanel.m_ShowSettingsWindow = true; }
                 if (ImGui::MenuItem("New Scene", "Ctrl+N")) { NewScene(); }
                 if (ImGui::MenuItem("Save as...", "Ctrl+Shift+S")) { SaveSceneAs(); }
                 if (ImGui::MenuItem("Open...", "Ctrl+O")) { OpenScene(); }
+                if (ImGui::MenuItem("FullScreen")) { Application::Get().GetWindow().SetFullScreen(); }
+                if (ImGui::MenuItem("ExitFullScreen")) { Application::Get().GetWindow().ExitFullScreen(); }
                 if (ImGui::MenuItem("Exit")) { Application::Get().Close(); }
                 ImGui::EndMenu();
             }
@@ -144,8 +149,9 @@ namespace Wildlands
             ImGui::EndMenuBar();
         }
 
-        // Scene Hierarchy Panel
-        m_HierarchyPanel.OnImGuiRender();
+        // Panels
+        m_SceneHierarchyPanel.OnImGuiRender();
+        m_ContentBrowserPanel.OnImGuiRender();
 
         ImGui::Begin("Render Stats");
 
@@ -191,8 +197,18 @@ namespace Wildlands
         uint64_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
         ImGui::Image((void*)textureID, ImVec2(m_ViewportSize.x, m_ViewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+            {
+                const wchar_t* path = (const wchar_t*)payload->Data;
+                OpenScene(std::filesystem::path(g_AssetPath) / path);
+            }
+            ImGui::EndDragDropTarget();
+        }
+
         // ImGuizmo
-        Entity selectedEntity = m_HierarchyPanel.GetSelectedEntity();
+        Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
         if (selectedEntity && m_GizmoType != -1)
         {
             // Set it to Perspective now.
@@ -320,7 +336,7 @@ namespace Wildlands
                     m_FrameBuffer->UnBind();
 				}
 
-				m_HierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
 			}
         }
         return false;
@@ -330,7 +346,7 @@ namespace Wildlands
     {
         m_ActiveScene = CreateRef<Scene>();
         m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-        m_HierarchyPanel.SetContext(m_ActiveScene);
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
     void EditorLayer::SaveSceneAs()
     {
@@ -345,14 +361,16 @@ namespace Wildlands
     {
 		auto filePath = FileDialogs::OpenFile("Wildlands Scene (*.wls)\0*.wls\0");
 		if (!filePath.empty())
-		{
-			m_ActiveScene = CreateRef<Scene>();
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_HierarchyPanel.SetContext(m_ActiveScene);
+            OpenScene(filePath);
+    }
+    void EditorLayer::OpenScene(std::filesystem::path path)
+    {
+        m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(filePath);
-		}
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Deserialize(path.string());
     }
 }
 

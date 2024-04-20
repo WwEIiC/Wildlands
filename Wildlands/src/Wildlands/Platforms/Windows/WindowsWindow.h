@@ -24,6 +24,9 @@ namespace Wildlands
 		virtual void SetVSync(bool enable) override;
 		virtual bool IsVSync() const override;
 
+		virtual void SetFullScreen() override;
+		virtual void ExitFullScreen() override;
+
 		inline virtual void SetEventCallback(const EventCallbackFunc& callback) override { m_Data.EventCallback = callback; }
 
 	private:

@@ -15,7 +15,7 @@ layout (binding = 0) uniform Camera
 struct VertexOutput{
 	vec2 TexCoord;
 	vec4 Color;
-	float TexIndex;
+	flat float TexIndex;
 	float TileFactor;
 };
 layout (location = 0) out VertexOutput Output;

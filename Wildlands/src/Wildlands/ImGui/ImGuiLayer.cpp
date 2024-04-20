@@ -118,8 +118,9 @@ namespace Wildlands
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		// Fonts
-		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/Fonts/Noto_Sans/NotoSans-Regular.ttf", 18.0f);
-		io.Fonts->AddFontFromFileTTF("assets/Fonts/Noto_Sans/NotoSans-Bold.ttf", 18.0f);
+		float fontSize = 18.0f;
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/Fonts/Noto_Sans/NotoSans-Regular.ttf", fontSize);
+		io.Fonts->AddFontFromFileTTF("assets/Fonts/Noto_Sans/NotoSans-Bold.ttf", fontSize);
 
 		ImVec4* colors = style.Colors;
 		// Frame

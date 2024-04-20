@@ -2,6 +2,7 @@
 #include "Wildlands.h"
 #include "Wildlands/Renderer/EditorCamera.h"
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 
 namespace Wildlands
 {
@@ -24,6 +25,7 @@ namespace Wildlands
 		void NewScene();
 		void SaveSceneAs();
 		void OpenScene();
+		void OpenScene(std::filesystem::path path);
 	private:
 		Ref<Texture2D> m_Texture;
 		Ref<FrameBuffer> m_FrameBuffer;
@@ -35,13 +37,15 @@ namespace Wildlands
 		glm::vec2 m_ViewportBounds[2] = { {0.0f, 0.0f}, {0.0f, 0.0f} };
 	private:
 		Ref<Scene> m_ActiveScene;
-
 		EditorCamera m_EditorCamera;
 
-		SceneHierarchyPanel m_HierarchyPanel;
 		int m_GizmoType = -1;
 		bool m_GizmoMode = false; // false  = local, true = world.
 		Entity m_HoveredEntity;
+		
+		// Panels
+		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
 	};
 }
 

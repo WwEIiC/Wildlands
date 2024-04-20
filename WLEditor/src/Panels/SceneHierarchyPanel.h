@@ -3,6 +3,7 @@
 #include "Wildlands/Core/Base.h"
 #include "Wildlands/ECS/Scene.h"
 #include "Wildlands/ECS/Entity.h"
+#include "Wildlands/Renderer/Texture.h"
 #include <functional>
 #include <imgui.h>
 
@@ -30,6 +31,8 @@ namespace Wildlands
 	private:
 		Ref<Scene> m_Context;
 		Entity m_SelectedEntity;
+
+		Ref<Texture2D> m_DefaultTexture;
 	};
 }
 

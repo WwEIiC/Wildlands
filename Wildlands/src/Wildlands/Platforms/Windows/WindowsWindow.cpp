@@ -69,7 +69,7 @@ namespace Wildlands
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(m_Data.VSync);
 
-		//Set up Application events callbacks
+		// Set up Application events callbacks
 		glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* window, int focused)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
@@ -219,5 +219,17 @@ namespace Wildlands
 	bool WindowsWindow::IsVSync() const
 	{
 		return m_Data.VSync;
+	}
+
+	void WindowsWindow::SetFullScreen()
+	{
+		GLFWmonitor* primary = glfwGetPrimaryMonitor();
+
+		const GLFWvidmode* mode = glfwGetVideoMode(primary);
+		glfwSetWindowMonitor(m_Window, NULL, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+	}
+	void WindowsWindow::ExitFullScreen()
+	{
+		glfwSetWindowMonitor(m_Window, NULL, 60, 60, 1600, 900, GLFW_DONT_CARE);
 	}
 }

@@ -6,7 +6,7 @@ layout(location = 1) out uint EntityID;
 struct VertexOutput{
 	vec2 TexCoord;
 	vec4 Color;
-	float TexIndex;
+	flat float TexIndex;
 	float TileFactor;
 };
 

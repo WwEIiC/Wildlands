@@ -39,6 +39,9 @@ namespace Wildlands
 		virtual void SetVSync(bool enable) = 0;
 		virtual bool IsVSync() const = 0;
 
+		virtual void SetFullScreen() = 0;
+		virtual void ExitFullScreen() = 0;
+
 		// set the event callback function
 		virtual void SetEventCallback(const EventCallbackFunc& callback) = 0;
 	};
