@@ -33,7 +33,8 @@ project "Wildlands"
 		"%{IncludeDirs.stb_image}",
 		"%{IncludeDirs.entt}",
 		"%{IncludeDirs.yaml_cpp}",
-		"%{IncludeDirs.ImGuizmo}"
+		"%{IncludeDirs.ImGuizmo}",
+		"%{IncludeDirs.Box2D}",
 	}
 
 	links {
@@ -41,6 +42,7 @@ project "Wildlands"
 		"Glad",
 		"ImGui",
 		"Yaml_cpp",
+		"Box2d",
 		"opengl32.lib"
 	}
 

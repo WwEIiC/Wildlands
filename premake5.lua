@@ -16,6 +16,7 @@ group "Dependences"
 	include "Wildlands/Externals/Glad"
 	include "Wildlands/Externals/ImGui"
 	include "Wildlands/Externals/yaml_cpp"
+	include "Wildlands/Externals/box2d"
 group ""
 
 include "Wildlands"

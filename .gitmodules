@@ -18,3 +18,7 @@
 	path = Wildlands/Externals/yaml_cpp
 	url = https://github.com/WwEIiC/yaml-cpp
 	branch = master
+[submodule "Wildlands/Externals/box2d"]
+	path = Wildlands/Externals/box2d
+	url = https://github.com/WwEIiC/box2d
+	branch = main
