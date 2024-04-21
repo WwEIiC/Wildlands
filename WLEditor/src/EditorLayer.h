@@ -20,19 +20,26 @@ namespace Wildlands
 
 		virtual void OnEvent(Event& event) override;
 	private:
+		// UI
+		void UI_Toolbar();
+	private:
+		// Events
 		bool OnKeyDownEvent(KeyDownEvent& e);
 		bool OnMouseButtonDownEvent(MouseButtonDownEvent& e);
+	private:
+		// Scene
 		void NewScene();
 		void SaveSceneAs();
 		void OpenScene();
 		void OpenScene(std::filesystem::path path);
+
+		void OnScenePlay();
+		void OnSceneStop();
 	private:
-		Ref<Texture2D> m_Texture;
 		Ref<FrameBuffer> m_FrameBuffer;
 
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
-
 		/// <summary> left-top and right-bottom </summary>
 		glm::vec2 m_ViewportBounds[2] = { {0.0f, 0.0f}, {0.0f, 0.0f} };
 	private:
@@ -43,9 +50,18 @@ namespace Wildlands
 		bool m_GizmoMode = false; // false  = local, true = world.
 		Entity m_HoveredEntity;
 		
+		enum class ESceneState
+		{
+			Edit = 0,
+			Play = 1
+		};
+		ESceneState m_SceneState = ESceneState::Edit;
+
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 		ContentBrowserPanel m_ContentBrowserPanel;
+
+		Ref<Texture2D> m_PlayButtonIcon, m_StopButtonIcon;
 	};
 }
 

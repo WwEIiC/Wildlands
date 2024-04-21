@@ -22,8 +22,10 @@ namespace Wildlands
     void EditorLayer::Attach()  
     {
         WL_PROFILE_FUNCTION();
-        WL_INFO("Sandbox2D Layer Attached");
-        m_Texture = Texture2D::Create("./assets/Textures/Checkerboard.png");
+        WL_INFO("WLEditor Layer Attached");
+
+        m_PlayButtonIcon = Texture2D::Create("resources/icons/PlayButtonIcon.png");
+        m_StopButtonIcon = Texture2D::Create("resources/icons/StopButtonIcon.png");
 
         FrameBufferSpecification framebufferSpec;
         framebufferSpec.Attachments = {
@@ -60,8 +62,6 @@ namespace Wildlands
     {
         WL_PROFILE_FUNCTION();
 
-        m_EditorCamera.Update(ts);
-
         Renderer2D::ResetStats();
         {
             WL_PROFILE_SCOPE("Render Pre");
@@ -78,8 +78,21 @@ namespace Wildlands
             WL_PROFILE_SCOPE("Renderer Draw");
 
 			// Scene Update
-			m_ActiveScene->UpdateEditor(ts, m_EditorCamera);
+            switch (m_SceneState)
+            {
+            case ESceneState::Edit:
+            {
+                m_EditorCamera.Update(ts);
 
+                m_ActiveScene->UpdateEditor(ts, m_EditorCamera);
+                break;
+            }
+            case ESceneState::Play:
+            {
+                m_ActiveScene->UpdateRuntime(ts);
+                break;
+            }
+            }
             m_FrameBuffer->UnBind();
         }
     }
@@ -169,7 +182,7 @@ namespace Wildlands
 
         
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-        ImGui::Begin("Viewport");
+        ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoTitleBar);
 
         // set up viewport data.
         auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
@@ -258,6 +271,7 @@ namespace Wildlands
         ImGui::End();//"Viewport"
         ImGui::PopStyleVar();
 
+        UI_Toolbar();
 
         ImGui::End();//""Dockspace"
     }
@@ -273,7 +287,41 @@ namespace Wildlands
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////// Private Functions ///////////////////////////////////////////////////////////
+    ////////////////////////////////////////////// UI Functions ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void EditorLayer::UI_Toolbar()
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 2});
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2{0, 0});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0, 0, 0, 0 });
+        auto& colors = ImGui::GetStyle().Colors;
+        const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+        const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+        ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse;
+        ImGui::Begin("Toolbar", nullptr, flags);
+        float buttonSize = ImGui::GetWindowHeight() - 4.f;
+        ImGui::SameLine((ImGui::GetContentRegionMax().x - buttonSize) * 0.5f);
+        Ref<Texture2D> icon = m_SceneState == ESceneState::Edit ? m_PlayButtonIcon : m_StopButtonIcon;
+        if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2{buttonSize, buttonSize}, ImVec2(0, 0), ImVec2(1, 1), 0))
+        {
+            if (m_SceneState == ESceneState::Edit)
+                OnScenePlay();
+            else if (m_SceneState == ESceneState::Play)
+                OnSceneStop();
+        }
+        ImGui::End();
+
+        ImGui::PopStyleColor(3);
+        ImGui::PopStyleVar(2);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////// Events Functions ////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     bool EditorLayer::OnKeyDownEvent(KeyDownEvent& e)
@@ -342,6 +390,10 @@ namespace Wildlands
         return false;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////// Scene Functions ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     void EditorLayer::NewScene()
     {
         m_ActiveScene = CreateRef<Scene>();
@@ -371,6 +423,15 @@ namespace Wildlands
 
 		SceneSerializer serializer(m_ActiveScene);
 		serializer.Deserialize(path.string());
+    }
+
+    void EditorLayer::OnScenePlay()
+    {
+        m_SceneState = ESceneState::Play;
+    }
+    void EditorLayer::OnSceneStop()
+    {
+        m_SceneState = ESceneState::Edit;
     }
 }
 

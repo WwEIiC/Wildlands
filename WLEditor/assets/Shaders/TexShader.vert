@@ -15,10 +15,10 @@ layout (binding = 0) uniform Camera
 struct VertexOutput{
 	vec2 TexCoord;
 	vec4 Color;
-	flat float TexIndex;
 	float TileFactor;
 };
 layout (location = 0) out VertexOutput Output;
+layout (location = 3) out flat float v_TexIndex;
 layout (location = 4) out flat uint v_EntityID;
 
 
@@ -27,8 +27,8 @@ void main()
 {
 	Output.TexCoord = a_TexCoord;
 	Output.Color = a_Color;
-	Output.TexIndex = a_TexIndex;
 	Output.TileFactor = a_TileFactor;
+	v_TexIndex = a_TexIndex;
 	v_EntityID = a_EntityID;
 	gl_Position = u_ViewprojectionMatrix * vec4(a_Position, 1.0f);
 }
