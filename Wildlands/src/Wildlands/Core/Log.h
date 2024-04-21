@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 
 namespace Wildlands
@@ -35,9 +36,9 @@ inline OStream& operator<<(OStream& os, const glm::mat<C, R, T, Q>& matrix)
 }
 
 template<typename OStream, typename T, glm::qualifier Q>
-inline OStream& operator<<(OStream& os, glm::qua<T, Q> quaternio)
+inline OStream& operator<<(OStream& os, glm::qua<T, Q> quaternion)
 {
-	return os << glm::to_string(quaternio);
+	return os << glm::to_string(quaternion);
 }
 
 //Core log macros
