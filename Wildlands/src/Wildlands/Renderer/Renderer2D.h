@@ -2,7 +2,7 @@
 #include "Wildlands/Renderer/Cameras.h"
 #include "Wildlands/Renderer/EditorCamera.h"
 #include "Wildlands/Renderer/Texture.h"
-#include "Wildlands/ECS/Components.h"
+#include "Wildlands/ECS/Entity.h"
 
 namespace Wildlands
 {

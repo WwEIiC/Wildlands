@@ -1,22 +1,29 @@
 #pragma once
+#include "Wildlands/Core/UUID.h"
+#include "Wildlands/Renderer/Cameras.h"
+#include "Wildlands/Renderer/Texture.h"
+#include "Wildlands/ECS/SceneCamera.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "Wildlands/Renderer/Cameras.h"
-#include "Wildlands/Renderer/Texture.h"
-#include "Wildlands/ECS/SceneCamera.h"
-#include "Wildlands/ECS/ScriptableEntity.h"
-
 namespace Wildlands
 {
+	struct IDComponent
+	{
+		UUID ID;
+
+		IDComponent() = default;
+		IDComponent(const IDComponent& other) = default;
+	};
+
 	struct TagComponent
 	{
 		std::string Tag;
 
 		TagComponent() = default;
-		TagComponent(const TagComponent& tagComp) = default;
+		TagComponent(const TagComponent& other) = default;
 		TagComponent(const std::string& tag)
 			: Tag(tag) {}
 	};
@@ -50,7 +57,7 @@ namespace Wildlands
 		float TilingFactor = 1.0f;
 
 		SpriteRendererComponent() = default;
-		SpriteRendererComponent(const SpriteRendererComponent& spriteComp) = default;
+		SpriteRendererComponent(const SpriteRendererComponent& other) = default;
 		SpriteRendererComponent(const glm::vec4& color)
 			: Color(color) {}
 	};
@@ -91,9 +98,8 @@ namespace Wildlands
 		BoxCollider2DComponent(const BoxCollider2DComponent& other) = default;
 	};
 
-	/// <summary>
-	/// use cpp to script
-	/// </summary>
+	class ScriptableEntity;
+	/// <summary> use cpp to script </summary>
 	struct NativeScriptComponent
 	{
 		ScriptableEntity* Instance = nullptr;

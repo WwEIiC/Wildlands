@@ -1,5 +1,6 @@
 #include "WLPCH.h"
 #include "SceneSerializer.h"
+#include "Wildlands/ECS/Entity.h"
 
 #include <yaml-cpp/yaml.h>
 #include "Wildlands/ECS/Components.h"
@@ -137,9 +138,10 @@ namespace Wildlands
 
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
-		out << YAML::BeginMap; // Entity
-		out << YAML::Key << "Entity" << YAML::Value << "12345"; // WLTODO: Entity ID
+		WL_CORE_ASSERT(entity.HasComponent<IDComponent>(), "Every entity must have id component");
 
+		out << YAML::BeginMap; // Entity
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
 		if (entity.HasComponent<TagComponent>())
 		{
 			out << YAML::Key << "TagComponent" << YAML::BeginMap; // TagComponent
@@ -265,13 +267,13 @@ namespace Wildlands
 		{
 			for (auto entity : entities)
 			{
-				uint64_t uuid  = entity["Entity"].as<uint64_t>(); // WLTODO: Entity ID
+				uint64_t uuid  = entity["Entity"].as<uint64_t>();
 
 				std::string name;
 				if (entity["TagComponent"])
 					name = entity["TagComponent"]["Tag"].as<std::string>();
 
-				Entity targetEntity = m_Scene->CreateEntity(name);
+				Entity targetEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 
 				auto transformNode = entity["TransformComponent"];
 				if (transformNode)

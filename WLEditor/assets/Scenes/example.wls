@@ -1,6 +1,6 @@
 Scene: Untitled
 Entities:
-  - Entity: 12345
+  - Entity: 5058150254742142159
     TagComponent:
       Tag: Squard
     TransformComponent:
@@ -8,4 +8,4 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
-      Color: [1.0, 0.254498303, 0.254498303, 1]
+      Color: [1, 0.254498303, 0.254498303, 1]

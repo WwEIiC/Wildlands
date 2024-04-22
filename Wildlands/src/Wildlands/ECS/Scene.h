@@ -1,9 +1,10 @@
 #pragma once
 
-#include <entt.hpp>
 #include "Wildlands/Core/Timestep.h"
 #include "Wildlands/Renderer/EditorCamera.h"
+#include "Wildlands/Core/UUID.h"
 
+#include <entt.hpp>
 class b2World;
 
 namespace Wildlands
@@ -24,6 +25,7 @@ namespace Wildlands
 		void UIRender();
 
 		Entity CreateEntity(const std::string& name = std::string());
+		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 		void DestoryEntity(Entity entity);
 
 		void OnViewportResize(uint32_t width, uint32_t height);

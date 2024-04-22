@@ -1,6 +1,8 @@
 #pragma once
 #include <entt.hpp>
+#include "Wildlands/Core/UUID.h"
 #include "Wildlands/ECS/Scene.h"
+#include "Wildlands/ECS/Components.h"
 
 namespace Wildlands
 {
@@ -48,6 +50,11 @@ namespace Wildlands
 			WL_CORE_ASSERT(HasComponent<Comp>(), "Entity doesn't has this component");
 
 			m_SceneHandle->m_Registry.remove<Comp>(m_EntityHandle);
+		}
+
+		UUID GetUUID() 
+		{
+			return GetComponent<IDComponent>().ID;
 		}
 
 	public:

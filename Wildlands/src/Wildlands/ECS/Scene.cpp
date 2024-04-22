@@ -3,6 +3,7 @@
 
 #include "Wildlands/ECS/Components.h"
 #include "Wildlands/ECS/Entity.h"
+#include "Wildlands/ECS/ScriptableEntity.h"
 
 #include "Wildlands/Renderer/Renderer2D.h"
 
@@ -163,7 +164,14 @@ namespace Wildlands
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
+		return CreateEntityWithUUID(UUID(), name);
+	}
+
+	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
+	{
 		Entity entity(m_Registry.create(), this);
+
+		entity.AddComponent<IDComponent>(uuid);
 
 		std::string tag = name.empty() ? "Entity" : name;
 		entity.AddComponent<TagComponent>(tag);
@@ -210,6 +218,10 @@ namespace Wildlands
 	void Scene::OnComponentAdded(Entity entity, Comp& component)
 	{
 	}
+	template<>
+	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component)
+	{
+	} 
 	template<>
 	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
 	{
