@@ -12,7 +12,7 @@ namespace Wildlands
 		static void Init();
 		static void Destory();
 
-		inline static RendererAPI::EAPI GetAPI() { return RendererAPI::GetAPI(); }
+		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
 		static void BeginScene(OrthographicCamera& camera);
 		static void EndScene();

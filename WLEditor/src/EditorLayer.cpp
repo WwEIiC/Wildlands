@@ -80,14 +80,14 @@ namespace Wildlands
 			// Scene Update
             switch (m_SceneState)
             {
-            case ESceneState::Edit:
+            case SceneState::Edit:
             {
                 m_EditorCamera.Update(ts);
 
                 m_ActiveScene->UpdateEditor(ts, m_EditorCamera);
                 break;
             }
-            case ESceneState::Play:
+            case SceneState::Play:
             {
                 m_ActiveScene->UpdateRuntime(ts);
                 break;
@@ -305,12 +305,12 @@ namespace Wildlands
         ImGui::Begin("Toolbar", nullptr, flags);
         float buttonSize = ImGui::GetWindowHeight() - 4.f;
         ImGui::SameLine((ImGui::GetContentRegionMax().x - buttonSize) * 0.5f);
-        Ref<Texture2D> icon = m_SceneState == ESceneState::Edit ? m_PlayButtonIcon : m_StopButtonIcon;
+        Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_PlayButtonIcon : m_StopButtonIcon;
         if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2{buttonSize, buttonSize}, ImVec2(0, 0), ImVec2(1, 1), 0))
         {
-            if (m_SceneState == ESceneState::Edit)
+            if (m_SceneState == SceneState::Edit)
                 OnScenePlay();
-            else if (m_SceneState == ESceneState::Play)
+            else if (m_SceneState == SceneState::Play)
                 OnSceneStop();
         }
         ImGui::End();
@@ -435,11 +435,13 @@ namespace Wildlands
 
     void EditorLayer::OnScenePlay()
     {
-        m_SceneState = ESceneState::Play;
+        m_ActiveScene->OnRuntimeStart();
+        m_SceneState = SceneState::Play;
     }
     void EditorLayer::OnSceneStop()
     {
-        m_SceneState = ESceneState::Edit;
+        m_ActiveScene->OnRuntimeStop();
+        m_SceneState = SceneState::Edit;
     }
 }
 

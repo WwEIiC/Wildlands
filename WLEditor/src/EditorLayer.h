@@ -50,12 +50,12 @@ namespace Wildlands
 		bool m_GizmoMode = false; // false  = local, true = world.
 		Entity m_HoveredEntity;
 		
-		enum class ESceneState
+		enum class SceneState
 		{
 			Edit = 0,
 			Play = 1
 		};
-		ESceneState m_SceneState = ESceneState::Edit;
+		SceneState m_SceneState = SceneState::Edit;
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;

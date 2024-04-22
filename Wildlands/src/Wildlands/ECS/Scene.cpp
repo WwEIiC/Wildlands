@@ -6,8 +6,69 @@
 
 #include "Wildlands/Renderer/Renderer2D.h"
 
+#include "box2d/b2_world.h"
+#include "box2d/b2_body.h"
+#include "box2d/b2_fixture.h"
+#include "box2d/b2_polygon_shape.h"
+
 namespace Wildlands
 {
+	static b2BodyType RigidbodyTypeToB2BodyType(Rigidbody2DComponent::BodyType bodyType)
+	{
+		switch (bodyType)
+		{
+			case Rigidbody2DComponent::BodyType::Static: return b2BodyType::b2_staticBody;
+			case Rigidbody2DComponent::BodyType::Dynamic: return b2BodyType::b2_dynamicBody;
+			case Rigidbody2DComponent::BodyType::Kinematic: return b2BodyType::b2_kinematicBody;
+		}
+		WL_CORE_ASSERT(false, "Unkown body type");
+		return b2BodyType::b2_staticBody;
+	}
+
+	void Scene::OnRuntimeStart()
+	{
+		// Create the physics world and all items inside the world.
+
+		m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
+		auto view = m_Registry.view<Rigidbody2DComponent>();
+		for (auto entityID : view)
+		{
+			Entity entity = { entityID, this };
+			auto& transformComp = entity.GetComponent<TransformComponent>();
+			auto& rb2dComp = entity.GetComponent<Rigidbody2DComponent>();
+
+			b2BodyDef bodyDef;
+			bodyDef.type	= RigidbodyTypeToB2BodyType(rb2dComp.Type);
+			bodyDef.angle	= transformComp.Rotation.z;
+			bodyDef.position.Set(transformComp.Position.x, transformComp.Position.y);
+			b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
+			body->SetFixedRotation(rb2dComp.FixedRotation);
+
+			rb2dComp.RuntimeRigidbody = body;
+
+			if (entity.HasComponent<BoxCollider2DComponent>())
+			{
+				auto& boxColliderComp = entity.GetComponent<BoxCollider2DComponent>();
+
+				b2PolygonShape shape;
+				shape.SetAsBox(boxColliderComp.Size.x * 0.5f * transformComp.Scale.x, boxColliderComp.Size.y * 0.5f * transformComp.Scale.y);
+
+				b2FixtureDef fixtureDef;
+				fixtureDef.shape					= &shape;
+				fixtureDef.density					= boxColliderComp.Density;
+				fixtureDef.friction					= boxColliderComp.Friction;
+				fixtureDef.restitution				= boxColliderComp.Restitution;
+				fixtureDef.restitutionThreshold		= boxColliderComp.RestitutionThreshold;
+				body->CreateFixture(&fixtureDef);
+			}
+		}
+	}
+	void Scene::OnRuntimeStop()
+	{
+		delete m_PhysicsWorld;
+		m_PhysicsWorld = nullptr;
+	}
+
 	void Scene::UpdateEditor(Timestep ts, EditorCamera& camera)
 	{
 		Renderer2D::BeginScene(camera);
@@ -24,7 +85,9 @@ namespace Wildlands
 	}
 	void Scene::UpdateRuntime(Timestep ts)
 	{
-		// update scriptable entites
+		// -- Update Order: Scripts --> Physics --> Render
+
+		// -------- Scripts --------
 		{
 			m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& NSComp)
 				{
@@ -39,7 +102,29 @@ namespace Wildlands
 				});
 		}
 
+		// -------- Physics --------
+		{
+			const int32_t velocityIterations = 6;
+			const int32_t positionIterations = 2;
+			m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
 
+			// update tranform from physics.
+			auto view = m_Registry.view<Rigidbody2DComponent>();
+			for (auto entityID : view)
+			{
+				Entity entity = { entityID, this };
+				auto& transformComp = entity.GetComponent<TransformComponent>();
+				auto& rb2dComp = entity.GetComponent<Rigidbody2DComponent>();
+
+				b2Body* body = static_cast<b2Body*>(rb2dComp.RuntimeRigidbody);
+				const b2Vec2& position = body->GetPosition();
+				transformComp.Position.x = position.x;
+				transformComp.Position.y = position.y;
+				transformComp.Rotation.z = body->GetAngle();
+			}
+		}
+
+		// -------- Render --------
 		Camera* mainCamera = nullptr;
 		glm::mat4 cameraTransform;
 
@@ -145,6 +230,14 @@ namespace Wildlands
 	}
 	template<>
 	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
+	{
+	} 
+	template<>
+	void Scene::OnComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component)
+	{
+	} 
+	template<>
+	void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
 	{
 	}
 }

@@ -65,6 +65,32 @@ namespace Wildlands
 		CameraComponent(const CameraComponent& spriteComp) = default;
 	};
 
+	struct Rigidbody2DComponent
+	{
+		enum class BodyType	{ Static = 0, Dynamic, Kinematic };
+		BodyType Type = BodyType::Static;
+		bool FixedRotation = false;
+		void* RuntimeRigidbody = nullptr;
+
+		Rigidbody2DComponent() = default;
+		Rigidbody2DComponent(const Rigidbody2DComponent& other) = default;
+	};
+
+	struct BoxCollider2DComponent
+	{
+		glm::vec2 Size = { 1.0f, 1.0f };
+		glm::vec2 Offset = { 0.0f, 0.0f };
+		void* RuntimeFixture = nullptr;
+
+		float Density = 1.0f;
+		float Friction = 0.2f;
+		float Restitution = 0.0f;
+		float RestitutionThreshold = 0.5f;
+
+		BoxCollider2DComponent() = default;
+		BoxCollider2DComponent(const BoxCollider2DComponent& other) = default;
+	};
+
 	/// <summary>
 	/// use cpp to script
 	/// </summary>

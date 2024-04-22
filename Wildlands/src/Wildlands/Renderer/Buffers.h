@@ -4,7 +4,7 @@
 
 namespace Wildlands
 {
-	enum class EShaderDataType
+	enum class ShaderDataType
 	{
 		None = 0,
 		Float, Float2, Float3, Float4,
@@ -13,22 +13,22 @@ namespace Wildlands
 		Bool
 	};
 
-	static uint32_t SizeOfShaderDataType(EShaderDataType type)
+	static uint32_t SizeOfShaderDataType(ShaderDataType type)
 	{
 		switch (type)
 		{
-		case EShaderDataType::Float:    return 4;
-		case EShaderDataType::Float2:   return 4 * 2;
-		case EShaderDataType::Float3:   return 4 * 3;
-		case EShaderDataType::Float4:   return 4 * 4;
-		case EShaderDataType::Int:      return 4;
-		case EShaderDataType::UInt:		return 4;
-		case EShaderDataType::Int2:     return 4 * 2;
-		case EShaderDataType::Int3:     return 4 * 3;
-		case EShaderDataType::Int4:     return 4 * 4;
-		case EShaderDataType::Mat3:     return 4 * 3 * 3;
-		case EShaderDataType::Mat4:     return 4 * 4 * 4;
-		case EShaderDataType::Bool:     return 1;
+		case ShaderDataType::Float:    return 4;
+		case ShaderDataType::Float2:   return 4 * 2;
+		case ShaderDataType::Float3:   return 4 * 3;
+		case ShaderDataType::Float4:   return 4 * 4;
+		case ShaderDataType::Int:      return 4;
+		case ShaderDataType::UInt:		return 4;
+		case ShaderDataType::Int2:     return 4 * 2;
+		case ShaderDataType::Int3:     return 4 * 3;
+		case ShaderDataType::Int4:     return 4 * 4;
+		case ShaderDataType::Mat3:     return 4 * 3 * 3;
+		case ShaderDataType::Mat4:     return 4 * 4 * 4;
+		case ShaderDataType::Bool:     return 1;
 		}
 
 		WL_CORE_ASSERT(false, "Unknown Type of ShaderData");
@@ -37,14 +37,14 @@ namespace Wildlands
 
 	struct BufferElement
 	{
-		EShaderDataType Type;
+		ShaderDataType Type;
 		std::string Name;
 		uint32_t Size;
 		uint32_t Offset;
 		bool Normalized;
 
 		BufferElement() = default;
-		BufferElement(EShaderDataType type, const std::string& name, bool normalized = false)
+		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
 			: Type(type), Name(name), Size(SizeOfShaderDataType(type)), Offset(0), Normalized(normalized)
 		{
 		}
@@ -53,19 +53,19 @@ namespace Wildlands
 		{
 			switch (Type)
 			{
-			case Wildlands::EShaderDataType::None:		return 0;
-			case Wildlands::EShaderDataType::Float:		return 1;
-			case Wildlands::EShaderDataType::Float2:	return 2;
-			case Wildlands::EShaderDataType::Float3:	return 3;
-			case Wildlands::EShaderDataType::Float4:	return 4;
-			case Wildlands::EShaderDataType::Int:		return 1;
-			case Wildlands::EShaderDataType::UInt:		return 1;
-			case Wildlands::EShaderDataType::Int2:		return 2;
-			case Wildlands::EShaderDataType::Int3:		return 3;
-			case Wildlands::EShaderDataType::Int4:		return 4;
-			case Wildlands::EShaderDataType::Mat3:		return 3 * 3;
-			case Wildlands::EShaderDataType::Mat4:		return 4 * 4;
-			case Wildlands::EShaderDataType::Bool:		return 1;
+			case Wildlands::ShaderDataType::None:		return 0;
+			case Wildlands::ShaderDataType::Float:		return 1;
+			case Wildlands::ShaderDataType::Float2:	return 2;
+			case Wildlands::ShaderDataType::Float3:	return 3;
+			case Wildlands::ShaderDataType::Float4:	return 4;
+			case Wildlands::ShaderDataType::Int:		return 1;
+			case Wildlands::ShaderDataType::UInt:		return 1;
+			case Wildlands::ShaderDataType::Int2:		return 2;
+			case Wildlands::ShaderDataType::Int3:		return 3;
+			case Wildlands::ShaderDataType::Int4:		return 4;
+			case Wildlands::ShaderDataType::Mat3:		return 3 * 3;
+			case Wildlands::ShaderDataType::Mat4:		return 4 * 4;
+			case Wildlands::ShaderDataType::Bool:		return 1;
 			}
 
 			WL_CORE_ASSERT(false, "Unknown Type of ShaderData");

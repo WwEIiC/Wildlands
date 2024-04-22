@@ -4,6 +4,8 @@
 #include "Wildlands/Core/Timestep.h"
 #include "Wildlands/Renderer/EditorCamera.h"
 
+class b2World;
+
 namespace Wildlands
 {
 	class Entity;
@@ -13,6 +15,9 @@ namespace Wildlands
 	public:
 		Scene() = default;
 		~Scene() = default;
+
+		void OnRuntimeStart();
+		void OnRuntimeStop();
 
 		void UpdateEditor(Timestep ts, EditorCamera& camera);
 		void UpdateRuntime(Timestep ts);
@@ -29,8 +34,9 @@ namespace Wildlands
 		void OnComponentAdded(Entity entity, Comp& comp);
 	private:
 		entt::registry m_Registry;
-
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+
+		b2World* m_PhysicsWorld = nullptr;
 
 	friend class Entity;
 	friend class SceneHierarchyPanel;

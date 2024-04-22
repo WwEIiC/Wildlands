@@ -54,7 +54,7 @@ namespace Wildlands
 		{
 			WL_PROFILE_SCOPE("GLFW Create Window");
 #ifdef WL_DEBUG
-			if (Renderer::GetAPI() == RendererAPI::EAPI::OpenGL)
+			if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
 			{
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 			}

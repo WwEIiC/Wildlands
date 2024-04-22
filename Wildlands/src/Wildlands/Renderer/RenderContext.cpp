@@ -10,11 +10,11 @@ namespace Wildlands
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::EAPI::None:
+		case RendererAPI::API::None:
 			WL_CORE_ASSERT(false, "RendererAPI is None");
 			return nullptr;
 
-		case RendererAPI::EAPI::OpenGL:
+		case RendererAPI::API::OpenGL:
 			return CreateUnique<OpenGLContext>(static_cast<GLFWwindow*>(window));
 		}
 

@@ -11,8 +11,8 @@ namespace Wildlands
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::EAPI::None:    WL_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::EAPI::OpenGL:  return CreateRef<OpenGLUniformBuffer>(size, binding);
+		case RendererAPI::API::None:    WL_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLUniformBuffer>(size, binding);
 		}
 
 		WL_CORE_ASSERT(false, "Unknown RendererAPI!");

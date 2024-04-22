@@ -5,17 +5,17 @@
 
 namespace Wildlands
 {
-	RendererAPI::EAPI RendererAPI::s_API = RendererAPI::EAPI::OpenGL;
+	RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
 
 	Unique<RendererAPI> RendererAPI::Create()
 	{
 		switch (s_API)
 		{
-		case RendererAPI::EAPI::None:
+		case RendererAPI::API::None:
 			WL_CORE_ASSERT(false, "RendererAPI is None");
 			return nullptr;
 
-		case RendererAPI::EAPI::OpenGL:
+		case RendererAPI::API::OpenGL:
 			return CreateUnique<OpenGLRendererAPI>();
 		}
 

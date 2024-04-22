@@ -5,22 +5,22 @@
 
 namespace Wildlands
 {
-	static GLenum EShaderDataTypeToOpenGLType(EShaderDataType type)
+	static GLenum EShaderDataTypeToOpenGLType(ShaderDataType type)
 	{
 		switch (type)
 		{
-		case EShaderDataType::Float:		return GL_FLOAT;
-		case EShaderDataType::Float2:		return GL_FLOAT;
-		case EShaderDataType::Float3:		return GL_FLOAT;
-		case EShaderDataType::Float4:		return GL_FLOAT;
-		case EShaderDataType::Mat3:			return GL_FLOAT;
-		case EShaderDataType::Mat4:			return GL_FLOAT;
-		case EShaderDataType::Int:			return GL_INT;
-		case EShaderDataType::Int2:			return GL_INT;
-		case EShaderDataType::Int3:			return GL_INT;
-		case EShaderDataType::Int4:			return GL_INT;
-		case EShaderDataType::UInt:			return GL_UNSIGNED_INT;
-		case EShaderDataType::Bool:			return GL_BOOL;
+		case ShaderDataType::Float:		return GL_FLOAT;
+		case ShaderDataType::Float2:		return GL_FLOAT;
+		case ShaderDataType::Float3:		return GL_FLOAT;
+		case ShaderDataType::Float4:		return GL_FLOAT;
+		case ShaderDataType::Mat3:			return GL_FLOAT;
+		case ShaderDataType::Mat4:			return GL_FLOAT;
+		case ShaderDataType::Int:			return GL_INT;
+		case ShaderDataType::Int2:			return GL_INT;
+		case ShaderDataType::Int3:			return GL_INT;
+		case ShaderDataType::Int4:			return GL_INT;
+		case ShaderDataType::UInt:			return GL_UNSIGNED_INT;
+		case ShaderDataType::Bool:			return GL_BOOL;
 		}
 
 		WL_CORE_ASSERT(false, "Unknown ShaderDataType!");
@@ -72,23 +72,23 @@ namespace Wildlands
 		{
 			switch (element.Type)
 			{
-			case EShaderDataType::Float:
-			case EShaderDataType::Float2:
-			case EShaderDataType::Float3:
-			case EShaderDataType::Float4:
-			case EShaderDataType::Mat3:
-			case EShaderDataType::Mat4:
+			case ShaderDataType::Float:
+			case ShaderDataType::Float2:
+			case ShaderDataType::Float3:
+			case ShaderDataType::Float4:
+			case ShaderDataType::Mat3:
+			case ShaderDataType::Mat4:
 			{
 				glVertexAttribPointer(m_VertexAttributeIndex, element.GetCount(), EShaderDataTypeToOpenGLType(element.Type),
 				element.Normalized, layout.GetStride(), (void*)(intptr_t)element.Offset);
 				break;
 			}
-			case EShaderDataType::Int:
-			case EShaderDataType::UInt:
-			case EShaderDataType::Int2:
-			case EShaderDataType::Int3:
-			case EShaderDataType::Int4:
-			case EShaderDataType::Bool:
+			case ShaderDataType::Int:
+			case ShaderDataType::UInt:
+			case ShaderDataType::Int2:
+			case ShaderDataType::Int3:
+			case ShaderDataType::Int4:
+			case ShaderDataType::Bool:
 			{
 				glVertexAttribIPointer(m_VertexAttributeIndex,
 					element.GetCount(),

@@ -63,12 +63,12 @@ namespace Wildlands
 
 		s_Data.VertexBuffer = VertexBuffer::Create(s_Data.MaxVertecies * sizeof(QuadVertex));
 		s_Data.VertexBuffer->SetLayout({
-			{EShaderDataType::Float3, "a_Position"},
-			{EShaderDataType::Float4, "a_Color"},
-			{EShaderDataType::Float2, "a_TexCoord"},
-			{EShaderDataType::Float,  "a_TexIndex"},
-			{EShaderDataType::Float,  "a_TileFactor"},
-			{EShaderDataType::UInt,  "a_EntityID"}
+			{ShaderDataType::Float3, "a_Position"},
+			{ShaderDataType::Float4, "a_Color"},
+			{ShaderDataType::Float2, "a_TexCoord"},
+			{ShaderDataType::Float,  "a_TexIndex"},
+			{ShaderDataType::Float,  "a_TileFactor"},
+			{ShaderDataType::UInt,  "a_EntityID"}
 			});
 		s_Data.VertexArray->AddVertexBuffer(s_Data.VertexBuffer);
 
