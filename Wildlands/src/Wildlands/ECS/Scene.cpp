@@ -26,6 +26,44 @@ namespace Wildlands
 		return b2BodyType::b2_staticBody;
 	}
 
+	template<typename Comp>
+	static void CopyComponent(Entity dstEntity, Entity srcEntity)
+	{
+		if (!srcEntity.HasComponent<Comp>()) { return; }
+
+		dstEntity.AddOrReplaceComponent<Comp>(srcEntity.GetComponent<Comp>());
+	}
+
+	Ref<Scene> Scene::Copy(Ref<Scene> other)
+	{
+		Ref<Scene> newScene = CreateRef<Scene>();
+
+		// Copy viewport data.
+		newScene->m_ViewportWidth = other->m_ViewportWidth;
+		newScene->m_ViewportHeight = other->m_ViewportHeight;
+
+		// Copy entities into new scene.
+		auto& srcSceneRegistry = other->m_Registry;
+		auto& dstSceneRegistry = newScene->m_Registry;
+		auto idView = srcSceneRegistry.view<IDComponent>();
+		for (auto eneityID : idView)
+		{
+			Entity srcEntity = { eneityID, other.get() };
+			UUID uuid = srcEntity.GetUUID();
+			const std::string& name = srcEntity.GetComponent<TagComponent>().Tag;
+			Entity dstEntity = newScene->CreateEntityWithUUID(uuid, name);
+
+			// Copy all components into new entity.
+			CopyComponent<TransformComponent>(dstEntity, srcEntity);
+			CopyComponent<SpriteRendererComponent>(dstEntity, srcEntity);
+			CopyComponent<CameraComponent>(dstEntity, srcEntity);
+			CopyComponent<Rigidbody2DComponent>(dstEntity, srcEntity);
+			CopyComponent<BoxCollider2DComponent>(dstEntity, srcEntity);
+			CopyComponent<NativeScriptComponent>(dstEntity, srcEntity);
+		}
+		return newScene;
+	}
+
 	void Scene::OnRuntimeStart()
 	{
 		// Create the physics world and all items inside the world.
@@ -183,6 +221,21 @@ namespace Wildlands
 	void Scene::DestoryEntity(Entity entity)
 	{
 		m_Registry.destroy(entity);
+	}
+
+	Entity Scene::DupilcateEntity(Entity entity)
+	{
+		Entity newEntity = CreateEntity(entity.GetName());
+
+		// Copy all components into new entity.
+		CopyComponent<TransformComponent>(newEntity, entity);
+		CopyComponent<SpriteRendererComponent>(newEntity, entity);
+		CopyComponent<CameraComponent>(newEntity, entity);
+		CopyComponent<Rigidbody2DComponent>(newEntity, entity);
+		CopyComponent<BoxCollider2DComponent>(newEntity, entity);
+		CopyComponent<NativeScriptComponent>(newEntity, entity);
+
+		return newEntity;
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)

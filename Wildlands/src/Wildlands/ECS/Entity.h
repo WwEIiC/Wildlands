@@ -35,11 +35,25 @@ namespace Wildlands
 		}
 
 		template<typename Comp, typename... Args>
+		Comp& GetOrAddComponent(Args&&... args)
+		{
+			return m_SceneHandle->m_Registry.get_or_emplace<Comp>(m_EntityHandle);
+		}
+
+		template<typename Comp, typename... Args>
 		Comp& AddComponent(Args&&... args)
 		{
 			WL_CORE_ASSERT(!HasComponent<Comp>(), "Entity already has component");
 
 			auto& component = m_SceneHandle->m_Registry.emplace<Comp>(m_EntityHandle, std::forward<Args>(args)...);
+			m_SceneHandle->OnComponentAdded<Comp>(*this, component);
+			return component;
+		}
+
+		template<typename Comp, typename... Args>
+		Comp& AddOrReplaceComponent(Args&&... args)
+		{
+			auto& component = m_SceneHandle->m_Registry.emplace_or_replace<Comp>(m_EntityHandle, std::forward<Args>(args)...);
 			m_SceneHandle->OnComponentAdded<Comp>(*this, component);
 			return component;
 		}
@@ -52,10 +66,9 @@ namespace Wildlands
 			m_SceneHandle->m_Registry.remove<Comp>(m_EntityHandle);
 		}
 
-		UUID GetUUID() 
-		{
-			return GetComponent<IDComponent>().ID;
-		}
+
+		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
+		const std::string& GetName() { return GetComponent<TagComponent>().Tag; }
 
 	public:
 		operator bool() const { return m_EntityHandle != EntityNull; }

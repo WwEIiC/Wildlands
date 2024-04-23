@@ -169,9 +169,9 @@ namespace Wildlands
         ImGui::Begin("Render Stats");
 
         std::string name = "None";
-        if (m_HoveredEntity)
-            name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
-        ImGui::Text("Hovered Entity: %s", name.c_str());
+        if (m_MouseClickedEntity)
+            name = m_MouseClickedEntity.GetComponent<TagComponent>().Tag;
+        ImGui::Text("Mouse Click Entity: %s", name.c_str());
 
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
@@ -343,14 +343,23 @@ namespace Wildlands
 			}
 			case Key::S :
 			{
-				if (ctrl && shift)
-					SaveSceneAs();
+                if (ctrl)
+                {
+                    if (shift) { SaveSceneAs(); }
+					else { SaveScene(); }
+                }
 				break;
 			}
 			case Key::O:
 			{
 				if (ctrl)
 					OpenScene();
+				break;
+			} 
+            case Key::D:
+			{
+				if (ctrl)
+					OnDuplicateEntity();
 				break;
 			}
 
@@ -380,14 +389,22 @@ namespace Wildlands
 				{
                     m_FrameBuffer->Bind();
 					uint32_t pixelData= m_FrameBuffer->ReadPixelAsUInt(1, (int)mouseX, (int)mouseY);
-					m_HoveredEntity = Entity((entt::entity)pixelData, m_ActiveScene.get());
+					m_MouseClickedEntity = Entity((entt::entity)pixelData, m_ActiveScene.get());
                     m_FrameBuffer->UnBind();
 				}
 
-				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+				m_SceneHierarchyPanel.SetSelectedEntity(m_MouseClickedEntity);
 			}
         }
         return false;
+    }
+
+    void EditorLayer::OnDuplicateEntity()
+    {
+        if (m_SceneState != SceneState::Edit) { return; }
+
+        Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+        if (selectedEntity) { m_ActiveScene->DupilcateEntity(selectedEntity); }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -399,14 +416,22 @@ namespace Wildlands
         m_ActiveScene = CreateRef<Scene>();
         m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+        m_EditorScenePath = std::filesystem::path();
+    }
+    void EditorLayer::SaveScene()
+    {
+        if (!m_EditorScenePath.empty())
+            SerializeScene(m_ActiveScene, m_EditorScenePath);
+        else
+            SaveSceneAs();
     }
     void EditorLayer::SaveSceneAs()
     {
 		auto filePath = FileDialogs::SaveFile("Wildlands Scene (*.wls)\0*.wls\0");
 		if (!filePath.empty())
 		{
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(filePath);
+            SerializeScene(m_ActiveScene, filePath);
+            m_EditorScenePath = filePath;
 		}
     }
     void EditorLayer::OpenScene()
@@ -417,6 +442,8 @@ namespace Wildlands
     }
     void EditorLayer::OpenScene(std::filesystem::path path)
     {
+        if (m_SceneState != SceneState::Edit) { OnSceneStop(); }
+
         if (path.extension().string() != ".wls")
         {
             WL_CORE_WARN("Could not load {0} - not a scene file", path.filename().string());
@@ -427,21 +454,36 @@ namespace Wildlands
         SceneSerializer serializer(newScene);
         if (serializer.Deserialize(path.string()))
         {
-            m_ActiveScene = newScene;
-            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-            m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+            m_EditorScene = newScene;
+            m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_SceneHierarchyPanel.SetContext(m_EditorScene);
+
+            m_ActiveScene = m_EditorScene;
+            m_EditorScenePath = path;
         }
+    }
+
+    void EditorLayer::SerializeScene(Ref<Scene> scene, std::filesystem::path path)
+    {
+			SceneSerializer serializer(scene);
+			serializer.Serialize(path.string());
     }
 
     void EditorLayer::OnScenePlay()
     {
-        m_ActiveScene->OnRuntimeStart();
         m_SceneState = SceneState::Play;
+
+        m_ActiveScene = Scene::Copy(m_EditorScene);
+
+        m_ActiveScene->OnRuntimeStart();
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
     void EditorLayer::OnSceneStop()
     {
-        m_ActiveScene->OnRuntimeStop();
         m_SceneState = SceneState::Edit;
+        m_ActiveScene->OnRuntimeStop();
+		m_ActiveScene = m_EditorScene;
+        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 }
 

@@ -17,6 +17,8 @@ namespace Wildlands
 		Scene() = default;
 		~Scene() = default;
 
+		static Ref<Scene>Copy(Ref<Scene> other);
+
 		void OnRuntimeStart();
 		void OnRuntimeStop();
 
@@ -27,6 +29,8 @@ namespace Wildlands
 		Entity CreateEntity(const std::string& name = std::string());
 		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 		void DestoryEntity(Entity entity);
+
+		Entity DupilcateEntity(Entity entity);
 
 		void OnViewportResize(uint32_t width, uint32_t height);
 

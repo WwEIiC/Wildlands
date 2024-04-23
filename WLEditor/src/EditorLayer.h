@@ -26,12 +26,17 @@ namespace Wildlands
 		// Events
 		bool OnKeyDownEvent(KeyDownEvent& e);
 		bool OnMouseButtonDownEvent(MouseButtonDownEvent& e);
+
+		void OnDuplicateEntity();
 	private:
 		// Scene
 		void NewScene();
+		void SaveScene();
 		void SaveSceneAs();
 		void OpenScene();
 		void OpenScene(std::filesystem::path path);
+
+		void SerializeScene(Ref<Scene> scene, std::filesystem::path path);
 
 		void OnScenePlay();
 		void OnSceneStop();
@@ -44,6 +49,8 @@ namespace Wildlands
 		glm::vec2 m_ViewportBounds[2] = { {0.0f, 0.0f}, {0.0f, 0.0f} };
 	private:
 		Ref<Scene> m_ActiveScene;
+		Ref<Scene> m_EditorScene;
+		std::filesystem::path m_EditorScenePath;
 		EditorCamera m_EditorCamera;
 
 		int m_GizmoType = -1;

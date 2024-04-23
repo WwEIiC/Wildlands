@@ -28,23 +28,26 @@ namespace Wildlands
 	{
 		ImGui::Begin("Scene HierarchyPanel");
 
-		m_Context->m_Registry.view<TransformComponent>().each([&](auto entityID, TransformComponent& transformComp)
-			{
-				Entity entity{ entityID, m_Context.get() };
-				DrawEntityNode(entity);
-			});
-
-		if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()){ m_SelectedEntity = {};}
-
-		// Right-Click on blank space.
-		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
+		if (m_Context)
 		{
-			if (ImGui::MenuItem("Create Entity"))
-			{
-				m_Context->CreateEntity("Empty Entity");
-			}
+			m_Context->m_Registry.view<TransformComponent>().each([&](auto entityID, TransformComponent& transformComp)
+				{
+					Entity entity{ entityID, m_Context.get() };
+					DrawEntityNode(entity);
+				});
 
-			ImGui::EndPopup();
+			if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) { m_SelectedEntity = {}; }
+
+			// Right-Click on blank space.
+			if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
+			{
+				if (ImGui::MenuItem("Create Entity"))
+				{
+					m_Context->CreateEntity("Empty Entity");
+				}
+
+				ImGui::EndPopup();
+			}
 		}
 		ImGui::End();
 
