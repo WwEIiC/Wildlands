@@ -49,7 +49,6 @@ namespace Wildlands
 
         m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
     }
 
     void EditorLayer::Detach()
@@ -417,6 +416,8 @@ namespace Wildlands
     }
     void EditorLayer::OpenScene(std::filesystem::path path)
     {
+        if (m_SceneState != SceneState::Edit) { OnSceneStop(); }
+
         if (path.extension().string() != ".wls")
         {
             WL_CORE_WARN("Could not load {0} - not a scene file", path.filename().string());
@@ -427,20 +428,25 @@ namespace Wildlands
         SceneSerializer serializer(newScene);
         if (serializer.Deserialize(path.string()))
         {
-            m_ActiveScene = newScene;
+            m_EditorScene = newScene;
             m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
             m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+            m_ActiveScene = m_EditorScene;
         }
     }
 
     void EditorLayer::OnScenePlay()
     {
+        //m_ActiveScene = Scene::Copy(m_EditorScene);
         m_ActiveScene->OnRuntimeStart();
+
         m_SceneState = SceneState::Play;
     }
     void EditorLayer::OnSceneStop()
     {
         m_ActiveScene->OnRuntimeStop();
+
+        m_ActiveScene = m_EditorScene;
         m_SceneState = SceneState::Edit;
     }
 }

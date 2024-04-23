@@ -44,6 +44,7 @@ namespace Wildlands
 		glm::vec2 m_ViewportBounds[2] = { {0.0f, 0.0f}, {0.0f, 0.0f} };
 	private:
 		Ref<Scene> m_ActiveScene;
+		Ref<Scene> m_EditorScene;
 		EditorCamera m_EditorCamera;
 
 		int m_GizmoType = -1;
