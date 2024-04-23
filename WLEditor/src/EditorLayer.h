@@ -55,7 +55,7 @@ namespace Wildlands
 
 		int m_GizmoType = -1;
 		bool m_GizmoMode = false; // false  = local, true = world.
-		Entity m_HoveredEntity;
+		Entity m_MouseClickedEntity;
 		
 		enum class SceneState
 		{
