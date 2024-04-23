@@ -44,23 +44,6 @@ namespace Wildlands
 			return component;
 		}
 
-		template<typename Comp, typename... Args>
-		Comp& GetOrAddComponent(Args&&... args)
-		{
-			if (HasComponent<Comp>())
-				return GetComponent<Comp>();
-			else
-				return AddComponent<Comp>(std::forward<Args>(args)...);
-		}
-
-		template<typename Comp, typename... Args>
-		Comp& AddOrReplaceComponent(Args&&... args)
-		{
-			if (HasComponent<Comp>())
-				RemoveComponent<Comp>();
-			return AddComponent<Comp>(std::forward<Args>(args)...);
-		}
-
 		template<typename Comp>
 		void RemoveComponent()
 		{
