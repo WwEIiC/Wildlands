@@ -133,7 +133,7 @@ namespace Wildlands
 
 				Renderer2D::DrawCircle(transform, circle.Color, circle.Thickness, circle.Fade, (uint32_t)entityID);
 			}
-		}
+		} 
 
 		Renderer2D::EndScene();
 	}
@@ -221,6 +221,8 @@ namespace Wildlands
 					Renderer2D::DrawCircle(transform, circle.Color, circle.Thickness, circle.Fade, (uint32_t)entityID);
 				}
 			}
+
+
 
 			Renderer2D::EndScene();
 		}

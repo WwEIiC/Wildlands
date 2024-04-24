@@ -1,7 +1,7 @@
 #version 450 core
 
-layout(location = 0) out vec4 Color;
-layout(location = 1) out uint EntityID;
+layout(location = 0) out vec4 o_Color;
+layout(location = 1) out uint o_EntityID;
 
 struct VertexOutput{
 	vec2 TexCoord;
@@ -17,6 +17,6 @@ layout (binding = 0) uniform sampler2D u_Textures[32];
 
 void main()
 {
-	Color = texture(u_Textures[int(v_TexIndex)], Input.TexCoord * Input.TileFactor) * Input.Color;
-	EntityID = v_EntityID;
+	o_Color = texture(u_Textures[int(v_TexIndex)], Input.TexCoord * Input.TileFactor) * Input.Color;
+	o_EntityID = v_EntityID;
 }

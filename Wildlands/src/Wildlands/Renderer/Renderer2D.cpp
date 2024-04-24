@@ -31,6 +31,13 @@ namespace Wildlands
 		float Fade;
 		//Editor-only
 		uint32_t EntityID;
+	}; 
+	struct LineVertex 
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+		//Editor-only
+		uint32_t EntityID;
 	};
 
 	struct Renderer2DData
@@ -53,7 +60,6 @@ namespace Wildlands
 		Ref<Texture2D> WhiteTexture;
 		std::array<Ref<Texture2D>, MaxTextures> TextureSlots;
 		uint32_t TextureSlotIndex = 1; // 0 = default texture.
-
 		glm::vec4 QuadVertexPos[4];
 
 		// Circle
@@ -63,6 +69,15 @@ namespace Wildlands
 		uint32_t CircleIndexCount = 0;
 		CircleVertex* NextCircleVertex = nullptr;
 		CircleVertex* CircleVerteciesBase = nullptr;
+
+		// Line
+		Ref<VertexArray> LineVertexArray;
+		Ref<VertexBuffer> LineVertexBuffer;
+		Ref<Shader> LineShader;
+		uint32_t LineVertexCount = 0;
+		LineVertex* NextLineVertex = nullptr;
+		LineVertex* LineVerteciesBase = nullptr;
+		float LineWidth = 0.8f;
 
 		// Uniform Buffer
 		struct CameraData
@@ -87,7 +102,7 @@ namespace Wildlands
 			{ ShaderDataType::Float2, "a_TexCoord"	},
 			{ ShaderDataType::Float,  "a_TexIndex"	},
 			{ ShaderDataType::Float,  "a_TileFactor"},
-			{ ShaderDataType::UInt,  "a_EntityID"	}
+			{ ShaderDataType::UInt,   "a_EntityID"	}
 			});
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 		s_Data.QuadVerteciesBase = new QuadVertex[s_Data.MaxVertecies];
@@ -115,13 +130,24 @@ namespace Wildlands
 			{ ShaderDataType::Float4, "a_Color"			},
 			{ ShaderDataType::Float,  "a_Thickness"		},
 			{ ShaderDataType::Float,  "a_Fade"			},
-			{ ShaderDataType::UInt,  "a_EntityID"		}
+			{ ShaderDataType::UInt,   "a_EntityID"		}
 			});
 		s_Data.CircleVertexArray->AddVertexBuffer(s_Data.CircleVertexBuffer);
 		s_Data.CircleVertexArray->SetIndexBuffer(quadIB);// just use the same indexbuffer of the quad.
 		s_Data.CircleVerteciesBase = new CircleVertex[s_Data.MaxVertecies];
 
+		// Line
+		s_Data.LineVertexArray = VertexArray::Create();
+		s_Data.LineVertexBuffer = VertexBuffer::Create(s_Data.MaxVertecies * sizeof(LineVertex));
+		s_Data.LineVertexBuffer->SetLayout({
+			{ ShaderDataType::Float3, "a_Position"	},
+			{ ShaderDataType::Float4, "a_Color"		},
+			{ ShaderDataType::UInt,	  "a_EntityID"	}
+			});
+		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer);
+		s_Data.LineVerteciesBase = new LineVertex[s_Data.MaxVertecies];
 
+		// Other default things
 		s_Data.WhiteTexture = Texture2D::Create(1, 1);
 		uint32_t defaultTextureData = 0xffffffff;
 		s_Data.WhiteTexture->SetData(&defaultTextureData, sizeof(uint32_t));
@@ -130,8 +156,9 @@ namespace Wildlands
 		for (uint32_t i = 0; i < s_Data.MaxTextures; i++)
 			samplers[i] = i;
 
-		s_Data.QuadShader =  Shader::Create("Quad", "assets/shaders/Renderer2D_Quad.vert", "assets/shaders/Renderer2D_Quad.frag");
+		s_Data.QuadShader	=  Shader::Create("Quad", "assets/shaders/Renderer2D_Quad.vert", "assets/shaders/Renderer2D_Quad.frag");
 		s_Data.CircleShader =  Shader::Create("Circle", "assets/shaders/Renderer2D_Circle.vert", "assets/shaders/Renderer2D_Circle.frag");
+		s_Data.LineShader	=  Shader::Create("Circle", "assets/shaders/Renderer2D_Line.vert", "assets/shaders/Renderer2D_Line.frag");
 
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
@@ -212,6 +239,19 @@ namespace Wildlands
 
 			s_Data.CircleShader->Bind();
 			RenderCommand::DrawIndex(s_Data.CircleVertexArray, s_Data.CircleIndexCount);
+
+			s_Data.stats.drawCalls++;
+		} 
+
+		// Draw Line 
+		if (s_Data.LineVertexCount)
+		{
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.NextLineVertex - (uint8_t*)s_Data.LineVerteciesBase);
+			s_Data.LineVertexBuffer->SetData(s_Data.LineVerteciesBase, dataSize);
+
+			s_Data.LineShader->Bind();
+			RenderCommand::SetLineWidth(s_Data.LineWidth);
+			RenderCommand::DrawLine(s_Data.LineVertexArray, s_Data.LineVertexCount);
 
 			s_Data.stats.drawCalls++;
 		}
@@ -444,6 +484,63 @@ namespace Wildlands
 		s_Data.stats.quadCount++;
 	}
 
+	void Renderer2D::DrawLine(const glm::vec3& pStart, const glm::vec3& pEnd, const glm::vec4& color, uint32_t entityID)
+	{
+		WL_PROFILE_FUNCTION();
+
+		// WLTODO::implement for line.
+		//the buffer is full, flush it and start next batch.
+		//if (s_Data.LineVertexCount >= Renderer2DData::MaxVertecies)
+		//	NextBatch();
+
+		s_Data.NextLineVertex->Position = pStart;
+		s_Data.NextLineVertex->Color = color;
+		s_Data.NextLineVertex->EntityID = entityID;
+		s_Data.NextLineVertex++;
+
+		s_Data.NextLineVertex->Position = pEnd;
+		s_Data.NextLineVertex->Color = color;
+		s_Data.NextLineVertex->EntityID = entityID;
+		s_Data.NextLineVertex++;
+
+		s_Data.LineVertexCount += 2;
+	}
+
+	float Renderer2D::GetLineWidth()
+	{
+		return s_Data.LineWidth;
+	}
+
+	void Renderer2D::SetLineWidth(float width)
+	{
+		s_Data.LineWidth = width;
+	}
+
+	void Renderer2D::DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, uint32_t entityID)
+	{
+		glm::vec3 pLB = glm::vec3(position.x - size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 pRB = glm::vec3(position.x + size.x * 0.5f, position.y - size.y * 0.5f, position.z);
+		glm::vec3 pRT = glm::vec3(position.x + size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+		glm::vec3 pLT = glm::vec3(position.x - size.x * 0.5f, position.y + size.y * 0.5f, position.z);
+
+		DrawLine(pLB, pRB, color);
+		DrawLine(pRB, pRT, color);
+		DrawLine(pRT, pLT, color);
+		DrawLine(pLT, pLB, color);
+	}
+
+	void Renderer2D::DrawRect(const glm::mat4& transform, const glm::vec4& color, uint32_t entityID)
+	{
+		glm::vec3 lineVertices[4];
+		for (size_t i = 0; i < 4; i++)
+			lineVertices[i] = transform * s_Data.QuadVertexPos[i];
+
+		DrawLine(lineVertices[0], lineVertices[1], color);
+		DrawLine(lineVertices[1], lineVertices[2], color);
+		DrawLine(lineVertices[2], lineVertices[3], color);
+		DrawLine(lineVertices[3], lineVertices[0], color);
+	}
+
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& spriteComp, uint32_t entityID)
 	{
 		if (spriteComp.Texture)
@@ -464,11 +561,17 @@ namespace Wildlands
 
 	void Renderer2D::StartBatch()
 	{
+		// Quad data
 		s_Data.QuadIndexCount = 0;
 		s_Data.NextQuadVertex = s_Data.QuadVerteciesBase;
 
+		// Circle data
 		s_Data.CircleIndexCount = 0;
 		s_Data.NextCircleVertex = s_Data.CircleVerteciesBase;
+
+		// Line data
+		s_Data.LineVertexCount = 0;
+		s_Data.NextLineVertex = s_Data.LineVerteciesBase;
 
 		s_Data.TextureSlotIndex = 1;
 	}
