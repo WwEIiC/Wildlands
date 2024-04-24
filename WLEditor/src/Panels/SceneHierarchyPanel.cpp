@@ -261,6 +261,15 @@ namespace Wildlands
 				}
 			}
 
+			if (!m_SelectedEntity.HasComponent<CircleCollider2DComponent>())
+			{
+				if (ImGui::MenuItem("CircleCollider2D"))
+				{
+					m_SelectedEntity.AddComponent<CircleCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
 			ImGui::EndPopup();
 		}
 		ImGui::PopItemWidth();
@@ -395,6 +404,16 @@ namespace Wildlands
 				ImGui::DragFloat("Friction", &bc2dComp.Friction , 0.01f, 0.0f, 1.0f, "%.2f");
 				ImGui::DragFloat("Restitution", &bc2dComp.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
 				ImGui::DragFloat("Restitution Threshold", &bc2dComp.RestitutionThreshold, 0.01f, 0.0f, 0.0f, "%.2f");
+			});
+
+		DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](auto& cc2dComp)
+			{
+				ImGui::DragFloat2("Offset", glm::value_ptr(cc2dComp.Offset), 0.1f, 0.0f, 0.0f, "%.2f");
+				ImGui::DragFloat("Radius", &cc2dComp.Radius, 0.1f, 0.0f, 0.0f, "%.2f");
+				ImGui::DragFloat("Density", &cc2dComp.Density, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("Friction", &cc2dComp.Friction, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("Restitution", &cc2dComp.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("Restitution Threshold", &cc2dComp.RestitutionThreshold, 0.01f, 0.0f, 0.0f, "%.2f");
 			});
 	}
 

@@ -11,6 +11,7 @@
 #include "box2d/b2_body.h"
 #include "box2d/b2_fixture.h"
 #include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_circle_shape.h"
 
 namespace Wildlands
 {
@@ -60,6 +61,7 @@ namespace Wildlands
 			CopyComponent<CameraComponent>(dstEntity, srcEntity);
 			CopyComponent<Rigidbody2DComponent>(dstEntity, srcEntity);
 			CopyComponent<BoxCollider2DComponent>(dstEntity, srcEntity);
+			CopyComponent<CircleCollider2DComponent>(dstEntity, srcEntity);
 			CopyComponent<NativeScriptComponent>(dstEntity, srcEntity);
 		}
 		return newScene;
@@ -99,6 +101,22 @@ namespace Wildlands
 				fixtureDef.friction					= boxColliderComp.Friction;
 				fixtureDef.restitution				= boxColliderComp.Restitution;
 				fixtureDef.restitutionThreshold		= boxColliderComp.RestitutionThreshold;
+				body->CreateFixture(&fixtureDef);
+			}
+			if (entity.HasComponent<CircleCollider2DComponent>())
+			{
+				auto& circleColliderComp = entity.GetComponent<CircleCollider2DComponent>();
+
+				b2CircleShape circleShape;
+				circleShape.m_p.Set(circleColliderComp.Offset.x, circleColliderComp.Offset.y);
+				circleShape.m_radius = circleColliderComp.Radius;
+
+				b2FixtureDef fixtureDef;
+				fixtureDef.shape				= &circleShape;
+				fixtureDef.density				= circleColliderComp.Density;
+				fixtureDef.friction				= circleColliderComp.Friction;
+				fixtureDef.restitution			= circleColliderComp.Restitution;
+				fixtureDef.restitutionThreshold = circleColliderComp.RestitutionThreshold;
 				body->CreateFixture(&fixtureDef);
 			}
 		}
@@ -222,8 +240,6 @@ namespace Wildlands
 				}
 			}
 
-
-
 			Renderer2D::EndScene();
 		}
 	}
@@ -265,6 +281,7 @@ namespace Wildlands
 		CopyComponent<CameraComponent>(newEntity, entity);
 		CopyComponent<Rigidbody2DComponent>(newEntity, entity);
 		CopyComponent<BoxCollider2DComponent>(newEntity, entity);
+		CopyComponent<CircleCollider2DComponent>(newEntity, entity);
 		CopyComponent<NativeScriptComponent>(newEntity, entity);
 
 		return newEntity;
@@ -299,18 +316,13 @@ namespace Wildlands
 	}
 
 
+#pragma region TODO::implement this in a better way
 	template<typename Comp>
-	void Scene::OnComponentAdded(Entity entity, Comp& component)
-	{
-	}
+	void Scene::OnComponentAdded(Entity entity, Comp& component) {}
 	template<>
-	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component)
-	{
-	} 
+	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component) {}
 	template<>
-	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
-	{
-	}
+	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component) {}
 	template<>
 	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
 	{
@@ -318,27 +330,18 @@ namespace Wildlands
 			component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
 	template<>
-	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
-	{
-	} 
+	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component) {}
 	template<>
-	void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component)
-	{
-	}
+	void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component) {}
 	template<>
-	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component)
-	{
-	}
+	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component){}
 	template<>
-	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
-	{
-	} 
+	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component){}
 	template<>
-	void Scene::OnComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component)
-	{
-	} 
+	void Scene::OnComponentAdded<Rigidbody2DComponent>(Entity entity, Rigidbody2DComponent& component) {}
 	template<>
-	void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
-	{
-	}
+	void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component) {}
+	template<>
+	void Scene::OnComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& component) {}
+#pragma endregion
 }

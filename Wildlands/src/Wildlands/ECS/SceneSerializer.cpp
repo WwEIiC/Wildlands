@@ -229,6 +229,20 @@ namespace Wildlands
 
 			out << YAML::EndMap; // BoxCollider2DComponent
 		}
+		if (entity.HasComponent<CircleCollider2DComponent>())
+		{
+			out << YAML::Key << "CircleCollider2DComponent" << YAML::BeginMap; // CircleCollider2DComponent
+
+			auto& cc2dComp = entity.GetComponent<CircleCollider2DComponent>();
+			out << YAML::Key << "Offset"				<< YAML::Value << cc2dComp.Offset;
+			out << YAML::Key << "Radius"				<< YAML::Value << cc2dComp.Radius;
+			out << YAML::Key << "Density"				<< YAML::Value << cc2dComp.Density;
+			out << YAML::Key << "Friction"				<< YAML::Value << cc2dComp.Friction;
+			out << YAML::Key << "Restitution"			<< YAML::Value << cc2dComp.Restitution;
+			out << YAML::Key << "RestitutionThreshold"	<< YAML::Value << cc2dComp.RestitutionThreshold;
+
+			out << YAML::EndMap; // CircleCollider2DComponent
+		}
 		out << YAML::EndMap; // Entity
 	}
 	void SceneSerializer::Serialize(const std::string& filepath)
@@ -351,6 +365,18 @@ namespace Wildlands
 					bc2dComp.Friction				= boxCollider2DNode["Friction"].as<float>();
 					bc2dComp.Restitution			= boxCollider2DNode["Restitution"].as<float>();
 					bc2dComp.RestitutionThreshold	= boxCollider2DNode["RestitutionThreshold"].as<float>();
+				}
+
+				auto circleCollider2DNode = entity["CircleCollider2DComponent"];
+				if (circleCollider2DNode)
+				{
+					auto& cc2dComp = targetEntity.AddComponent<CircleCollider2DComponent>();
+					cc2dComp.Offset					= circleCollider2DNode["Offset"].as<glm::vec2>();
+					cc2dComp.Radius					= circleCollider2DNode["Radius"].as<float>();
+					cc2dComp.Density				= circleCollider2DNode["Density"].as<float>();
+					cc2dComp.Friction				= circleCollider2DNode["Friction"].as<float>();
+					cc2dComp.Restitution			= circleCollider2DNode["Restitution"].as<float>();
+					cc2dComp.RestitutionThreshold	= circleCollider2DNode["RestitutionThreshold"].as<float>();
 				}
 			}
 		}

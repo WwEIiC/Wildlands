@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Wildlands/Core/UUID.h"
 #include "Wildlands/Core/Timestep.h"
 #include "Wildlands/Renderer/EditorCamera.h"
-#include "Wildlands/Core/UUID.h"
 
 #include <entt.hpp>
 class b2World;

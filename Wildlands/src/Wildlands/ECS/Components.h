@@ -108,6 +108,21 @@ namespace Wildlands
 
 		BoxCollider2DComponent() = default;
 		BoxCollider2DComponent(const BoxCollider2DComponent& other) = default;
+	}; 
+
+	struct CircleCollider2DComponent
+	{
+		glm::vec2 Offset = { 0.0f, 0.0f };
+		float Radius = 0.5f;
+		void* RuntimeFixture = nullptr;
+
+		float Density = 1.0f;
+		float Friction = 0.2f;
+		float Restitution = 0.0f;
+		float RestitutionThreshold = 0.5f;
+
+		CircleCollider2DComponent() = default;
+		CircleCollider2DComponent(const CircleCollider2DComponent& other) = default;
 	};
 
 	class ScriptableEntity;
