@@ -225,6 +225,15 @@ namespace Wildlands
 				}
 			}
 
+			if (!m_SelectedEntity.HasComponent<CircleRendererComponent>())
+			{
+				if (ImGui::MenuItem("Circle Renderer"))
+				{
+					m_SelectedEntity.AddComponent<CircleRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
 			if (!m_SelectedEntity.HasComponent<CameraComponent>())
 			{
 				if (ImGui::MenuItem("Camera"))
@@ -317,7 +326,7 @@ namespace Wildlands
 				}
 			});
 		
-		DrawComponent<SpriteRendererComponent>("Sprite", entity, [&](auto& spriteComp)
+		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [&](auto& spriteComp)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(spriteComp.Color));
 
@@ -345,6 +354,13 @@ namespace Wildlands
 					spriteComp.Texture = nullptr;
 
 				ImGui::DragFloat("Tiling Factor", &spriteComp.TilingFactor, 0.1f, 0.0f, 100.0f, "%.2f");
+			});
+
+		DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [&](auto& circleComp)
+			{
+				ImGui::ColorEdit4("Color", glm::value_ptr(circleComp.Color));
+				ImGui::DragFloat("Thickness", &circleComp.Thickness, 0.025f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat("Fade", &circleComp.Fade, 0.00025f, 0.0f, 1.0f, "%.3f");
 			});
 
 		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& rb2dComp)

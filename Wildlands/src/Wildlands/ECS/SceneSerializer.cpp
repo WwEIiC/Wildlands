@@ -156,9 +156,9 @@ namespace Wildlands
 			out << YAML::Key << "TransformComponent" << YAML::BeginMap; // TransformComponent
 
 			auto& transformComp = entity.GetComponent<TransformComponent>();
-			out << YAML::Key << "Position" << YAML::Value << transformComp.Position;
-			out << YAML::Key << "Rotation" << YAML::Value << transformComp.Rotation;
-			out << YAML::Key << "Scale" << YAML::Value << transformComp.Scale;
+			out << YAML::Key << "Position"	<< YAML::Value << transformComp.Position;
+			out << YAML::Key << "Rotation"	<< YAML::Value << transformComp.Rotation;
+			out << YAML::Key << "Scale"		<< YAML::Value << transformComp.Scale;
 
 			out << YAML::EndMap; // TransformComponent
 		}
@@ -170,6 +170,17 @@ namespace Wildlands
 			out << YAML::Key << "Color" << YAML::Value << spriteRendererComp.Color;
 
 			out << YAML::EndMap; // SpriteRendererComponent
+		} 
+		if (entity.HasComponent<CircleRendererComponent>())
+		{
+			out << YAML::Key << "CircleRendererComponent" << YAML::BeginMap; // CircleRendererComponent
+
+			auto& circleRendererComp = entity.GetComponent<CircleRendererComponent>();
+			out << YAML::Key << "Color"		<< YAML::Value << circleRendererComp.Color;
+			out << YAML::Key << "Thickness"	<< YAML::Value << circleRendererComp.Thickness;
+			out << YAML::Key << "Fade"		<< YAML::Value << circleRendererComp.Fade;
+
+			out << YAML::EndMap; // CircleRendererComponent
 		}
 		if (entity.HasComponent<CameraComponent>())
 		{
@@ -179,18 +190,18 @@ namespace Wildlands
 			auto& camera = cameraComp.Camera;
 
 			out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap; // Camera
-			out << YAML::Key << "ProjectionType" << YAML::Value << (int)camera.GetProjectionType();
-			out << YAML::Key << "PerspectiveFOV" << YAML::Value << camera.GetPerspectiveFOV();
-			out << YAML::Key << "PerspectiveNear" << YAML::Value << camera.GetPerspectiveNearClip();
-			out << YAML::Key << "PerspectiveFar" << YAML::Value << camera.GetPerspectiveFarClip();
-			out << YAML::Key << "OrthographicSize" << YAML::Value << camera.GetOrthographicSize();
-			out << YAML::Key << "OrthographicNear" << YAML::Value << camera.GetOrthographicNearClip();
-			out << YAML::Key << "OrthographicFar" << YAML::Value << camera.GetOrthographicFarClip();
+			out << YAML::Key << "ProjectionType"	<< YAML::Value << (int)camera.GetProjectionType();
+			out << YAML::Key << "PerspectiveFOV"	<< YAML::Value << camera.GetPerspectiveFOV();
+			out << YAML::Key << "PerspectiveNear"	<< YAML::Value << camera.GetPerspectiveNearClip();
+			out << YAML::Key << "PerspectiveFar"	<< YAML::Value << camera.GetPerspectiveFarClip();
+			out << YAML::Key << "OrthographicSize"	<< YAML::Value << camera.GetOrthographicSize();
+			out << YAML::Key << "OrthographicNear"	<< YAML::Value << camera.GetOrthographicNearClip();
+			out << YAML::Key << "OrthographicFar"	<< YAML::Value << camera.GetOrthographicFarClip();
 			out << YAML::EndMap; // Camera
 
 
-			out << YAML::Key << "Primary" << YAML::Value << cameraComp.Primary;
-			out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComp.FixedAspectRatio;
+			out << YAML::Key << "Primary"			<< YAML::Value << cameraComp.Primary;
+			out << YAML::Key << "FixedAspectRatio"	<< YAML::Value << cameraComp.FixedAspectRatio;
 
 			out << YAML::EndMap; // CameraComponent
 		}
@@ -199,7 +210,7 @@ namespace Wildlands
 			out << YAML::Key << "Rigidbody2DComponent" << YAML::BeginMap; // Rigidbody2DComponent
 
 			auto& rb2dComp = entity.GetComponent<Rigidbody2DComponent>();
-			out << YAML::Key << "BodyType" << YAML::Value << RigidBody2DBodyTypeToString(rb2dComp.Type);
+			out << YAML::Key << "BodyType"		<< YAML::Value << RigidBody2DBodyTypeToString(rb2dComp.Type);
 			out << YAML::Key << "FixedRotation" << YAML::Value << rb2dComp.FixedRotation;
 
 			out << YAML::EndMap; // Rigidbody2DComponent
@@ -209,12 +220,12 @@ namespace Wildlands
 			out << YAML::Key << "BoxCollider2DComponent" << YAML::BeginMap; // BoxCollider2DComponent
 
 			auto& bc2dComp = entity.GetComponent<BoxCollider2DComponent>();
-			out << YAML::Key << "Offset" << YAML::Value << bc2dComp.Offset;
-			out << YAML::Key << "Size" << YAML::Value << bc2dComp.Size;
-			out << YAML::Key << "Density" << YAML::Value << bc2dComp.Density;
-			out << YAML::Key << "Friction" << YAML::Value << bc2dComp.Friction;
-			out << YAML::Key << "Restitution" << YAML::Value << bc2dComp.Restitution;
-			out << YAML::Key << "RestitutionThreshold" << YAML::Value << bc2dComp.RestitutionThreshold;
+			out << YAML::Key << "Offset"				<< YAML::Value << bc2dComp.Offset;
+			out << YAML::Key << "Size"					<< YAML::Value << bc2dComp.Size;
+			out << YAML::Key << "Density"				<< YAML::Value << bc2dComp.Density;
+			out << YAML::Key << "Friction"				<< YAML::Value << bc2dComp.Friction;
+			out << YAML::Key << "Restitution"			<< YAML::Value << bc2dComp.Restitution;
+			out << YAML::Key << "RestitutionThreshold"	<< YAML::Value << bc2dComp.RestitutionThreshold;
 
 			out << YAML::EndMap; // BoxCollider2DComponent
 		}
@@ -225,8 +236,8 @@ namespace Wildlands
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
-
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+
 		m_Scene->m_Registry.view<TagComponent>().each([&](auto entityID, auto& tagComp)
 			{
 				Entity entity = { entityID, m_Scene.get() };
@@ -282,7 +293,7 @@ namespace Wildlands
 					auto& tc = targetEntity.GetComponent<TransformComponent>();
 					tc.Position = transformNode["Position"].as<glm::vec3>();
 					tc.Rotation = transformNode["Rotation"].as<glm::vec3>();
-					tc.Scale = transformNode["Scale"].as<glm::vec3>();
+					tc.Scale	= transformNode["Scale"].as<glm::vec3>();
 				}
 
 				auto spriteRendererNode = entity["SpriteRendererComponent"];
@@ -290,6 +301,15 @@ namespace Wildlands
 				{
 					auto& src = targetEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererNode["Color"].as<glm::vec4>();
+				}
+
+				auto circleRendererNode = entity["CircleRendererComponent"];
+				if (circleRendererNode)
+				{
+					auto& crc = targetEntity.AddComponent<CircleRendererComponent>();
+					crc.Color		= circleRendererNode["Color"].as<glm::vec4>();
+					crc.Thickness	= circleRendererNode["Thickness"].as<float>();
+					crc.Fade		= circleRendererNode["Fade"].as<float>();
 				}
 
 				auto cameraNode = entity["CameraComponent"];

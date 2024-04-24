@@ -20,17 +20,19 @@ namespace Wildlands
 
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
-
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, uint32_t entityID = (uint32_t)Entity::EntityNull);
-		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tileFactor = 1.0f, const glm::vec4& texColor = glm::vec4(1.0f), uint32_t entityID = (uint32_t)Entity::EntityNull);
 
 		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tileFactor = 1.0f, const glm::vec4& texColor = glm::vec4(1.0f));
 		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tileFactor = 1.0f, const glm::vec4& texColor = glm::vec4(1.0f));
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tileFactor = 1.0f, const glm::vec4& texColor = glm::vec4(1.0f), uint32_t entityID = (uint32_t)Entity::EntityNull);
 
 		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color);
 		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color);
 		static void DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tileFactor = 1.0f, const glm::vec4& texColor = glm::vec4(1.0f));
 		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tileFactor = 1.0f, const glm::vec4& texColor = glm::vec4(1.0f));
+
+
+		static void DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness = 1.0f, float fade = 0.005f, uint32_t entityID = (uint32_t)Entity::EntityNull);
 
 		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& spriteComp, uint32_t entityID);
 	public:

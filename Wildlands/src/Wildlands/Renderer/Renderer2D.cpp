@@ -22,6 +22,16 @@ namespace Wildlands
 		//Editor-only
 		uint32_t EntityID;
 	};
+	struct CircleVertex
+	{
+		glm::vec3 WorldPosition;
+		glm::vec3 LocalPosition;
+		glm::vec4 Color;
+		float Thickness;
+		float Fade;
+		//Editor-only
+		uint32_t EntityID;
+	};
 
 	struct Renderer2DData
 	{
@@ -31,21 +41,30 @@ namespace Wildlands
 		static const uint32_t MaxVertecies = MaxQuads * 4;
 		static const uint32_t MaxIndices = MaxQuads * 6;
 		static const uint32_t MaxTextures = 32;
-		uint32_t IndexCount = 0;
 
-		Ref<VertexArray> VertexArray;
-		Ref<VertexBuffer> VertexBuffer;
-		Ref<Shader> Shader;
-		Ref<Texture2D> DefaultTexture;
-
+		// Quad
+		Ref<VertexArray> QuadVertexArray;
+		Ref<VertexBuffer> QuadVertexBuffer;
+		Ref<Shader> QuadShader;
+		uint32_t QuadIndexCount = 0;
 		QuadVertex* NextQuadVertex = nullptr;
 		QuadVertex* QuadVerteciesBase = nullptr;
 
+		Ref<Texture2D> WhiteTexture;
 		std::array<Ref<Texture2D>, MaxTextures> TextureSlots;
 		uint32_t TextureSlotIndex = 1; // 0 = default texture.
 
 		glm::vec4 QuadVertexPos[4];
 
+		// Circle
+		Ref<VertexArray> CircleVertexArray;
+		Ref<VertexBuffer> CircleVertexBuffer;
+		Ref<Shader> CircleShader;
+		uint32_t CircleIndexCount = 0;
+		CircleVertex* NextCircleVertex = nullptr;
+		CircleVertex* CircleVerteciesBase = nullptr;
+
+		// Uniform Buffer
 		struct CameraData
 		{
 			glm::mat4 ViewProjectionMatrix;
@@ -59,19 +78,18 @@ namespace Wildlands
 	{
 		WL_PROFILE_FUNCTION();
 
-		s_Data.VertexArray = VertexArray::Create();
-
-		s_Data.VertexBuffer = VertexBuffer::Create(s_Data.MaxVertecies * sizeof(QuadVertex));
-		s_Data.VertexBuffer->SetLayout({
-			{ShaderDataType::Float3, "a_Position"},
-			{ShaderDataType::Float4, "a_Color"},
-			{ShaderDataType::Float2, "a_TexCoord"},
-			{ShaderDataType::Float,  "a_TexIndex"},
-			{ShaderDataType::Float,  "a_TileFactor"},
-			{ShaderDataType::UInt,  "a_EntityID"}
+		// Quad
+		s_Data.QuadVertexArray = VertexArray::Create();
+		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertecies * sizeof(QuadVertex));
+		s_Data.QuadVertexBuffer->SetLayout({
+			{ ShaderDataType::Float3, "a_Position"	},
+			{ ShaderDataType::Float4, "a_Color"		},
+			{ ShaderDataType::Float2, "a_TexCoord"	},
+			{ ShaderDataType::Float,  "a_TexIndex"	},
+			{ ShaderDataType::Float,  "a_TileFactor"},
+			{ ShaderDataType::UInt,  "a_EntityID"	}
 			});
-		s_Data.VertexArray->AddVertexBuffer(s_Data.VertexBuffer);
-
+		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 		s_Data.QuadVerteciesBase = new QuadVertex[s_Data.MaxVertecies];
 
 		uint32_t* quadIndices = new uint32_t[s_Data.MaxIndices];
@@ -85,20 +103,37 @@ namespace Wildlands
 			quadIndices[i + 5] = offset + 0;
 		}
 		Ref<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
-		s_Data.VertexArray->SetIndexBuffer(quadIB);
+		s_Data.QuadVertexArray->SetIndexBuffer(quadIB);
 		delete[] quadIndices;
 
-		s_Data.DefaultTexture = Texture2D::Create(1, 1);
+		// Circle
+		s_Data.CircleVertexArray = VertexArray::Create();
+		s_Data.CircleVertexBuffer = VertexBuffer::Create(s_Data.MaxVertecies * sizeof(CircleVertex));
+		s_Data.CircleVertexBuffer->SetLayout({
+			{ ShaderDataType::Float3, "a_WorldPosition"	},
+			{ ShaderDataType::Float3, "a_LoaclPosition"	},
+			{ ShaderDataType::Float4, "a_Color"			},
+			{ ShaderDataType::Float,  "a_Thickness"		},
+			{ ShaderDataType::Float,  "a_Fade"			},
+			{ ShaderDataType::UInt,  "a_EntityID"		}
+			});
+		s_Data.CircleVertexArray->AddVertexBuffer(s_Data.CircleVertexBuffer);
+		s_Data.CircleVertexArray->SetIndexBuffer(quadIB);// just use the same indexbuffer of the quad.
+		s_Data.CircleVerteciesBase = new CircleVertex[s_Data.MaxVertecies];
+
+
+		s_Data.WhiteTexture = Texture2D::Create(1, 1);
 		uint32_t defaultTextureData = 0xffffffff;
-		s_Data.DefaultTexture->SetData(&defaultTextureData, sizeof(uint32_t));
+		s_Data.WhiteTexture->SetData(&defaultTextureData, sizeof(uint32_t));
 
 		int32_t samplers[s_Data.MaxTextures];
 		for (uint32_t i = 0; i < s_Data.MaxTextures; i++)
 			samplers[i] = i;
 
-		s_Data.Shader =  Shader::Create("Texture", "assets/shaders/TexShader.vert", "assets/shaders/TexShader.frag");
+		s_Data.QuadShader =  Shader::Create("Quad", "assets/shaders/Renderer2D_Quad.vert", "assets/shaders/Renderer2D_Quad.frag");
+		s_Data.CircleShader =  Shader::Create("Circle", "assets/shaders/Renderer2D_Circle.vert", "assets/shaders/Renderer2D_Circle.frag");
 
-		s_Data.TextureSlots[0] = s_Data.DefaultTexture;
+		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
 		s_Data.QuadVertexPos[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPos[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
@@ -154,19 +189,32 @@ namespace Wildlands
 	{
 		WL_PROFILE_FUNCTION();
 
-		if (s_Data.IndexCount == 0) { return; }
+		// Draw Quad.
+		if (s_Data.QuadIndexCount)
+		{
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.NextQuadVertex - (uint8_t*)s_Data.QuadVerteciesBase);
+			s_Data.QuadVertexBuffer->SetData(s_Data.QuadVerteciesBase, dataSize);
 
-		s_Data.VertexArray->Bind();
-		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.NextQuadVertex - (uint8_t*)s_Data.QuadVerteciesBase);
-		s_Data.VertexBuffer->SetData(s_Data.QuadVerteciesBase, dataSize);
+			for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+				s_Data.TextureSlots[i]->Bind(i);
 
-		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-			s_Data.TextureSlots[i]->Bind(i);
+			s_Data.QuadShader->Bind();
+			RenderCommand::DrawIndex(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 
-		s_Data.Shader->Bind();
-		RenderCommand::DrawIndex(s_Data.VertexArray, s_Data.IndexCount);
+			s_Data.stats.drawCalls++;
+		}
 
-		s_Data.stats.drawCalls++;
+		// Draw Circle
+		if (s_Data.CircleIndexCount)
+		{
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.NextCircleVertex - (uint8_t*)s_Data.CircleVerteciesBase);
+			s_Data.CircleVertexBuffer->SetData(s_Data.CircleVerteciesBase, dataSize);
+
+			s_Data.CircleShader->Bind();
+			RenderCommand::DrawIndex(s_Data.CircleVertexArray, s_Data.CircleIndexCount);
+
+			s_Data.stats.drawCalls++;
+		}
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
@@ -182,13 +230,12 @@ namespace Wildlands
 
 		DrawQuad(transform, color);
 	}
-
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, uint32_t entityID)
 	{
 		WL_PROFILE_FUNCTION();
 
 		//the buffer is full, flush it and start next batch.
-		if (s_Data.IndexCount >= Renderer2DData::MaxIndices)
+		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
 		const float textureIndex = 0.f;
@@ -203,19 +250,18 @@ namespace Wildlands
 
 		for (int i = 0; i < 4; i++)
 		{
-			s_Data.NextQuadVertex->Position = transform * s_Data.QuadVertexPos[i];
-			s_Data.NextQuadVertex->Color = color;
-			s_Data.NextQuadVertex->Texcoord = textureCoords[i];
+			s_Data.NextQuadVertex->Position		= transform * s_Data.QuadVertexPos[i];
+			s_Data.NextQuadVertex->Color		= color;
+			s_Data.NextQuadVertex->Texcoord		= textureCoords[i];
 			s_Data.NextQuadVertex->TextureIndex = textureIndex;
-			s_Data.NextQuadVertex->TileFactor = tileFactor;
-			s_Data.NextQuadVertex->EntityID = entityID;
+			s_Data.NextQuadVertex->TileFactor	= tileFactor;
+			s_Data.NextQuadVertex->EntityID		= entityID;
 			s_Data.NextQuadVertex++;
 		}
 
-		s_Data.IndexCount += 6;
+		s_Data.QuadIndexCount += 6;
 		s_Data.stats.quadCount++;
 	}
-
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor)
 	{
@@ -230,13 +276,12 @@ namespace Wildlands
 
 		DrawQuad(transform, texture, tileFactor, texColor);
 	}
-
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor, uint32_t entityID)
 	{
 		WL_PROFILE_FUNCTION();
 
 		//the buffer is full, flush it and start next batch.
-		if (s_Data.IndexCount >= Renderer2DData::MaxIndices)
+		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
 		float textureIndex = 0.f;
@@ -266,18 +311,19 @@ namespace Wildlands
 
 		for (int i = 0; i < 4; i++)
 		{
-			s_Data.NextQuadVertex->Position = transform * s_Data.QuadVertexPos[i];
-			s_Data.NextQuadVertex->Color = texColor;
-			s_Data.NextQuadVertex->Texcoord = textureCoords[i];
+			s_Data.NextQuadVertex->Position		= transform * s_Data.QuadVertexPos[i];
+			s_Data.NextQuadVertex->Color		= texColor;
+			s_Data.NextQuadVertex->Texcoord		= textureCoords[i];
 			s_Data.NextQuadVertex->TextureIndex = textureIndex;
-			s_Data.NextQuadVertex->TileFactor = tileFactor;
-			s_Data.NextQuadVertex->EntityID = entityID;
+			s_Data.NextQuadVertex->TileFactor	= tileFactor;
+			s_Data.NextQuadVertex->EntityID		= entityID;
 			s_Data.NextQuadVertex++;
 		}
 
-		s_Data.IndexCount += 6;
+		s_Data.QuadIndexCount += 6;
 		s_Data.stats.quadCount++;
 	}
+
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
@@ -288,7 +334,7 @@ namespace Wildlands
 		WL_PROFILE_FUNCTION();
 
 		//the buffer is full, flush it and start next batch.
-		if (s_Data.IndexCount >= Renderer2DData::MaxIndices)
+		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
 		const float textureIndex = 0.f;
@@ -315,7 +361,7 @@ namespace Wildlands
 			s_Data.NextQuadVertex++;
 		}
 
-		s_Data.IndexCount += 6;
+		s_Data.QuadIndexCount += 6;
 		s_Data.stats.quadCount++;
 	}
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tileFactor, const glm::vec4& texColor)
@@ -327,7 +373,7 @@ namespace Wildlands
 		WL_PROFILE_FUNCTION();
 
 		//the buffer is full, flush it and start next batch.
-		if (s_Data.IndexCount >= Renderer2DData::MaxIndices)
+		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
 		float textureIndex = 0.0f;
@@ -370,7 +416,31 @@ namespace Wildlands
 			s_Data.NextQuadVertex++;
 		}
 
-		s_Data.IndexCount += 6;
+		s_Data.QuadIndexCount += 6;
+		s_Data.stats.quadCount++;
+	}
+
+	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness, float fade, uint32_t entityID)
+	{
+		WL_PROFILE_FUNCTION();
+
+		// WLTODO::implement for circle.
+		//the buffer is full, flush it and start next batch.
+		//if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+		//	NextBatch();
+
+		for (int i = 0; i < 4; i++)
+		{
+			s_Data.NextCircleVertex->WorldPosition	= transform * s_Data.QuadVertexPos[i];
+			s_Data.NextCircleVertex->LocalPosition	= s_Data.QuadVertexPos[i] * 2.0f; //[-1.0f, 1.0f]
+			s_Data.NextCircleVertex->Color			= color;
+			s_Data.NextCircleVertex->Thickness		= thickness;
+			s_Data.NextCircleVertex->Fade			= fade;
+			s_Data.NextCircleVertex->EntityID		= entityID;
+			s_Data.NextCircleVertex++;
+		}
+
+		s_Data.CircleIndexCount += 6;
 		s_Data.stats.quadCount++;
 	}
 
@@ -394,8 +464,11 @@ namespace Wildlands
 
 	void Renderer2D::StartBatch()
 	{
-		s_Data.IndexCount = 0;
+		s_Data.QuadIndexCount = 0;
 		s_Data.NextQuadVertex = s_Data.QuadVerteciesBase;
+
+		s_Data.CircleIndexCount = 0;
+		s_Data.NextCircleVertex = s_Data.CircleVerteciesBase;
 
 		s_Data.TextureSlotIndex = 1;
 	}

@@ -56,6 +56,7 @@ namespace Wildlands
 			// Copy all components into new entity.
 			CopyComponent<TransformComponent>(dstEntity, srcEntity);
 			CopyComponent<SpriteRendererComponent>(dstEntity, srcEntity);
+			CopyComponent<CircleRendererComponent>(dstEntity, srcEntity);
 			CopyComponent<CameraComponent>(dstEntity, srcEntity);
 			CopyComponent<Rigidbody2DComponent>(dstEntity, srcEntity);
 			CopyComponent<BoxCollider2DComponent>(dstEntity, srcEntity);
@@ -112,12 +113,26 @@ namespace Wildlands
 	{
 		Renderer2D::BeginScene(camera);
 
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
+		// Draw Sprites.
 		{
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+			for (auto entityID : group)
+			{
+				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entityID);
 
-			Renderer2D::DrawSprite(transform, sprite, (uint32_t)entity);
+				Renderer2D::DrawSprite(transform, sprite, (uint32_t)entityID);
+			}
+		}
+
+		// Draw Circles.
+		{
+			auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto entityID : view)
+			{
+				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entityID);
+
+				Renderer2D::DrawCircle(transform, circle.Color, circle.Thickness, circle.Fade, (uint32_t)entityID);
+			}
 		}
 
 		Renderer2D::EndScene();
@@ -185,12 +200,26 @@ namespace Wildlands
 		{
 			Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto entity : group)
+			// Draw Sprites.
 			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+				for (auto entityID : group)
+				{
+					auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entityID);
 
-				Renderer2D::DrawSprite(transform, sprite, (uint32_t)entity);
+					Renderer2D::DrawSprite(transform, sprite, (uint32_t)entityID);
+				}
+			}
+
+			// Draw Circles.
+			{
+				auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
+				for (auto entityID : view)
+				{
+					auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entityID);
+
+					Renderer2D::DrawCircle(transform, circle.Color, circle.Thickness, circle.Fade, (uint32_t)entityID);
+				}
 			}
 
 			Renderer2D::EndScene();
@@ -230,6 +259,7 @@ namespace Wildlands
 		// Copy all components into new entity.
 		CopyComponent<TransformComponent>(newEntity, entity);
 		CopyComponent<SpriteRendererComponent>(newEntity, entity);
+		CopyComponent<CircleRendererComponent>(newEntity, entity);
 		CopyComponent<CameraComponent>(newEntity, entity);
 		CopyComponent<Rigidbody2DComponent>(newEntity, entity);
 		CopyComponent<BoxCollider2DComponent>(newEntity, entity);
@@ -287,6 +317,10 @@ namespace Wildlands
 	}
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+	} 
+	template<>
+	void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component)
 	{
 	}
 	template<>
