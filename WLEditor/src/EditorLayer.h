@@ -20,8 +20,8 @@ namespace Wildlands
 
 		virtual void OnEvent(Event& event) override;
 	private:
-		// UI
 		void UI_Toolbar();
+		void OverlayRender();
 	private:
 		// Events
 		bool OnKeyDownEvent(KeyDownEvent& e);
@@ -57,6 +57,8 @@ namespace Wildlands
 		bool m_GizmoMode = false; // false  = local, true = world.
 		Entity m_MouseClickedEntity;
 		
+		bool m_ShowPhysicsColliders = false;
+
 		enum class SceneState
 		{
 			Edit = 0,

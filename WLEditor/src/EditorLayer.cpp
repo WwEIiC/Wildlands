@@ -80,19 +80,21 @@ namespace Wildlands
 			// Scene Update
             switch (m_SceneState)
             {
-            case SceneState::Edit:
-            {
-                m_EditorCamera.Update(ts);
+				case SceneState::Edit:
+				{
+					m_EditorCamera.Update(ts);
 
-                m_ActiveScene->UpdateEditor(ts, m_EditorCamera);
-                break;
+					m_ActiveScene->UpdateEditor(ts, m_EditorCamera);
+					break;
+				}
+				case SceneState::Play:
+				{
+					m_ActiveScene->UpdateRuntime(ts);
+					break;
+				}
             }
-            case SceneState::Play:
-            {
-                m_ActiveScene->UpdateRuntime(ts);
-                break;
-            }
-            }
+
+            OverlayRender();
             m_FrameBuffer->UnBind();
         }
     }
@@ -180,7 +182,10 @@ namespace Wildlands
 		ImGui::Text("Indices: %d", stats.GetIndexCount());
         ImGui::End();
 
-        
+        ImGui::Begin("Scene Settings");
+        ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
+        ImGui::End();
+
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
         ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoTitleBar);
 
@@ -317,6 +322,55 @@ namespace Wildlands
 
         ImGui::PopStyleColor(3);
         ImGui::PopStyleVar(2);
+    }
+
+    void EditorLayer::OverlayRender()
+    {
+        if (m_SceneState == SceneState::Play)
+        {
+            Entity camera = m_ActiveScene->GetPrimaryCameraEntity();
+            Renderer2D::BeginScene(camera.GetComponent<CameraComponent>().Camera.GetProjection(), camera.GetComponent<TransformComponent>().GetTransform());
+        }
+        else
+            Renderer2D::BeginScene(m_EditorCamera);
+
+        if (m_ShowPhysicsColliders)
+        {
+            // Box Colliders
+            {
+                auto view = m_ActiveScene->GetAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
+                for (auto entity : view)
+                {
+                    auto [transformComp, bc2dComp] = view.get<TransformComponent, BoxCollider2DComponent>(entity);
+
+                    glm::vec3 translation = transformComp.Position + glm::vec3(bc2dComp.Offset, 0.001f);
+                    glm::vec3 scale = transformComp.Scale * glm::vec3(bc2dComp.Size, 1.0f);
+
+                    glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+                        * glm::rotate(glm::mat4(1.0f), transformComp.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+                        * glm::scale(glm::mat4(1.0f), scale);
+
+                    Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
+                }
+            }
+
+            // Circle Colliders
+            {
+                auto view = m_ActiveScene->GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
+                for (auto entityID : view)
+                {
+                    auto [transformComp, cc2dComp] = view.get<TransformComponent, CircleCollider2DComponent>(entityID);
+                    glm::vec3 translation = transformComp.Position + glm::vec3(cc2dComp.Offset, 0.001f);
+                    glm::vec3 scale = transformComp.Scale * glm::vec3(cc2dComp.Radius * 2.0f);
+
+                    glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+                        * glm::scale(glm::mat4(1.0f), scale);
+
+                    Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.02f);
+                }
+            }
+        }
+        Renderer2D::EndScene();
     }
 
 

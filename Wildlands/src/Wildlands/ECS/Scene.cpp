@@ -109,7 +109,7 @@ namespace Wildlands
 
 				b2CircleShape circleShape;
 				circleShape.m_p.Set(circleColliderComp.Offset.x, circleColliderComp.Offset.y);
-				circleShape.m_radius = circleColliderComp.Radius;
+				circleShape.m_radius = transformComp.Scale.x * circleColliderComp.Radius;
 
 				b2FixtureDef fixtureDef;
 				fixtureDef.shape				= &circleShape;
