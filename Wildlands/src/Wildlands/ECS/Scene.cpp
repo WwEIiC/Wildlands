@@ -27,12 +27,20 @@ namespace Wildlands
 		return b2BodyType::b2_staticBody;
 	}
 
-	template<typename Comp>
+	template<typename... Components>
 	static void CopyComponent(Entity dstEntity, Entity srcEntity)
 	{
-		if (!srcEntity.HasComponent<Comp>()) { return; }
+		([&]()
+			{
+				if (!srcEntity.HasComponent<Components>()) { return; }
+				dstEntity.AddOrReplaceComponent<Components>(srcEntity.GetComponent<Components>());
+			}(), ...);
+	}
 
-		dstEntity.AddOrReplaceComponent<Comp>(srcEntity.GetComponent<Comp>());
+	template<typename... Components>
+	static void CopyComponent(ComponentGroup<Components...>, Entity dstEntity, Entity srcEntity)
+	{
+		CopyComponent<Components...>(dstEntity, srcEntity);
 	}
 
 	Scene::~Scene()
@@ -60,14 +68,7 @@ namespace Wildlands
 			Entity dstEntity = newScene->CreateEntityWithUUID(uuid, name);
 
 			// Copy all components into new entity.
-			CopyComponent<TransformComponent>(dstEntity, srcEntity);
-			CopyComponent<SpriteRendererComponent>(dstEntity, srcEntity);
-			CopyComponent<CircleRendererComponent>(dstEntity, srcEntity);
-			CopyComponent<CameraComponent>(dstEntity, srcEntity);
-			CopyComponent<Rigidbody2DComponent>(dstEntity, srcEntity);
-			CopyComponent<BoxCollider2DComponent>(dstEntity, srcEntity);
-			CopyComponent<CircleCollider2DComponent>(dstEntity, srcEntity);
-			CopyComponent<NativeScriptComponent>(dstEntity, srcEntity);
+			CopyComponent(AllComponents{}, dstEntity, srcEntity);
 		}
 		return newScene;
 	}
@@ -247,14 +248,7 @@ namespace Wildlands
 		Entity newEntity = CreateEntity(entity.GetName());
 
 		// Copy all components into new entity.
-		CopyComponent<TransformComponent>(newEntity, entity);
-		CopyComponent<SpriteRendererComponent>(newEntity, entity);
-		CopyComponent<CircleRendererComponent>(newEntity, entity);
-		CopyComponent<CameraComponent>(newEntity, entity);
-		CopyComponent<Rigidbody2DComponent>(newEntity, entity);
-		CopyComponent<BoxCollider2DComponent>(newEntity, entity);
-		CopyComponent<CircleCollider2DComponent>(newEntity, entity);
-		CopyComponent<NativeScriptComponent>(newEntity, entity);
+		CopyComponent(AllComponents{}, newEntity, entity);
 
 		return newEntity;
 	}

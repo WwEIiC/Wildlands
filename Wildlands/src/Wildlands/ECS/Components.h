@@ -141,4 +141,11 @@ namespace Wildlands
 			DestoryScript = [](ScriptableEntity* instance) { delete instance; instance = nullptr; };
 		}
 	};
+
+	template<typename... Components>
+	struct ComponentGroup {};
+
+	using AllComponents = ComponentGroup<IDComponent, TagComponent, TransformComponent, SpriteRendererComponent,
+						CircleRendererComponent, CameraComponent, Rigidbody2DComponent,
+						BoxCollider2DComponent, CircleCollider2DComponent, NativeScriptComponent>;
 }
