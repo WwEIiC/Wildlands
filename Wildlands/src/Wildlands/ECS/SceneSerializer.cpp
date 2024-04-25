@@ -168,6 +168,10 @@ namespace Wildlands
 
 			auto& spriteRendererComp = entity.GetComponent<SpriteRendererComponent>();
 			out << YAML::Key << "Color" << YAML::Value << spriteRendererComp.Color;
+			if (spriteRendererComp.Texture)
+				out << YAML::Key << "TexturePath" << YAML::Value << spriteRendererComp.Texture->GetPath();
+
+			out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComp.TilingFactor;
 
 			out << YAML::EndMap; // SpriteRendererComponent
 		} 
@@ -316,6 +320,10 @@ namespace Wildlands
 				{
 					auto& src = targetEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererNode["Color"].as<glm::vec4>();
+					if (spriteRendererNode["TexturePath"])
+						src.Texture = Texture2D::Create(spriteRendererNode["TexturePath"].as<std::string>());
+					if (spriteRendererNode["TilingFactor"])
+						src.TilingFactor = spriteRendererNode["TilingFactor"].as<float>();
 				}
 
 				auto circleRendererNode = entity["CircleRendererComponent"];

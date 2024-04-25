@@ -9,8 +9,8 @@
 class Sandbox : public Wildlands::Application
 {
 public:
-	Sandbox(Wildlands::ApplicationCommandLineArgs args)
-		: Application("WLEditor", args)
+	Sandbox(const Wildlands::ApplicationSpecification& specification)
+		: Wildlands::Application(specification)
 	{
 		PushLayer(new Sandbox2D());
 	}
@@ -21,5 +21,10 @@ public:
 
 Wildlands::Application* Wildlands::CreateApplication(Wildlands::ApplicationCommandLineArgs args)
 {
-	return new Sandbox(args);
+	ApplicationSpecification spec;
+	spec.Name = "Sandbox";
+	spec.WorkingDirectory = "../WLEditor";
+	spec.CommandLineArgs = args;
+
+	return new Sandbox(spec);
 }

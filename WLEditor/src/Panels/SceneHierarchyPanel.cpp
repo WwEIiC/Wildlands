@@ -216,60 +216,12 @@ namespace Wildlands
 
 		if (ImGui::BeginPopup("AddComponent"))
 		{
-			if (!m_SelectedEntity.HasComponent<SpriteRendererComponent>())
-			{
-				if (ImGui::MenuItem("Sprite Renderer"))
-				{
-					m_SelectedEntity.AddComponent<SpriteRendererComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			if (!m_SelectedEntity.HasComponent<CircleRendererComponent>())
-			{
-				if (ImGui::MenuItem("Circle Renderer"))
-				{
-					m_SelectedEntity.AddComponent<CircleRendererComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			if (!m_SelectedEntity.HasComponent<CameraComponent>())
-			{
-				if (ImGui::MenuItem("Camera"))
-				{
-					m_SelectedEntity.AddComponent<CameraComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			if (!m_SelectedEntity.HasComponent<Rigidbody2DComponent>())
-			{
-				if (ImGui::MenuItem("Rigidbody2D"))
-				{
-					m_SelectedEntity.AddComponent<Rigidbody2DComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			if (!m_SelectedEntity.HasComponent<BoxCollider2DComponent>())
-			{
-				if (ImGui::MenuItem("BoxCollider2D"))
-				{
-					m_SelectedEntity.AddComponent<BoxCollider2DComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
-			if (!m_SelectedEntity.HasComponent<CircleCollider2DComponent>())
-			{
-				if (ImGui::MenuItem("CircleCollider2D"))
-				{
-					m_SelectedEntity.AddComponent<CircleCollider2DComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-			}
-
+			DrawAddComponentItem<CameraComponent>("Camera");
+			DrawAddComponentItem<SpriteRendererComponent>("Sprite Renderer");
+			DrawAddComponentItem<CircleRendererComponent>("Circle Renderer");
+			DrawAddComponentItem<Rigidbody2DComponent>("Rigidbody 2D");
+			DrawAddComponentItem<BoxCollider2DComponent>("Box Collider 2D");
+			DrawAddComponentItem<CircleCollider2DComponent>("Circle Collider 2D");
 			ImGui::EndPopup();
 		}
 		ImGui::PopItemWidth();
@@ -416,6 +368,20 @@ namespace Wildlands
 				ImGui::DragFloat("Restitution Threshold", &cc2dComp.RestitutionThreshold, 0.01f, 0.0f, 0.0f, "%.2f");
 			});
 	}
+
+	template<typename Comp>
+	void SceneHierarchyPanel::DrawAddComponentItem(const std::string& name)
+	{
+		if (!m_SelectedEntity.HasComponent<Comp>())
+		{
+			if (ImGui::MenuItem(name.c_str()))
+			{
+				m_SelectedEntity.AddComponent<Comp>();
+				ImGui::CloseCurrentPopup();
+			}
+		}
+	}
+
 
 	void SceneHierarchyPanel::DrawWindows()
 	{

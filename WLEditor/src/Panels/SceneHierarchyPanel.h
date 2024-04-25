@@ -24,6 +24,9 @@ namespace Wildlands
 	private:
 		void DrawEntityNode(Entity& entity);
 		void DrawEntityComponents(Entity& entity);
+
+		template<typename Comp>
+		void DrawAddComponentItem(const std::string& name);
 	public:
 		void DrawWindows();
 		void ShowSettingsWindow();

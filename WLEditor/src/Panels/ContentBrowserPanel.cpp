@@ -36,8 +36,7 @@ namespace Wildlands
 		for (auto& directoryEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
 		{
 			const std::filesystem::path& path = directoryEntry.path();
-			std::filesystem::path relativePath = std::filesystem::relative(path, g_AssetPath);
-			std::string filenameString = relativePath.filename().string();
+			std::string filenameString = path.filename().string();
 
 			// because every filefolder/file buttons have the same icon(will be the same id).
 			// we need to indentify them by their name.
@@ -48,6 +47,7 @@ namespace Wildlands
 			ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 			if (ImGui::BeginDragDropSource())
 			{
+				std::filesystem::path relativePath = std::filesystem::relative(path, g_AssetPath);
 				const wchar_t* itemPath = relativePath.c_str();
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
 				ImGui::EndDragDropSource();

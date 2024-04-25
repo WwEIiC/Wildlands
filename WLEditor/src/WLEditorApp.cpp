@@ -8,19 +8,19 @@ namespace Wildlands
 	class WLEditor : public Application
 	{
 	public:
-		WLEditor(ApplicationCommandLineArgs args)
-			: Application("WLEditor", args)
+		WLEditor(const ApplicationSpecification& specification)
+			: Application(specification)
 		{
 			PushLayer(new EditorLayer());
-		}
-
-		~WLEditor()
-		{
 		}
 	};
 
 	Application* CreateApplication(ApplicationCommandLineArgs args)
 	{
-		return new WLEditor(args);
+		ApplicationSpecification spec;
+		spec.Name = "WLEditor";
+		spec.CommandLineArgs = args;
+
+		return new WLEditor(spec);
 	}
 }

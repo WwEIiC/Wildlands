@@ -7,14 +7,15 @@
 
 #include "Wildlands/Renderer/Renderer.h"
 
-#include "GLFW/glfw3.h"
+#include <filesystem>
+#include <GLFW/glfw3.h>
 
 namespace Wildlands
 {
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application(const std::string& name, ApplicationCommandLineArgs args)
-		: m_CommandLineArgs(args)
+	Application::Application(const ApplicationSpecification& specification)
+		: m_Specification(specification)
 	{
 		WL_PROFILE_FUNCTION();
 
@@ -22,7 +23,12 @@ namespace Wildlands
 		s_Instance = this;
 
 		m_Running = true;
-		m_Window = Window::Create(WindowConstructData(name));
+
+		// Set working directory here
+		if (!m_Specification.WorkingDirectory.empty())
+			std::filesystem::current_path(m_Specification.WorkingDirectory);
+
+		m_Window = Window::Create(WindowConstructData(m_Specification.Name));
 		m_Window->SetEventCallback(BIND_EVENT_FUNC(Application::OnEvents));
 
 		Renderer::Init();

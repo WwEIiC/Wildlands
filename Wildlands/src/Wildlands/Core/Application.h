@@ -25,10 +25,17 @@ namespace Wildlands
 		}
 	};
 
+	struct ApplicationSpecification
+	{
+		std::string Name = "Wildlands Application";
+		std::string WorkingDirectory;
+		ApplicationCommandLineArgs CommandLineArgs;
+	};
+
 	class  Application
 	{
 	public:
-		Application(const std::string& name = "Wildlands Application", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
+		Application(const ApplicationSpecification& specification);
 		virtual ~Application();
 
 		void Close();
@@ -40,7 +47,7 @@ namespace Wildlands
 
 		inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 
-		ApplicationCommandLineArgs GetCommandLineArgs() const { return m_CommandLineArgs; }
+		const ApplicationSpecification& GetSpecification() const { return m_Specification; }
 
 		// Push and Pop Layer to m_LayerStack
 		void PushLayer(Layer* layer);
@@ -62,7 +69,7 @@ namespace Wildlands
 		bool m_Running;
 		bool m_Minimized = false;
 		Unique<Window> m_Window;
-		ApplicationCommandLineArgs m_CommandLineArgs;
+		ApplicationSpecification m_Specification;
 
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;

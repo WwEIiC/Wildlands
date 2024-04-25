@@ -41,7 +41,7 @@ namespace Wildlands
         m_EditorScene = CreateRef<Scene>();
         m_ActiveScene = m_EditorScene;
 
-        auto commandLineArgs = Application::Get().GetCommandLineArgs();
+        auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
             auto sceneFilePath = commandLineArgs[1];
@@ -52,6 +52,8 @@ namespace Wildlands
         m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+        Renderer2D::SetLineWidth(0.95f);
     }
 
     void EditorLayer::Detach()
@@ -162,6 +164,7 @@ namespace Wildlands
             {
                 if (ImGui::MenuItem("Settings")) { m_SceneHierarchyPanel.m_ShowSettingsWindow = true; }
                 if (ImGui::MenuItem("New Scene", "Ctrl+N")) { NewScene(); }
+                if (ImGui::MenuItem("Save", "Ctrl+S")) { SaveScene(); }
                 if (ImGui::MenuItem("Save as...", "Ctrl+Shift+S")) { SaveSceneAs(); }
                 if (ImGui::MenuItem("Open...", "Ctrl+O")) { OpenScene(); }
                 if (ImGui::MenuItem("FullScreen")) { Application::Get().GetWindow().SetFullScreen(); }
@@ -178,11 +181,6 @@ namespace Wildlands
         m_ContentBrowserPanel.OnImGuiRender();
 
         ImGui::Begin("Render Stats");
-
-        std::string name = "None";
-        if (m_MouseClickedEntity)
-            name = m_MouseClickedEntity.GetComponent<TagComponent>().Tag;
-        ImGui::Text("Mouse Click Entity: %s", name.c_str());
 
         auto stats = Renderer2D::GetStats();
         ImGui::Text("Renderer2D Stats:");
@@ -292,7 +290,8 @@ namespace Wildlands
 
     void EditorLayer::OnEvent(Event& event)
     {
-        m_EditorCamera.OnEvent(event);
+        if (m_SceneState == SceneState::Edit)
+            m_EditorCamera.OnEvent(event);
 
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyDownEvent>(BIND_EVENT_FUNC(EditorLayer::OnKeyDownEvent));
@@ -399,6 +398,14 @@ namespace Wildlands
                     Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.02f);
                 }
             }
+        }
+
+        // Draw selected entity outline 
+        if (Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity())
+        {
+            TransformComponent transformComp = selectedEntity.GetComponent<TransformComponent>();
+
+            Renderer2D::DrawRect(transformComp.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
         }
         Renderer2D::EndScene();
     }

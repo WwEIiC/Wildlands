@@ -1,5 +1,5 @@
 #pragma once
-#include "Wildlands/Core/Base.h"
+#include "Wildlands/Core/Log.h"
 
 #include <string>
 #include <chrono>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include "Wildlands/Core/WL_KMCode.h"
+#include <glm/glm.hpp>
 
 namespace Wildlands
 {

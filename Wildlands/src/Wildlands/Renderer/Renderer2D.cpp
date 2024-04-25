@@ -77,7 +77,7 @@ namespace Wildlands
 		uint32_t LineVertexCount = 0;
 		LineVertex* NextLineVertex = nullptr;
 		LineVertex* LineVerteciesBase = nullptr;
-		float LineWidth = 0.8f;
+		float LineWidth = 0.7f;
 
 		// Uniform Buffer
 		struct CameraData
@@ -523,10 +523,10 @@ namespace Wildlands
 		glm::vec3 pRT = glm::vec3(position.x + size.x * 0.5f, position.y + size.y * 0.5f, position.z);
 		glm::vec3 pLT = glm::vec3(position.x - size.x * 0.5f, position.y + size.y * 0.5f, position.z);
 
-		DrawLine(pLB, pRB, color);
-		DrawLine(pRB, pRT, color);
-		DrawLine(pRT, pLT, color);
-		DrawLine(pLT, pLB, color);
+		DrawLine(pLB, pRB, color, entityID);
+		DrawLine(pRB, pRT, color, entityID);
+		DrawLine(pRT, pLT, color, entityID);
+		DrawLine(pLT, pLB, color, entityID);
 	}
 
 	void Renderer2D::DrawRect(const glm::mat4& transform, const glm::vec4& color, uint32_t entityID)
@@ -535,10 +535,10 @@ namespace Wildlands
 		for (size_t i = 0; i < 4; i++)
 			lineVertices[i] = transform * s_Data.QuadVertexPos[i];
 
-		DrawLine(lineVertices[0], lineVertices[1], color);
-		DrawLine(lineVertices[1], lineVertices[2], color);
-		DrawLine(lineVertices[2], lineVertices[3], color);
-		DrawLine(lineVertices[3], lineVertices[0], color);
+		DrawLine(lineVertices[0], lineVertices[1], color, entityID);
+		DrawLine(lineVertices[1], lineVertices[2], color, entityID);
+		DrawLine(lineVertices[2], lineVertices[3], color, entityID);
+		DrawLine(lineVertices[3], lineVertices[0], color, entityID);
 	}
 
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& spriteComp, uint32_t entityID)
