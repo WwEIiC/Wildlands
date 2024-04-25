@@ -22,24 +22,24 @@ namespace Wildlands
 	class  KeyDownEvent : public KeyEvent
 	{
 	public:
-		KeyDownEvent(KeyCode keycode, int repeatcount)
-			: KeyEvent(keycode), m_RepeatCount(repeatcount)
+		KeyDownEvent(KeyCode keycode, bool isRepeat = false)
+			: KeyEvent(keycode), m_IsRepeat(isRepeat)
 		{
 		}
 
-		inline int GetRepeatCount() const { return m_RepeatCount; }
+		inline bool IsRepeat() const { return m_IsRepeat; }
 
 		virtual std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyDownEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
+			ss << "KeyDownEvent: " << m_KeyCode << " (repeat = " << m_IsRepeat << ")";
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(KeyDown)
 			
 	protected:
-		int m_RepeatCount;
+		bool m_IsRepeat;
 	};
 
 	class  KeyUpEvent : public KeyEvent

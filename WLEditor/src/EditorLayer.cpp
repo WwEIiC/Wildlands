@@ -411,7 +411,7 @@ namespace Wildlands
     bool EditorLayer::OnKeyDownEvent(KeyDownEvent& e)
     {
         // only deal with the shortcut now.
-        if (e.GetRepeatCount() > 0) { return false; }
+        if (e.IsRepeat()) { return false; }
 
 
         bool ctrl = Input::IsKeyDown(Key::LeftControl) || Input::IsKeyDown(Key::RightControl);

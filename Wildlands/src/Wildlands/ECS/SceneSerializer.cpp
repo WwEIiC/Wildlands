@@ -279,6 +279,7 @@ namespace Wildlands
 		}
 		catch (YAML::ParserException e)
 		{
+			WL_CORE_ERROR("Failed to load .hazel file '{0}'\n     {1}", filepath, e.what());
 			return false;
 		}
 

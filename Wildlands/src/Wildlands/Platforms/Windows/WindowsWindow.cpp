@@ -168,7 +168,7 @@ namespace Wildlands
 					}
 					case GLFW_REPEAT:
 					{
-						KeyDownEvent event(static_cast<KeyCode>(key), 1);
+						KeyDownEvent event(static_cast<KeyCode>(key), true);
 						data.EventCallback(event);
 						break;
 
