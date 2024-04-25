@@ -39,6 +39,7 @@ namespace Wildlands
 		void SerializeScene(Ref<Scene> scene, std::filesystem::path path);
 
 		void OnScenePlay();
+		void OnSceneSimulate();
 		void OnSceneStop();
 	private:
 		Ref<FrameBuffer> m_FrameBuffer;
@@ -62,7 +63,8 @@ namespace Wildlands
 		enum class SceneState
 		{
 			Edit = 0,
-			Play = 1
+			Play = 1,
+			Simulate = 2
 		};
 		SceneState m_SceneState = SceneState::Edit;
 
@@ -70,7 +72,7 @@ namespace Wildlands
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 		ContentBrowserPanel m_ContentBrowserPanel;
 
-		Ref<Texture2D> m_PlayButtonIcon, m_StopButtonIcon;
+		Ref<Texture2D> m_PlayButtonIcon, m_SimulateButtonIcon, m_StopButtonIcon;
 	};
 }
 

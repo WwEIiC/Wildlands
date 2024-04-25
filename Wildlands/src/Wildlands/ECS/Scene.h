@@ -15,16 +15,19 @@ namespace Wildlands
 	{
 	public:
 		Scene() = default;
-		~Scene() = default;
+		~Scene();
 
 		static Ref<Scene>Copy(Ref<Scene> other);
 
 		void OnRuntimeStart();
 		void OnRuntimeStop();
 
+		void OnSimulationStart();
+		void OnSimulationStop();
+
 		void UpdateEditor(Timestep ts, EditorCamera& camera);
 		void UpdateRuntime(Timestep ts);
-		void UIRender();
+		void UpdateSimulation(Timestep ts, EditorCamera& camera);
 
 		Entity CreateEntity(const std::string& name = std::string());
 		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
@@ -42,6 +45,11 @@ namespace Wildlands
 			return m_Registry.view<Components...>();
 		}
 	private:
+		void RenderScene(EditorCamera& camera);
+
+		void Physics2DStart();
+		void Physics2DStop();
+
 		template <typename Comp>
 		void OnComponentAdded(Entity entity, Comp& comp);
 	private:
