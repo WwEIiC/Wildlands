@@ -2,7 +2,7 @@ project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir ("bin/" .. outputDir .."/%{prj.name}")
 	objdir ("bin-int/" .. outputDir .."/%{prj.name}")

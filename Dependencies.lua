@@ -12,3 +12,16 @@ IncludeDirs["entt"] 			= "%{wks.location}/Wildlands/Externals/entt/include"
 IncludeDirs["yaml_cpp"] 		= "%{wks.location}/Wildlands/Externals/yaml_cpp/include"
 IncludeDirs["ImGuizmo"] 		= "%{wks.location}/Wildlands/Externals/ImGuizmo"
 IncludeDirs["Box2D"] 			= "%{wks.location}/Wildlands/Externals/box2d/include"
+IncludeDirs["Mono"] 			= "%{wks.location}/Wildlands/Externals/Mono/include"
+
+LibraryDirs = {}
+LibraryDirs["Mono"] = "%{wks.location}/Wildlands/Externals/mono/lib/%{cfg.buildcfg}"
+
+Library = {}
+Library["Mono"] = "%{LibraryDirs.Mono}/libmono-static-sgen.lib"
+
+-- Windows
+Library["WinSock"] = "Ws2_32.lib"
+Library["WinMM"] = "Winmm.lib"
+Library["WinVersion"] = "Version.lib"
+Library["BCrypt"] = "Bcrypt.lib"

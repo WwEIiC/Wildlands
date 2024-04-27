@@ -19,6 +19,15 @@ group "Dependences"
 	include "Wildlands/Externals/box2d"
 group ""
 
-include "Wildlands"
-include "WLEditor"
-include "Sandbox"
+group "Core"
+	include "Wildlands"
+	include "Wildlands-ScriptCore"
+group ""
+
+group "Tools"
+	include "WLEditor"
+group ""
+
+group "APPs"
+	include "Sandbox"
+group ""

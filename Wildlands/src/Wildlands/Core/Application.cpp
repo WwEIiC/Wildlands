@@ -6,6 +6,7 @@
 #include "Wildlands/Core/Input.h"
 
 #include "Wildlands/Renderer/Renderer.h"
+#include "Wildlands/Scripting/ScriptEngine.h"
 
 #include <filesystem>
 #include <GLFW/glfw3.h>
@@ -32,6 +33,7 @@ namespace Wildlands
 		m_Window->SetEventCallback(BIND_EVENT_FUNC(Application::OnEvents));
 
 		Renderer::Init();
+		ScriptEngine::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverLayer(m_ImGuiLayer);

@@ -2,7 +2,7 @@ project "Wildlands"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
-	staticruntime "On"
+	staticruntime "off"
 
 	targetdir ("bin/" .. outputDir .."/%{prj.name}")
 	objdir ("bin-int/" .. outputDir .."/%{prj.name}")
@@ -35,6 +35,7 @@ project "Wildlands"
 		"%{IncludeDirs.yaml_cpp}",
 		"%{IncludeDirs.ImGuizmo}",
 		"%{IncludeDirs.Box2D}",
+		"%{IncludeDirs.Mono}"
 	}
 
 	links {
@@ -43,6 +44,7 @@ project "Wildlands"
 		"ImGui",
 		"Yaml_cpp",
 		"Box2d",
+		"%{Library.Mono}",
 		"opengl32.lib"
 	}
 
@@ -61,6 +63,14 @@ project "Wildlands"
 			"WL_PLATFORM_WINDOWS",
 			"GLFW_INCLUDE_NONE",		--don't include any gl library because glad will provide.
 			"_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING"		--get rid of some warnings when use C++20.
+		}
+
+		links
+		{
+			"%{Library.WinSock}",
+			"%{Library.WinMM}",
+			"%{Library.WinVersion}",
+			"%{Library.BCrypt}",
 		}
 
 		-- postbuildcommands { 
