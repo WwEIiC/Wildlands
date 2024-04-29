@@ -32,8 +32,8 @@ Entities:
     TagComponent:
       Tag: Right
     TransformComponent:
-      Position: [0.351999998, 0, 0.349999994]
-      Rotation: [0, 0.785398185, 0]
+      Position: [0.351999998, 0, 0.349999964]
+      Rotation: [0, 0.785398245, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [0.54842025, 0, 0.586872578, 1]

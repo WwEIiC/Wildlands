@@ -9,10 +9,8 @@
 
 namespace Wildlands
 {
-
 	namespace Utils
 	{
-
 		// TODO: move to FileSystem class
 		static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
 		{
@@ -96,20 +94,38 @@ namespace Wildlands
 		MonoAssembly* CoreAssembly = nullptr;
 		MonoImage* CoreAssemblyImage = nullptr;
 
+		MonoAssembly* AppAssembly = nullptr;
+		MonoImage* AppAssemblyImage = nullptr;
+
 		ScriptClass EntityClass;
+
+		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
+		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+
+		// Runtime
+		Scene* SceneContext = nullptr;
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
 
+	// ===========================================================================
+	// ======================= ScriptEngine ======================================
+	// ===========================================================================
 	void ScriptEngine::Init()
 	{
 		s_Data = new ScriptEngineData();
 
 		InitMono();
 		LoadAssembly("resources/Scripts/Wildlands-ScriptCore.dll");
+		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+		LoadAssemblyClasses();
 
+		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterFunctions();
 
+		s_Data->EntityClass = ScriptClass("Wildlands", "Entity", true);
+#if 0
+		// Example how to use mono.
 		// Retrieve and instantiate class (with constructor)
 		s_Data->EntityClass = ScriptClass("Wildlands", "Entity");
 
@@ -140,7 +156,7 @@ namespace Wildlands
 		MonoMethod* printCustomMessageFunc = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
 		void* stringParam = monoString;
 		s_Data->EntityClass.InvokeMethod(instance, printCustomMessageFunc, &stringParam);
-
+#endif
 	}
 
 	void ScriptEngine::Close()
@@ -169,6 +185,7 @@ namespace Wildlands
 		s_Data->AppDomain = nullptr;
 
 		// mono_jit_cleanup(s_Data->RootDomain);
+
 		s_Data->RootDomain = nullptr;
 	}
 
@@ -185,6 +202,66 @@ namespace Wildlands
 		// Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
 	}
 
+	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
+	{
+		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
+		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
+		// Utils::PrintAssemblyTypes(s_Data->AppAssembly);
+	}
+
+	void ScriptEngine::OnRuntimeStart(Scene* scene)
+	{
+		s_Data->SceneContext = scene;
+	}
+
+	void ScriptEngine::OnRuntimeStop()
+	{
+		s_Data->SceneContext = nullptr;
+
+		s_Data->EntityInstances.clear();
+	}
+
+	bool ScriptEngine::EntityClassExists(const std::string& fullClassName)
+	{
+		return s_Data->EntityClasses.find(fullClassName) != s_Data->EntityClasses.end();
+	}
+
+	void ScriptEngine::CreateEntity(Entity entity)
+	{
+		const auto& sc = entity.GetComponent<ScriptComponent>();
+		if (ScriptEngine::EntityClassExists(sc.ClassName))
+		{
+			Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[sc.ClassName], entity);
+			s_Data->EntityInstances[entity.GetUUID()] = instance;
+			instance->InvokeOnCreate();
+		}
+	}
+
+	void ScriptEngine::UpdateEntity(Entity entity, Timestep ts)
+	{
+		UUID entityUUID = entity.GetUUID();
+		WL_CORE_ASSERT(s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end(), "Entity isn't existed.");
+
+		Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+		auto& p = s_Data->EntityInstances;
+		instance->InvokeOnUpdate((float)ts);
+	}
+
+	Scene* ScriptEngine::GetSceneContext()
+	{
+		return s_Data->SceneContext;
+	}
+
+	std::unordered_map<std::string, Ref<ScriptClass>> ScriptEngine::GetEntityClasses()
+	{
+		return std::unordered_map<std::string, Ref<ScriptClass>>();
+	}
+
+	MonoImage* ScriptEngine::GetCoreAssemblyImage()
+	{
+		return s_Data->CoreAssemblyImage;
+	}
+
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)
 	{
 		MonoObject* instance = mono_object_new(s_Data->AppDomain, monoClass);
@@ -192,10 +269,45 @@ namespace Wildlands
 		return instance;
 	}
 
-	ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className)
+	void ScriptEngine::LoadAssemblyClasses()
+	{
+		s_Data->EntityClasses.clear();
+
+		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppAssemblyImage, MONO_TABLE_TYPEDEF);
+		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+		MonoClass* entityClass = mono_class_from_name(s_Data->CoreAssemblyImage, "Wildlands", "Entity");
+
+		for (int32_t i = 0; i < numTypes; i++)
+		{
+			uint32_t cols[MONO_TYPEDEF_SIZE];
+			mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
+
+			const char* nameSpace = mono_metadata_string_heap(s_Data->AppAssemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
+			const char* name = mono_metadata_string_heap(s_Data->AppAssemblyImage, cols[MONO_TYPEDEF_NAME]);
+			std::string fullName;
+			if (strlen(nameSpace) != 0)
+				fullName = fmt::format("{}.{}", nameSpace, name);
+			else
+				fullName = name;
+
+			MonoClass* monoClass = mono_class_from_name(s_Data->AppAssemblyImage, nameSpace, name);
+
+			if (monoClass == entityClass)
+				continue;
+
+			bool isEntity = mono_class_is_subclass_of(monoClass, entityClass, false);
+			if (isEntity)
+				s_Data->EntityClasses[fullName] = CreateRef<ScriptClass>(nameSpace, name);
+		}
+	}
+
+	// ===========================================================================
+	// ======================= ScriptClass =======================================
+	// ===========================================================================
+	ScriptClass::ScriptClass(const std::string& classNamespace, const std::string& className, bool isCore)
 		: m_ClassNamespace(classNamespace), m_ClassName(className)
 	{
-		m_MonoClass = mono_class_from_name(s_Data->CoreAssemblyImage, classNamespace.c_str(), className.c_str());
+		m_MonoClass = mono_class_from_name(isCore ? s_Data->CoreAssemblyImage : s_Data->AppAssemblyImage, classNamespace.c_str(), className.c_str());
 	}
 
 	MonoObject* ScriptClass::Instantiate()
@@ -213,4 +325,38 @@ namespace Wildlands
 		return mono_runtime_invoke(method, instance, params, nullptr);
 	}
 
+	// ===========================================================================
+	// ======================= ScriptInstance ====================================
+	// ===========================================================================
+	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)
+		: m_ScriptClass(scriptClass)
+	{
+		m_Instance = scriptClass->Instantiate();
+
+		m_Constructor = s_Data->EntityClass.GetMethod(".ctor", 1);
+		m_OnCreateMethod = scriptClass->GetMethod("OnCreate", 0);
+		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
+
+		// Call Entity constructor
+		{
+			UUID entityID = entity.GetUUID();
+			void* param = &entityID;
+			m_ScriptClass->InvokeMethod(m_Instance, m_Constructor, &param);
+		}
+	}
+
+	void ScriptInstance::InvokeOnCreate()
+	{
+		if (m_OnCreateMethod)
+			m_ScriptClass->InvokeMethod(m_Instance, m_OnCreateMethod);
+	}
+
+	void ScriptInstance::InvokeOnUpdate(float ts)
+	{
+		if (m_OnUpdateMethod)
+		{
+			void* param = &ts;
+			m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
+		}
+	}
 }

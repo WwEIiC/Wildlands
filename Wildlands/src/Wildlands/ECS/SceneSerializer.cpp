@@ -247,6 +247,14 @@ namespace Wildlands
 
 			out << YAML::EndMap; // CircleCollider2DComponent
 		}
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+
+			out << YAML::Key << "ScriptComponent" << YAML::BeginMap; // ScriptComponent
+			out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
+			out << YAML::EndMap; // ScriptComponent
+		}
 		out << YAML::EndMap; // Entity
 	}
 	void SceneSerializer::Serialize(const std::string& filepath)
@@ -283,7 +291,7 @@ namespace Wildlands
 		}
 		catch (YAML::ParserException e)
 		{
-			WL_CORE_ERROR("Failed to load .hazel file '{0}'\n     {1}", filepath, e.what());
+			WL_CORE_ERROR("Failed to load .wls file '{0}'\n     {1}", filepath, e.what());
 			return false;
 		}
 
@@ -386,6 +394,13 @@ namespace Wildlands
 					cc2dComp.Friction				= circleCollider2DNode["Friction"].as<float>();
 					cc2dComp.Restitution			= circleCollider2DNode["Restitution"].as<float>();
 					cc2dComp.RestitutionThreshold	= circleCollider2DNode["RestitutionThreshold"].as<float>();
+				}
+
+				auto scriptNode = entity["ScriptComponent"];
+				if (scriptNode)
+				{
+					auto& sc = targetEntity.AddComponent<ScriptComponent>();
+					sc.ClassName = scriptNode["ClassName"].as<std::string>();
 				}
 			}
 		}

@@ -125,6 +125,14 @@ namespace Wildlands
 		CircleCollider2DComponent(const CircleCollider2DComponent& other) = default;
 	};
 
+	struct ScriptComponent
+	{
+		std::string ClassName;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
+	};
+
 	class ScriptableEntity;
 	/// <summary> use cpp to script </summary>
 	struct NativeScriptComponent
@@ -146,6 +154,6 @@ namespace Wildlands
 	struct ComponentGroup {};
 
 	using AllComponents = ComponentGroup<IDComponent, TagComponent, TransformComponent, SpriteRendererComponent,
-						CircleRendererComponent, CameraComponent, Rigidbody2DComponent,
+						CircleRendererComponent, CameraComponent, ScriptComponent, Rigidbody2DComponent,
 						BoxCollider2DComponent, CircleCollider2DComponent, NativeScriptComponent>;
 }

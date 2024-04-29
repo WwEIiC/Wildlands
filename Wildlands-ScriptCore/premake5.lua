@@ -2,9 +2,10 @@ project "Wildlands-ScriptCore"
 	kind "SharedLib"
 	language "C#"
 	dotnetframework "4.7.2"
+	namespace "Wildlands"
 
-	targetdir ("%{wks.location}/WLEditor/resources/Scripts")
-	objdir ("%{wks.location}/WLEditor/resources/Scripts/Intermediates")
+	targetdir ("../WLEditor/resources/Scripts")
+	objdir ("../WLEditor/resources/Scripts/Intermediates")
 
 	files 
 	{

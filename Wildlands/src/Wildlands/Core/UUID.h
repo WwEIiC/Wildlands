@@ -14,3 +14,18 @@ namespace Wildlands
 	};
 }
 
+namespace std
+{
+	template <typename T> struct hash;
+
+	template<>
+	struct hash<Wildlands::UUID>
+	{
+		std::size_t operator()(const Wildlands::UUID& uuid) const
+		{
+			return (uint64_t)uuid;
+		}
+	};
+}
+
+

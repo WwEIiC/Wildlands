@@ -1,11 +1,13 @@
 #include "SceneHierarchyPanel.h"
+#include "Wildlands/ECS/Components.h"
+#include "Wildlands/Scripting/ScriptEngine.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
 
-#include "Wildlands/ECS/Components.h"
 
 namespace Wildlands
 {
@@ -217,6 +219,7 @@ namespace Wildlands
 		if (ImGui::BeginPopup("AddComponent"))
 		{
 			DrawAddComponentItem<CameraComponent>("Camera");
+			DrawAddComponentItem<ScriptComponent>("Script");
 			DrawAddComponentItem<SpriteRendererComponent>("Sprite Renderer");
 			DrawAddComponentItem<CircleRendererComponent>("Circle Renderer");
 			DrawAddComponentItem<Rigidbody2DComponent>("Rigidbody 2D");
@@ -285,6 +288,23 @@ namespace Wildlands
 
 					ImGui::Checkbox("Fixed Aspect Ratio", &cameraComp.FixedAspectRatio);
 				}
+			});
+
+		DrawComponent<ScriptComponent>("Script", entity, [](auto& scriptComp)
+			{
+			bool scriptClassExists = ScriptEngine::EntityClassExists(scriptComp.ClassName);
+
+			static char buffer[64];
+			strcpy(buffer, scriptComp.ClassName.c_str());
+
+			if (!scriptClassExists)
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+
+			if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				scriptComp.ClassName = buffer;
+
+			if (!scriptClassExists)
+				ImGui::PopStyleColor();
 			});
 		
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [&](auto& spriteComp)

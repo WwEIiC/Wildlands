@@ -7,6 +7,8 @@
 
 #include "Wildlands/Renderer/Renderer2D.h"
 
+#include "Wildlands/Scripting/ScriptEngine.h"
+
 #include "box2d/b2_world.h"
 #include "box2d/b2_body.h"
 #include "box2d/b2_fixture.h"
@@ -75,15 +77,29 @@ namespace Wildlands
 
 	void Scene::OnRuntimeStart()
 	{
-		// Scripts
-
 		// Physics
 		Physics2DStart();
+
+		// Scripting
+		{
+			ScriptEngine::OnRuntimeStart(this);
+			// Instantiate all script entities
+
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto entityID : view)
+			{
+				Entity entity = { entityID, this };
+				ScriptEngine::CreateEntity(entity);
+			}
+		}
 	}
 	void Scene::OnRuntimeStop()
 	{
 		// Physics
 		Physics2DStop();
+
+		// Scipting
+		ScriptEngine::OnRuntimeStop();
 	}
 
 	void Scene::OnSimulationStart()
@@ -107,7 +123,15 @@ namespace Wildlands
 	{
 		// -- Update Order: Scripts --> Physics --> Render
 
-		// -------- Scripts --------
+		// ------- C# Entity ----------
+		auto view = m_Registry.view<ScriptComponent>();
+		for (auto entityID : view)
+		{
+			Entity entity = { entityID, this };
+			ScriptEngine::UpdateEntity(entity, ts);
+		}
+
+		// ------ Native Scripts --------
 		{
 			m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& NSComp)
 				{
@@ -235,12 +259,15 @@ namespace Wildlands
 		entity.AddComponent<TagComponent>(tag);
 
 		entity.AddComponent<TransformComponent>();
+
+		m_EntityMap[uuid] = entity;
 		return entity;
 	}
 
 	void Scene::DestoryEntity(Entity entity)
 	{
 		m_Registry.destroy(entity);
+		m_EntityMap.erase(entity.GetUUID());
 	}
 
 	Entity Scene::DupilcateEntity(Entity entity)
@@ -267,6 +294,14 @@ namespace Wildlands
 				cameraComp.Camera.SetViewportSize(width, height);
 			}
 		}
+	}
+
+	Entity Scene::GetEntityByUUID(UUID uuid)
+	{
+		if (m_EntityMap.find(uuid) != m_EntityMap.end())
+			return { m_EntityMap.at(uuid), this };
+
+		return {};
 	}
 
 	Entity Scene::GetPrimaryCameraEntity()
@@ -391,6 +426,8 @@ namespace Wildlands
 	void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component) {}
 	template<>
 	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component){}
+	template<>
+	void Scene::OnComponentAdded<ScriptComponent>(Entity entity, ScriptComponent& component){}
 	template<>
 	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component){}
 	template<>
