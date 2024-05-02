@@ -11,9 +11,27 @@ namespace Sandbox
     public class Camera : Entity
     {
         public Entity OtherEntity;
+        public float DistanceFromPlayer = 5.0f;
+        private Entity m_Player;
+
+        public float px, py, pz;
+
+        void OnCraete()
+        {
+            m_Player = FindEntityByName("Player");
+        }
 
         void OnUpdate(float ts)
         {
+            if (m_Player != null)
+            {
+                Position = new Vector3(m_Player.Position.XY, DistanceFromPlayer);
+                px = m_Player.Position.X;
+                py = m_Player.Position.Y;
+                pz = m_Player.Position.Z;
+            }
+            else { m_Player = FindEntityByName("Player"); }
+
             float speed = 1.0f;
             Vector3 velocity = Vector3.Zero;
 

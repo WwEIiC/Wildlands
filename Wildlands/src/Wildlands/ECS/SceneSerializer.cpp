@@ -299,7 +299,7 @@ namespace Wildlands
 
 					out << YAML::BeginMap; // ScriptField
 					out << YAML::Key << "Name" << YAML::Value << name;
-					out << YAML::Key << "Type" << YAML::Value << (int)field.Type;
+					out << YAML::Key << "Type" << YAML::Value << Utils::ScriptFieldTypeToString(field.Type);
 					out << YAML::Key << "Data" << YAML::Value;
 					ScriptFieldInstance& scriptFieldInstance = entityFields[name];
 					switch (field.Type)

@@ -286,6 +286,8 @@ namespace Wildlands
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
+		if (m_ViewportWidth == width && m_ViewportHeight == height) { return; }
+
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
 
@@ -305,6 +307,17 @@ namespace Wildlands
 		if (m_EntityMap.find(uuid) != m_EntityMap.end())
 			return { m_EntityMap.at(uuid), this };
 
+		return {};
+	}
+
+	Entity Scene::FindEntityByName(std::string_view name)
+	{
+		auto view = m_Registry.view<TagComponent>();
+		for (auto entityID : view)
+		{
+			const TagComponent tagComp = view.get<TagComponent>(entityID);
+			if (tagComp.Tag == name) { return Entity(entityID, this); }
+		}
 		return {};
 	}
 

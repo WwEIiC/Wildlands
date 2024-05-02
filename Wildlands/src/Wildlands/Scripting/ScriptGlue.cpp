@@ -41,6 +41,24 @@ namespace Wildlands
 #pragma endregion
 
 #pragma region Entity
+	static uint64_t Entity_FindEntityByName(MonoString* name)
+	{
+		char* nameCStr = mono_string_to_utf8(name);
+
+		Scene* scene = ScriptEngine::GetSceneContext();
+		WL_CORE_ASSERT(scene, "Scene doesn't exisited.");
+		Entity entity = scene->FindEntityByName(nameCStr);
+		mono_free(nameCStr);
+
+		if (entity) { return entity.GetUUID(); }
+		return 0;
+	}
+
+	static MonoObject* Entity_GetScriptInstance(UUID uuid)
+	{
+		return ScriptEngine::GetManagedInstance(uuid);
+	}
+
 	static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
@@ -151,6 +169,8 @@ namespace Wildlands
 		WL_ADD_INTERNAL_CALL(NativeLog_Vector);
 		WL_ADD_INTERNAL_CALL(NativeLog_VectorDot);
 
+		WL_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		WL_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
 		WL_ADD_INTERNAL_CALL(Entity_HasComponent);
 		WL_ADD_INTERNAL_CALL(TransformComponent_GetPosition);
 		WL_ADD_INTERNAL_CALL(TransformComponent_SetPosition);

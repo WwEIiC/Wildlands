@@ -202,6 +202,7 @@ namespace Wildlands
 		LoadAssembly("resources/Scripts/Wildlands-ScriptCore.dll");
 		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
 		LoadAssemblyClasses();
+		auto& p = s_Data->EntityScriptFields;
 
 		ScriptGlue::RegisterComponents();
 		ScriptGlue::RegisterFunctions();
@@ -383,6 +384,12 @@ namespace Wildlands
 	MonoImage* ScriptEngine::GetCoreAssemblyImage()
 	{
 		return s_Data->CoreAssemblyImage;
+	}
+
+	MonoObject* ScriptEngine::GetManagedInstance(UUID uuid)
+	{
+		WL_CORE_ASSERT(s_Data->EntityScriptInstances.find(uuid) != s_Data->EntityScriptInstances.end(), "Script Instance doesn't exisit.");
+		return s_Data->EntityScriptInstances.at(uuid)->GetManagedObject();
 	}
 
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)

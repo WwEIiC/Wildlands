@@ -46,6 +46,16 @@ namespace Sandbox
             //m_Transform.Position = new Vector3(m_Transform.Position.X + velocity.X, m_Transform.Position.Y + velocity.Y, m_Transform.Position.Z);
             if (HasComponent<Rigidbody2DComponent>())
                 m_Rigidbody.ApplyLinearImpulse(velocity.XY, true);
+
+            Entity cameraEntity = FindEntityByName("Camera");
+            if (cameraEntity != null)
+            {
+                Camera camera = cameraEntity.As<Camera>();
+                if (Input.IsKeyDown(KeyCode.Q))
+                    camera.DistanceFromPlayer += speed * 10.0f * ts;
+                else if (Input.IsKeyDown(KeyCode.E))
+                    camera.DistanceFromPlayer -= speed * 10.0f * ts;
+            }
         }
     }
 }

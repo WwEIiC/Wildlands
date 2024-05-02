@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,6 +10,12 @@ namespace Wildlands
 {
     public static class InternalCalls
     {
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static ulong Entity_FindEntityByName(string name);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal extern static object Entity_GetScriptInstance(ulong entityID);
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal extern static bool Entity_HasComponent(ulong entityID, Type componentType);
 
