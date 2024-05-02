@@ -99,12 +99,47 @@ namespace Wildlands
 						layer->UIRender();
 				}
 				m_ImGuiLayer->End();
-
 			}
 			m_Window->Update();
 		}
 	}
+#pragma region Push and Pop Layer
+	void Application::SubmitToMainThread(const std::function<void()>& function)
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
 
+		m_MainThreadQueue.emplace_back(function);
+	}
+	
+	void Application::PushLayer(Layer* layer)
+	{
+		WL_PROFILE_FUNCTION();
+
+		m_LayerStack.PushLayer(layer); 
+		layer->Attach();
+	}
+	void Application::PopLayer(Layer* layer) 
+	{
+		WL_PROFILE_FUNCTION();
+
+		layer->Detach();
+		m_LayerStack.PopLayer(layer); 
+	}
+	void Application::PushOverLayer(Layer* overlayer) 
+	{
+		WL_PROFILE_FUNCTION();
+
+		m_LayerStack.PushOverlay(overlayer); 
+		overlayer->Attach();
+	}
+	void Application::PopOverLayer(Layer* overlayer) 
+	{
+		WL_PROFILE_FUNCTION();
+
+		overlayer->Detach();
+		m_LayerStack.PopOverlay(overlayer); 
+	}
+#pragma endregion
 
 	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
