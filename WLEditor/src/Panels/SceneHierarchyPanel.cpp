@@ -330,7 +330,7 @@ namespace Wildlands
 			{
 				if (scriptClassExists)
 				{
-					Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(scriptComp.ClassName);
+					Ref<ScriptClass> entityClass = ScriptEngine::GetEntityScriptClass(scriptComp.ClassName);
 					const auto& classFields = entityClass->GetFields();
 
 					auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);

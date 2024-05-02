@@ -1,9 +1,11 @@
 #include "WLPCH.h"
 #include "SceneSerializer.h"
-#include "Wildlands/ECS/Entity.h"
 
-#include <yaml-cpp/yaml.h>
+#include "Wildlands/ECS/Entity.h"
 #include "Wildlands/ECS/Components.h"
+
+#include "Wildlands/Scripting/ScriptEngine.h"
+#include <yaml-cpp/yaml.h>
 
 namespace YAML
 {
@@ -83,10 +85,40 @@ namespace YAML
 			return true;
 		}
 	};
+
+	template<>
+	struct convert<Wildlands::UUID>
+	{
+		static Node encode(const Wildlands::UUID& uuid)
+		{
+			Node node;
+			node.push_back((uint64_t)uuid);
+			return node;
+		}
+
+		static bool decode(const Node& node, Wildlands::UUID& uuid)
+		{
+			uuid = node.as<uint64_t>();
+			return true;
+		}
+	};
 }
 
 namespace Wildlands
 {
+#define WRITE_SCRIPT_FIELD(FieldType, Type)					  \
+			case ScriptFieldType::FieldType:				  \
+				out << scriptFieldInstance.GetValue<Type>();  \
+				break
+
+#define READ_SCRIPT_FIELD(FieldType, Type)             \
+	case ScriptFieldType::FieldType:                   \
+	{                                                  \
+		Type data = scriptFieldNode["Data"].as<Type>();    \
+		fieldInstance.SetValue(data);                  \
+		break;                                         \
+	}
+
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)
 	{
 		out << YAML::Flow;
@@ -253,6 +285,46 @@ namespace Wildlands
 
 			out << YAML::Key << "ScriptComponent" << YAML::BeginMap; // ScriptComponent
 			out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
+
+			// Fields
+			Ref<ScriptClass> entityScriptClass = ScriptEngine::GetEntityScriptClass(scriptComponent.ClassName);
+			const auto& classFields = entityScriptClass->GetFields();
+			if (classFields.size() > 0)
+			{
+				out << YAML::Key << "ScriptFields" << YAML::Value << YAML::BeginSeq; // ScriptFields
+				auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+				for (const auto& [name, field] : classFields)
+				{
+					if (entityFields.find(name) == entityFields.end()) { continue; }
+
+					out << YAML::BeginMap; // ScriptField
+					out << YAML::Key << "Name" << YAML::Value << name;
+					out << YAML::Key << "Type" << YAML::Value << (int)field.Type;
+					out << YAML::Key << "Data" << YAML::Value;
+					ScriptFieldInstance& scriptFieldInstance = entityFields[name];
+					switch (field.Type)
+					{
+						WRITE_SCRIPT_FIELD(Float, float);
+						WRITE_SCRIPT_FIELD(Double, double);
+						WRITE_SCRIPT_FIELD(Bool, bool);
+						WRITE_SCRIPT_FIELD(Char, char);
+						WRITE_SCRIPT_FIELD(Byte, int8_t);
+						WRITE_SCRIPT_FIELD(Short, int16_t);
+						WRITE_SCRIPT_FIELD(Int, int32_t);
+						WRITE_SCRIPT_FIELD(Long, int64_t);
+						WRITE_SCRIPT_FIELD(UByte, uint8_t);
+						WRITE_SCRIPT_FIELD(UShort, uint16_t);
+						WRITE_SCRIPT_FIELD(UInt, uint32_t);
+						WRITE_SCRIPT_FIELD(ULong, uint64_t);
+						WRITE_SCRIPT_FIELD(Vector2, glm::vec2);
+						WRITE_SCRIPT_FIELD(Vector3, glm::vec3);
+						WRITE_SCRIPT_FIELD(Vector4, glm::vec4);
+						WRITE_SCRIPT_FIELD(Entity, UUID);
+					}
+					out << YAML::EndMap; // ScriptField
+				}
+				out << YAML::EndSeq; // ScriptFields
+			}
 			out << YAML::EndMap; // ScriptComponent
 		}
 		out << YAML::EndMap; // Entity
@@ -401,6 +473,45 @@ namespace Wildlands
 				{
 					auto& sc = targetEntity.AddComponent<ScriptComponent>();
 					sc.ClassName = scriptNode["ClassName"].as<std::string>();
+
+					auto scriptFieldsNode = scriptNode["ScriptFields"];
+					if (scriptFieldsNode)
+					{
+						Ref<ScriptClass> entityScriptClass = ScriptEngine::GetEntityScriptClass(sc.ClassName);
+						const auto& classFields = entityScriptClass->GetFields();
+						auto& entityFields = ScriptEngine::GetScriptFieldMap(targetEntity);
+
+						for (auto scriptFieldNode : scriptFieldsNode)
+						{
+							std::string name = scriptFieldNode["Name"].as<std::string>();
+							std::string typeString = scriptFieldNode["Type"].as<std::string>();
+							ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
+
+							ScriptFieldInstance& fieldInstance = entityFields[name];
+							if (entityFields.find(name) == entityFields.end()) { continue; }
+
+							fieldInstance.Field = classFields.at(name);
+							switch (type)
+							{
+								READ_SCRIPT_FIELD(Float, float);
+								READ_SCRIPT_FIELD(Double, double);
+								READ_SCRIPT_FIELD(Bool, bool);
+								READ_SCRIPT_FIELD(Char, char);
+								READ_SCRIPT_FIELD(Byte, int8_t);
+								READ_SCRIPT_FIELD(Short, int16_t);
+								READ_SCRIPT_FIELD(Int, int32_t);
+								READ_SCRIPT_FIELD(Long, int64_t);
+								READ_SCRIPT_FIELD(UByte, uint8_t);
+								READ_SCRIPT_FIELD(UShort, uint16_t);
+								READ_SCRIPT_FIELD(UInt, uint32_t);
+								READ_SCRIPT_FIELD(ULong, uint64_t);
+								READ_SCRIPT_FIELD(Vector2, glm::vec2);
+								READ_SCRIPT_FIELD(Vector3, glm::vec3);
+								READ_SCRIPT_FIELD(Vector4, glm::vec4);
+								READ_SCRIPT_FIELD(Entity, UUID);
+							}
+						}
+					}
 				}
 			}
 		}

@@ -143,6 +143,29 @@ namespace Wildlands
 			}
 			return "<Invalid>";
 		}
+
+		inline ScriptFieldType ScriptFieldTypeFromString(std::string_view fieldType)
+		{
+			if (fieldType == "None")    return ScriptFieldType::None;
+			if (fieldType == "Float")   return ScriptFieldType::Float;
+			if (fieldType == "Double")  return ScriptFieldType::Double;
+			if (fieldType == "Bool")    return ScriptFieldType::Bool;
+			if (fieldType == "Char")    return ScriptFieldType::Char;
+			if (fieldType == "Byte")    return ScriptFieldType::Byte;
+			if (fieldType == "Short")   return ScriptFieldType::Short;
+			if (fieldType == "Int")     return ScriptFieldType::Int;
+			if (fieldType == "Long")    return ScriptFieldType::Long;
+			if (fieldType == "UByte")   return ScriptFieldType::UByte;
+			if (fieldType == "UShort")  return ScriptFieldType::UShort;
+			if (fieldType == "UInt")    return ScriptFieldType::UInt;
+			if (fieldType == "ULong")   return ScriptFieldType::ULong;
+			if (fieldType == "Vector2") return ScriptFieldType::Vector2;
+			if (fieldType == "Vector3") return ScriptFieldType::Vector3;
+			if (fieldType == "Vector4") return ScriptFieldType::Vector4;
+			if (fieldType == "Entity")  return ScriptFieldType::Entity;
+
+			return ScriptFieldType::None;
+		}
 	}
 
 	struct ScriptEngineData
@@ -332,7 +355,7 @@ namespace Wildlands
 		return it->second;
 	}
 
-	Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& name)
+	Ref<ScriptClass> ScriptEngine::GetEntityScriptClass(const std::string& name)
 	{
 		if (s_Data->EntityClasses.find(name) != s_Data->EntityClasses.end())
 			return s_Data->EntityClasses[name];

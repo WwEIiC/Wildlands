@@ -63,7 +63,7 @@ Entities:
       RestitutionThreshold: 0.5
   - Entity: 8072431159575447130
     TagComponent:
-      Tag: Squard
+      Tag: Player
     TransformComponent:
       Position: [-7.4505806e-09, 1.29421043, 0]
       Rotation: [0, 0, 0]
@@ -83,6 +83,10 @@ Entities:
       RestitutionThreshold: 0.5
     ScriptComponent:
       ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: Speed
+          Type: 1
+          Data: 0
   - Entity: 18034685068954353523
     TagComponent:
       Tag: Camera

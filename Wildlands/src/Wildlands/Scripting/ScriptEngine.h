@@ -46,18 +46,18 @@ namespace Wildlands
 		template<typename T>
 		T GetValue()
 		{
-			static_assert(sizeof(T) <= 8, "Type too large!");
+			static_assert(sizeof(T) <= 16, "Type too large!");
 			return *(T*)m_Buffer;
 		}
 
 		template<typename T>
 		void SetValue(T value)
 		{
-			static_assert(sizeof(T) <= 8, "Type too large!");
+			static_assert(sizeof(T) <= 16, "Type too large!");
 			memcpy(m_Buffer, &value, sizeof(T));
 		}
 	private:
-		uint8_t m_Buffer[8];
+		uint8_t m_Buffer[16];
 
 	friend class ScriptEngine;
 	friend class ScriptInstance;
@@ -98,7 +98,7 @@ namespace Wildlands
 		template<typename T>
 		T GetFieldValue(const std::string& name)
 		{
-			static_assert(sizeof(T) <= 8, "Type too large!");
+			static_assert(sizeof(T) <= 16, "Type too large!");
 			bool success = GetFieldValueInternal(name, s_FieldValueBuffer);
 
 			if (!success) { return T(); }
@@ -109,7 +109,7 @@ namespace Wildlands
 		template<typename T>
 		void SetFieldValue(const std::string& name, T value)
 		{
-			static_assert(sizeof(T) <= 8, "Type too large!");
+			static_assert(sizeof(T) <= 16, "Type too large!");
 			SetFieldValueInternal(name, &value);
 		}
 
@@ -125,7 +125,7 @@ namespace Wildlands
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
 
-		inline static char s_FieldValueBuffer[8];
+		inline static char s_FieldValueBuffer[16];
 
 	friend class ScriptEngine;
 	friend struct ScriptFieldInstance;
@@ -150,7 +150,7 @@ namespace Wildlands
 		static Scene* GetSceneContext();
 		static Ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);
 
-		static Ref<ScriptClass> GetEntityClass(const std::string& name);
+		static Ref<ScriptClass> GetEntityScriptClass(const std::string& name);
 		static std::unordered_map<std::string, Ref<ScriptClass>> GetEntityClasses();
 		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 
@@ -165,4 +165,11 @@ namespace Wildlands
 		friend class ScriptClass;
 		friend class ScriptGlue;
 	};
+
+	namespace Utils
+	{
+		extern const char* ScriptFieldTypeToString(ScriptFieldType type);
+
+		extern inline ScriptFieldType ScriptFieldTypeFromString(std::string_view fieldType);
+	}
 }
