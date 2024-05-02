@@ -234,7 +234,7 @@ namespace Wildlands
 
         // ImGuizmo
         Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-        if (selectedEntity && m_GizmoType != -1)
+        if (m_SceneState == SceneState::Edit && selectedEntity && m_GizmoType != -1)
         {
             // Set it to Perspective now.
 			ImGuizmo::SetOrthographic(false);

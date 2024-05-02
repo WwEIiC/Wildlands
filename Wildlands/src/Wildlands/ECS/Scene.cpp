@@ -77,6 +77,8 @@ namespace Wildlands
 
 	void Scene::OnRuntimeStart()
 	{
+		m_IsRunning = true;
+
 		// Physics
 		Physics2DStart();
 
@@ -95,6 +97,8 @@ namespace Wildlands
 	}
 	void Scene::OnRuntimeStop()
 	{
+		m_IsRunning = false;
+
 		// Physics
 		Physics2DStop();
 

@@ -205,7 +205,7 @@ namespace Wildlands
 			auto& tag = entity.GetComponent<TagComponent>().Tag;
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
-			strcpy_s(buffer, sizeof(buffer), tag.c_str());
+			strncpy_s(buffer, sizeof(buffer), tag.c_str(), sizeof(buffer));
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
@@ -230,72 +230,72 @@ namespace Wildlands
 		ImGui::PopItemWidth();
 
 		DrawComponent<TransformComponent>("Transform", entity, [](auto& transformComp)
-			{
-				DrawVec3Controller("Position", transformComp.Position);
-				glm::vec3 ratationInDegrees = glm::degrees(transformComp.Rotation);
-				DrawVec3Controller("Rotation", ratationInDegrees);
-				transformComp.Rotation = glm::radians(ratationInDegrees);
-				DrawVec3Controller("Scale", transformComp.Scale, 1.0f);
-			});
+		{
+			DrawVec3Controller("Position", transformComp.Position);
+			glm::vec3 ratationInDegrees = glm::degrees(transformComp.Rotation);
+			DrawVec3Controller("Rotation", ratationInDegrees);
+			transformComp.Rotation = glm::radians(ratationInDegrees);
+			DrawVec3Controller("Scale", transformComp.Scale, 1.0f);
+		});
 
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& cameraComp)
+		{
+			auto& camera = cameraComp.Camera;
+
+			ImGui::Checkbox("Primary", &cameraComp.Primary);
+
+			const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
+
+			if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
 			{
-				auto& camera = cameraComp.Camera;
-
-				ImGui::Checkbox("Primary", &cameraComp.Primary);
-
-				const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
-				const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
-
-				if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
+				for (int i = 0; i < 2; i++)
 				{
-					for (int i = 0; i < 2; i++)
+					bool isSelected = projectionTypeStrings[i] == currentProjectionTypeString;
+					if (ImGui::Selectable(projectionTypeStrings[i], isSelected))
 					{
-						bool isSelected = projectionTypeStrings[i] == currentProjectionTypeString;
-						if (ImGui::Selectable(projectionTypeStrings[i], isSelected))
-						{
-							currentProjectionTypeString = projectionTypeStrings[i];
-							camera.SetProjectionType((SceneCamera::ProjectionType)i);
-						}
-
-						if (isSelected) { ImGui::SetItemDefaultFocus(); }
+						currentProjectionTypeString = projectionTypeStrings[i];
+						camera.SetProjectionType((SceneCamera::ProjectionType)i);
 					}
 
-					ImGui::EndCombo();
+					if (isSelected) { ImGui::SetItemDefaultFocus(); }
 				}
 
-				if (camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
-				{
-					float fov = glm::degrees(camera.GetPerspectiveFOV());
-					if (ImGui::DragFloat("FOV", &fov)) { camera.SetPerspectiveFOV(glm::radians(fov)); }
+				ImGui::EndCombo();
+			}
 
-					float nearClip = camera.GetPerspectiveNearClip();
-					if (ImGui::DragFloat("Near Clip", &nearClip)) { camera.SetPerspectiveNearClip(nearClip); }
-
-					float farClip = camera.GetPerspectiveFarClip();
-					if (ImGui::DragFloat("Far Clip", &farClip)) { camera.SetPerspectiveNearClip(farClip); }
-				}
-				else if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
-				{
-					float size = camera.GetOrthographicSize();
-					if (ImGui::DragFloat("Size", &size)) { camera.SetOrthographicSize(size); }
-
-					float nearClip = camera.GetOrthographicNearClip();
-					if (ImGui::DragFloat("Near Clip", &nearClip)) { camera.SetOrthographicNearClip(nearClip); }
-
-					float farClip = camera.GetOrthographicFarClip();
-					if (ImGui::DragFloat("Far Clip", &farClip)) { camera.SetOrthographicFarClip(farClip); }
-
-					ImGui::Checkbox("Fixed Aspect Ratio", &cameraComp.FixedAspectRatio);
-				}
-			});
-
-		DrawComponent<ScriptComponent>("Script", entity, [](auto& scriptComp)
+			if (camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
 			{
+				float fov = glm::degrees(camera.GetPerspectiveFOV());
+				if (ImGui::DragFloat("FOV", &fov)) { camera.SetPerspectiveFOV(glm::radians(fov)); }
+
+				float nearClip = camera.GetPerspectiveNearClip();
+				if (ImGui::DragFloat("Near Clip", &nearClip)) { camera.SetPerspectiveNearClip(nearClip); }
+
+				float farClip = camera.GetPerspectiveFarClip();
+				if (ImGui::DragFloat("Far Clip", &farClip)) { camera.SetPerspectiveNearClip(farClip); }
+			}
+			else if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
+			{
+				float size = camera.GetOrthographicSize();
+				if (ImGui::DragFloat("Size", &size)) { camera.SetOrthographicSize(size); }
+
+				float nearClip = camera.GetOrthographicNearClip();
+				if (ImGui::DragFloat("Near Clip", &nearClip)) { camera.SetOrthographicNearClip(nearClip); }
+
+				float farClip = camera.GetOrthographicFarClip();
+				if (ImGui::DragFloat("Far Clip", &farClip)) { camera.SetOrthographicFarClip(farClip); }
+
+				ImGui::Checkbox("Fixed Aspect Ratio", &cameraComp.FixedAspectRatio);
+			}
+		});
+
+		DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& scriptComp) mutable
+		{
 			bool scriptClassExists = ScriptEngine::EntityClassExists(scriptComp.ClassName);
 
 			static char buffer[64];
-			strcpy(buffer, scriptComp.ClassName.c_str());
+			strcpy_s(buffer, sizeof(buffer), scriptComp.ClassName.c_str());
 
 			if (!scriptClassExists)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
@@ -303,90 +303,158 @@ namespace Wildlands
 			if (ImGui::InputText("Class", buffer, sizeof(buffer)))
 				scriptComp.ClassName = buffer;
 
+			// Fields
+			bool sceneRunning = scene->IsRunning();
+			if (sceneRunning)
+			{
+				Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+				if (scriptInstance)
+				{
+					// Set the data in editor UI to the script instance
+					const auto& classFields = scriptInstance->GetScriptClass()->GetFields();
+					for (const auto& [name, field] : classFields)
+					{
+						if (field.Type == ScriptFieldType::Float)
+						{
+							float data = scriptInstance->GetFieldValue<float>(name);
+							if (ImGui::DragFloat(name.c_str(), &data))
+							{
+								scriptInstance->SetFieldValue(name, data);
+							}
+						}
+						//...other data type.
+					}
+				}
+			}
+			else
+			{
+				if (scriptClassExists)
+				{
+					Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(scriptComp.ClassName);
+					const auto& classFields = entityClass->GetFields();
+
+					auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+
+					// retrieve all the fields from class data:
+					// if the field had scriptFieldInstance then dispaly the controller to it
+					// else create a scriptFieldInstance for this field.
+					for (const auto& [name, field] : classFields)
+					{
+						// Field has been set in editor
+						if (entityFields.find(name) != entityFields.end())
+						{
+							ScriptFieldInstance& scriptField = entityFields.at(name);
+
+							// Display control to set it.
+							if (field.Type == ScriptFieldType::Float)
+							{
+								float data = scriptField.GetValue<float>();
+								if (ImGui::DragFloat(name.c_str(), &data))
+									scriptField.SetValue(data);
+							}
+						}
+						else
+						{
+							// Create scriptFieldInstance and Display control to set it.
+							if (field.Type == ScriptFieldType::Float)
+							{
+								float data = 0.0f;
+								if (ImGui::DragFloat(name.c_str(), &data))
+								{
+									ScriptFieldInstance& fieldInstance = entityFields[name];
+									fieldInstance.Field = field;
+									fieldInstance.SetValue(data);
+								}
+							}
+						}
+					}
+				}
+			}
+
 			if (!scriptClassExists)
 				ImGui::PopStyleColor();
-			});
+		});
 		
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [&](auto& spriteComp)
+		{
+			ImGui::ColorEdit4("Color", glm::value_ptr(spriteComp.Color));
+
+			ImGui::Text("Texture");
+			uint32_t textureID = spriteComp.Texture ? spriteComp.Texture->GetRendererID() : m_DefaultTexture->GetRendererID();
+			ImGui::Image((void*)(uint64_t)textureID, ImVec2(64.0f, 64.0f), ImVec2(0, 1), ImVec2(1, 0));
+
+			if (ImGui::BeginDragDropTarget())
 			{
-				ImGui::ColorEdit4("Color", glm::value_ptr(spriteComp.Color));
-
-				ImGui::Text("Texture");
-				uint32_t textureID = spriteComp.Texture ? spriteComp.Texture->GetRendererID() : m_DefaultTexture->GetRendererID();
-				ImGui::Image((void*)(uint64_t)textureID, ImVec2(64.0f, 64.0f), ImVec2(0, 1), ImVec2(1, 0));
-
-				if (ImGui::BeginDragDropTarget())
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-					{
-						const wchar_t* path = (const wchar_t*)payload->Data;
-						std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
-						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
-						if (texture->IsLoaded())
-							spriteComp.Texture = texture;
-						else
-							WL_CORE_WARN("Could not load texture {0}", texturePath.filename().string());
-					}
-					ImGui::EndDragDropTarget();
+					const wchar_t* path = (const wchar_t*)payload->Data;
+					std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
+					Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+					if (texture->IsLoaded())
+						spriteComp.Texture = texture;
+					else
+						WL_CORE_WARN("Could not load texture {0}", texturePath.filename().string());
 				}
+				ImGui::EndDragDropTarget();
+			}
 
-				ImGui::SameLine();
-				if (ImGui::Button("Remove"))
-					spriteComp.Texture = nullptr;
+			ImGui::SameLine();
+			if (ImGui::Button("Remove"))
+				spriteComp.Texture = nullptr;
 
-				ImGui::DragFloat("Tiling Factor", &spriteComp.TilingFactor, 0.1f, 0.0f, 100.0f, "%.2f");
-			});
+			ImGui::DragFloat("Tiling Factor", &spriteComp.TilingFactor, 0.1f, 0.0f, 100.0f, "%.2f");
+		});
 
 		DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [&](auto& circleComp)
-			{
-				ImGui::ColorEdit4("Color", glm::value_ptr(circleComp.Color));
-				ImGui::DragFloat("Thickness", &circleComp.Thickness, 0.025f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("Fade", &circleComp.Fade, 0.00025f, 0.0f, 1.0f, "%.3f");
-			});
+		{
+			ImGui::ColorEdit4("Color", glm::value_ptr(circleComp.Color));
+			ImGui::DragFloat("Thickness", &circleComp.Thickness, 0.025f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("Fade", &circleComp.Fade, 0.00025f, 0.0f, 1.0f, "%.3f");
+		});
 
 		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& rb2dComp)
+		{
+			const char* rigidbodyTypeStrings[] = { "Static", "Dynamic", "Kinematic"};
+			const char* currentRBTypeString = rigidbodyTypeStrings[(int)rb2dComp.Type];
+
+			if (ImGui::BeginCombo("Body Type", currentRBTypeString))
 			{
-				const char* rigidbodyTypeStrings[] = { "Static", "Dynamic", "Kinematic"};
-				const char* currentRBTypeString = rigidbodyTypeStrings[(int)rb2dComp.Type];
-
-				if (ImGui::BeginCombo("Body Type", currentRBTypeString))
+				for (int i = 0; i < 3; i++)
 				{
-					for (int i = 0; i < 3; i++)
+					bool isSelected = rigidbodyTypeStrings[i] == currentRBTypeString;
+					if (ImGui::Selectable(rigidbodyTypeStrings[i], isSelected))
 					{
-						bool isSelected = rigidbodyTypeStrings[i] == currentRBTypeString;
-						if (ImGui::Selectable(rigidbodyTypeStrings[i], isSelected))
-						{
-							currentRBTypeString = rigidbodyTypeStrings[i];
-							rb2dComp.Type = (Rigidbody2DComponent::BodyType)i;
-						}
-
-						if (isSelected) { ImGui::SetItemDefaultFocus(); }
+						currentRBTypeString = rigidbodyTypeStrings[i];
+						rb2dComp.Type = (Rigidbody2DComponent::BodyType)i;
 					}
-					ImGui::EndCombo();
-				}
 
-				ImGui::Checkbox("FixedRotation", &rb2dComp.FixedRotation);
-			});
+					if (isSelected) { ImGui::SetItemDefaultFocus(); }
+				}
+				ImGui::EndCombo();
+			}
+
+			ImGui::Checkbox("FixedRotation", &rb2dComp.FixedRotation);
+		});
 
 		DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& bc2dComp)
-			{
-				ImGui::DragFloat2("Size", glm::value_ptr(bc2dComp.Size), 0.1f, 0.0f, 0.0f, "%.2f");
-				ImGui::DragFloat2("Offset", glm::value_ptr(bc2dComp.Offset), 0.1f, 0.0f, 0.0f, "%.2f");
-				ImGui::DragFloat("Density", &bc2dComp.Density, 0.01f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("Friction", &bc2dComp.Friction , 0.01f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("Restitution", &bc2dComp.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("Restitution Threshold", &bc2dComp.RestitutionThreshold, 0.01f, 0.0f, 0.0f, "%.2f");
-			});
+		{
+			ImGui::DragFloat2("Size", glm::value_ptr(bc2dComp.Size), 0.1f, 0.0f, 0.0f, "%.2f");
+			ImGui::DragFloat2("Offset", glm::value_ptr(bc2dComp.Offset), 0.1f, 0.0f, 0.0f, "%.2f");
+			ImGui::DragFloat("Density", &bc2dComp.Density, 0.01f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("Friction", &bc2dComp.Friction , 0.01f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("Restitution", &bc2dComp.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("Restitution Threshold", &bc2dComp.RestitutionThreshold, 0.01f, 0.0f, 0.0f, "%.2f");
+		});
 
 		DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](auto& cc2dComp)
-			{
-				ImGui::DragFloat2("Offset", glm::value_ptr(cc2dComp.Offset), 0.1f, 0.0f, 0.0f, "%.2f");
-				ImGui::DragFloat("Radius", &cc2dComp.Radius, 0.1f, 0.0f, 0.0f, "%.2f");
-				ImGui::DragFloat("Density", &cc2dComp.Density, 0.01f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("Friction", &cc2dComp.Friction, 0.01f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("Restitution", &cc2dComp.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat("Restitution Threshold", &cc2dComp.RestitutionThreshold, 0.01f, 0.0f, 0.0f, "%.2f");
-			});
+		{
+			ImGui::DragFloat2("Offset", glm::value_ptr(cc2dComp.Offset), 0.1f, 0.0f, 0.0f, "%.2f");
+			ImGui::DragFloat("Radius", &cc2dComp.Radius, 0.1f, 0.0f, 0.0f, "%.2f");
+			ImGui::DragFloat("Density", &cc2dComp.Density, 0.01f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("Friction", &cc2dComp.Friction, 0.01f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("Restitution", &cc2dComp.Restitution, 0.01f, 0.0f, 1.0f, "%.2f");
+			ImGui::DragFloat("Restitution Threshold", &cc2dComp.RestitutionThreshold, 0.01f, 0.0f, 0.0f, "%.2f");
+		});
 	}
 
 	template<typename Comp>
