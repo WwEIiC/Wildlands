@@ -25,9 +25,11 @@ namespace Wildlands
         WL_PROFILE_FUNCTION();
         WL_INFO("WLEditor Layer Attached");
 
-        m_PlayButtonIcon    = Texture2D::Create("resources/icons/PlayButtonIcon.png");
-        m_SimulateButtonIcon= Texture2D::Create("resources/icons/SimulateButtonIcon.png");
-        m_StopButtonIcon    = Texture2D::Create("resources/icons/StopButtonIcon.png");
+        m_PlayButtonIcon        = Texture2D::Create("resources/icons/PlayButtonIcon.png");
+        m_SimulateButtonIcon    = Texture2D::Create("resources/icons/SimulateButtonIcon.png");
+        m_StopButtonIcon        = Texture2D::Create("resources/icons/StopButtonIcon.png");
+        m_PauseButtonIcon       = Texture2D::Create("resources/icons/PauseButtonIcon.png");
+        m_StepforwardButtonIcon = Texture2D::Create("resources/icons/StepforwardButtonIcon.png");
 
         FrameBufferSpecification framebufferSpec;
         framebufferSpec.Attachments = {
@@ -328,9 +330,18 @@ namespace Wildlands
             tintColor.w = 0.5f;
         float buttonSize = ImGui::GetWindowHeight() - 4.f;
 
+        bool showPlayButton     = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play;
+        bool showSimulateButton = m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate;
+        bool showPauseButton    = m_SceneState != SceneState::Edit;
+
+        float offsetFactor = m_ActiveScene->IsPaused() ? buttonSize * 1.5f : buttonSize;
+        ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - offsetFactor);
+
+        if (showPlayButton)
         {
+            // editor,simulate --> playbutton
+            // play --> stopbutton
             Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_PlayButtonIcon : m_StopButtonIcon;
-            ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (buttonSize * 0.5f));
             if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(buttonSize, buttonSize), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
             {
                 if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
@@ -339,17 +350,49 @@ namespace Wildlands
                     OnSceneStop();
             }
         }
-		ImGui::SameLine();
-		{
-			Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_SimulateButtonIcon : m_StopButtonIcon;		//ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-			if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(buttonSize, buttonSize), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
-			{
-				if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
-					OnSceneSimulate();
-				else if (m_SceneState == SceneState::Simulate)
-					OnSceneStop();
-			}
-		}
+
+        if (showSimulateButton)
+        {
+            if (showPlayButton)
+                ImGui::SameLine();
+
+            // editor,play --> simulatebutton
+            // simulate --> stopbutton
+            Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_SimulateButtonIcon : m_StopButtonIcon;
+            if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(buttonSize, buttonSize), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+            {
+                if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
+                    OnSceneSimulate();
+                else if (m_SceneState == SceneState::Simulate)
+                    OnSceneStop();
+            }
+        }
+        if (showPauseButton)
+        {
+            bool isPaused = m_ActiveScene->IsPaused();
+            ImGui::SameLine();
+            {
+                Ref<Texture2D> icon = m_PauseButtonIcon;
+                if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(buttonSize, buttonSize), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+                {
+                    m_ActiveScene->SetPaused(!isPaused);
+                }
+            }
+
+            // Step button
+            if (isPaused)
+            {
+                ImGui::SameLine();
+                {
+                    Ref<Texture2D> icon = m_StepforwardButtonIcon;
+                    bool isPaused = m_ActiveScene->IsPaused();
+                    if (ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), ImVec2(buttonSize, buttonSize), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+                    {
+                        m_ActiveScene->StepForward();
+                    }
+                }
+            }
+        }
 
         ImGui::End();
         ImGui::PopStyleColor(3);
@@ -609,6 +652,13 @@ namespace Wildlands
 
 		m_ActiveScene = m_EditorScene;
         m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+    }
+
+    void EditorLayer::OnScenePause()
+    {
+        if (m_SceneState == SceneState::Edit) { return; }
+
+        m_ActiveScene->SetPaused(true);
     }
 }
 

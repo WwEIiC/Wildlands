@@ -41,6 +41,7 @@ namespace Wildlands
 		void OnScenePlay();
 		void OnSceneSimulate();
 		void OnSceneStop();
+		void OnScenePause();
 	private:
 		Ref<FrameBuffer> m_FrameBuffer;
 
@@ -73,6 +74,7 @@ namespace Wildlands
 		ContentBrowserPanel m_ContentBrowserPanel;
 
 		Ref<Texture2D> m_PlayButtonIcon, m_SimulateButtonIcon, m_StopButtonIcon;
+		Ref<Texture2D> m_PauseButtonIcon, m_StepforwardButtonIcon;
 	};
 }
 

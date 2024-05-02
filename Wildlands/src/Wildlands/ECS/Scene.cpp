@@ -127,49 +127,56 @@ namespace Wildlands
 	{
 		// -- Update Order: Scripts --> Physics --> Render
 
-		// ------- C# Entity ----------
-		auto view = m_Registry.view<ScriptComponent>();
-		for (auto entityID : view)
+		if (!m_IsPaused || m_StepCount-- > 0)
 		{
-			Entity entity = { entityID, this };
-			ScriptEngine::UpdateEntity(entity, ts);
-		}
-
-		// ------ Native Scripts --------
-		{
-			m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& NSComp)
-				{
-					if (!NSComp.Instance)
-					{
-						NSComp.Instance = NSComp.InstantiateScript();
-						NSComp.Instance->m_Entity = Entity(entity, this);
-
-						NSComp.Instance->OnCreate();
-					}
-					NSComp.Instance->OnUpdate(ts);
-				});
-		}
-
-		// -------- Physics --------
-		{
-			const int32_t velocityIterations = 6;
-			const int32_t positionIterations = 2;
-			m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
-
-			// update tranform from physics.
-			auto view = m_Registry.view<Rigidbody2DComponent>();
-			for (auto entityID : view)
+			// ------- Update Scripts ----------
 			{
-				Entity entity = { entityID, this };
-				auto& transformComp = entity.GetComponent<TransformComponent>();
-				auto& rb2dComp = entity.GetComponent<Rigidbody2DComponent>();
+				// ------- C# Entity ----------
+				auto view = m_Registry.view<ScriptComponent>();
+				for (auto entityID : view)
+				{
+					Entity entity = { entityID, this };
+					ScriptEngine::UpdateEntity(entity, ts);
+				}
 
-				b2Body* body = static_cast<b2Body*>(rb2dComp.RuntimeRigidbody);
-				const b2Vec2& position = body->GetPosition();
-				transformComp.Position.x = position.x;
-				transformComp.Position.y = position.y;
-				transformComp.Rotation.z = body->GetAngle();
+				// ------ Native Scripts --------
+				{
+					m_Registry.view<NativeScriptComponent>().each([=](auto entity, NativeScriptComponent& NSComp)
+					{
+						if (!NSComp.Instance)
+						{
+							NSComp.Instance = NSComp.InstantiateScript();
+							NSComp.Instance->m_Entity = Entity(entity, this);
+
+							NSComp.Instance->OnCreate();
+						}
+						NSComp.Instance->OnUpdate(ts);
+					});
+				}
 			}
+
+			// -------- Physics --------
+			{
+				const int32_t velocityIterations = 6;
+				const int32_t positionIterations = 2;
+				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
+
+				// update tranform from physics.
+				auto view = m_Registry.view<Rigidbody2DComponent>();
+				for (auto entityID : view)
+				{
+					Entity entity = { entityID, this };
+					auto& transformComp = entity.GetComponent<TransformComponent>();
+					auto& rb2dComp = entity.GetComponent<Rigidbody2DComponent>();
+
+					b2Body* body = static_cast<b2Body*>(rb2dComp.RuntimeRigidbody);
+					const b2Vec2& position = body->GetPosition();
+					transformComp.Position.x = position.x;
+					transformComp.Position.y = position.y;
+					transformComp.Rotation.z = body->GetAngle();
+				}
+			}
+
 		}
 
 		// -------- Render --------
@@ -221,25 +228,28 @@ namespace Wildlands
 	}
 	void Scene::UpdateSimulation(Timestep ts, EditorCamera& camera)
 	{
-		// -------- Physics --------
+		if (!m_IsPaused || m_StepCount-- > 0)
 		{
-			const int32_t velocityIterations = 6;
-			const int32_t positionIterations = 2;
-			m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
-
-			// update tranform from physics.
-			auto view = m_Registry.view<Rigidbody2DComponent>();
-			for (auto entityID : view)
+			// -------- Physics --------
 			{
-				Entity entity = { entityID, this };
-				auto& transformComp = entity.GetComponent<TransformComponent>();
-				auto& rb2dComp = entity.GetComponent<Rigidbody2DComponent>();
+				const int32_t velocityIterations = 6;
+				const int32_t positionIterations = 2;
+				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
 
-				b2Body* body = static_cast<b2Body*>(rb2dComp.RuntimeRigidbody);
-				const b2Vec2& position = body->GetPosition();
-				transformComp.Position.x = position.x;
-				transformComp.Position.y = position.y;
-				transformComp.Rotation.z = body->GetAngle();
+				// update tranform from physics.
+				auto view = m_Registry.view<Rigidbody2DComponent>();
+				for (auto entityID : view)
+				{
+					Entity entity = { entityID, this };
+					auto& transformComp = entity.GetComponent<TransformComponent>();
+					auto& rb2dComp = entity.GetComponent<Rigidbody2DComponent>();
+
+					b2Body* body = static_cast<b2Body*>(rb2dComp.RuntimeRigidbody);
+					const b2Vec2& position = body->GetPosition();
+					transformComp.Position.x = position.x;
+					transformComp.Position.y = position.y;
+					transformComp.Rotation.z = body->GetAngle();
+				}
 			}
 		}
 
@@ -331,6 +341,11 @@ namespace Wildlands
 				return Entity(entity, this);
 		}
 		return Entity{};
+	}
+
+	void Scene::StepForward(int frameToStepforward)
+	{
+		m_StepCount = frameToStepforward;
 	}
 
 	void Scene::RenderScene(EditorCamera& camera)
