@@ -9,7 +9,7 @@ Entities:
       Scale: [1, 1, 1]
     CameraComponent:
       Camera:
-        ProjectionType: 1
+        ProjectionType: 0
         PerspectiveFOV: 0.785398185
         PerspectiveNear: 0.00999999978
         PerspectiveFar: 1000
@@ -26,7 +26,7 @@ Entities:
     TagComponent:
       Tag: Player
     TransformComponent:
-      Position: [-7.4505806e-09, 1.29421043, 0]
+      Position: [0, 1.29421043, 0]
       Rotation: [0, 0, 0]
       Scale: [0.639999986, 0.639999986, 0.639999986]
     SpriteRendererComponent:
@@ -47,7 +47,7 @@ Entities:
       ScriptFields:
         - Name: Speed
           Type: Float
-          Data: 0.0500000007
+          Data: 7
         - Name: Time
           Type: Float
           Data: 0

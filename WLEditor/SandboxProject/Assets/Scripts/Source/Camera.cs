@@ -14,8 +14,6 @@ namespace Sandbox
         public float DistanceFromPlayer = 5.0f;
         private Entity m_Player;
 
-        public float px, py, pz;
-
         void OnCraete()
         {
             m_Player = FindEntityByName("Player");
@@ -26,9 +24,6 @@ namespace Sandbox
             if (m_Player != null)
             {
                 Position = new Vector3(m_Player.Position.XY, DistanceFromPlayer);
-                px = m_Player.Position.X;
-                py = m_Player.Position.Y;
-                pz = m_Player.Position.Z;
             }
             else { m_Player = FindEntityByName("Player"); }
 

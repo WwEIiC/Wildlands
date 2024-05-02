@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Wildlands/ECS/SceneSerializer.h"
+#include "Wildlands/Scripting/ScriptEngine.h"
 #include "Wildlands/Utils/PlatformUtils.h"
 
 #include "Wildlands/Math/Math.h"
@@ -169,6 +170,11 @@ namespace Wildlands
                 if (ImGui::MenuItem("FullScreen")) { Application::Get().GetWindow().SetFullScreen(); }
                 if (ImGui::MenuItem("ExitFullScreen")) { Application::Get().GetWindow().ExitFullScreen(); }
                 if (ImGui::MenuItem("Exit")) { Application::Get().Close(); }
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Script"))
+            {
+                if (ImGui::MenuItem("Reload assembly", "Ctrl+R")) { ScriptEngine::ReloadAssembly(); }
                 ImGui::EndMenu();
             }
 
@@ -457,7 +463,16 @@ namespace Wildlands
             case Key::Q: { if (!IsMouseOrGizmoUsing) { m_GizmoType = -1; } break; }
             case Key::W: { if (!IsMouseOrGizmoUsing) { m_GizmoType = ImGuizmo::OPERATION::TRANSLATE; } break; }
             case Key::E: { if (!IsMouseOrGizmoUsing) { m_GizmoType = ImGuizmo::OPERATION::ROTATE; } break; }
-            case Key::R: { if (!IsMouseOrGizmoUsing) { m_GizmoType = ImGuizmo::OPERATION::SCALE; } break; }
+            case Key::R: 
+            { 
+                if (ctrl) 
+                    ScriptEngine::ReloadAssembly(); 
+                else
+                {
+                    if (!IsMouseOrGizmoUsing) { m_GizmoType = ImGuizmo::OPERATION::SCALE; } 
+                }
+                break;
+            }
             case Key::V: { if (!IsMouseOrGizmoUsing) { m_GizmoMode = !m_GizmoMode; } break; }
 
         }
