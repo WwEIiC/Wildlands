@@ -13,6 +13,7 @@ IncludeDirs["yaml_cpp"] 		= "%{wks.location}/Wildlands/Externals/yaml_cpp/includ
 IncludeDirs["ImGuizmo"] 		= "%{wks.location}/Wildlands/Externals/ImGuizmo"
 IncludeDirs["Box2D"] 			= "%{wks.location}/Wildlands/Externals/box2d/include"
 IncludeDirs["Mono"] 			= "%{wks.location}/Wildlands/Externals/Mono/include"
+IncludeDirs["filewatch"] 		= "%{wks.location}/Wildlands/Externals/filewatch"
 
 LibraryDirs = {}
 LibraryDirs["Mono"] = "%{wks.location}/Wildlands/Externals/mono/lib/%{cfg.buildcfg}"

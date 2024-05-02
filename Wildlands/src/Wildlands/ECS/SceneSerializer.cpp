@@ -111,12 +111,12 @@ namespace Wildlands
 				out << scriptFieldInstance.GetValue<Type>();  \
 				break
 
-#define READ_SCRIPT_FIELD(FieldType, Type)             \
-	case ScriptFieldType::FieldType:                   \
-	{                                                  \
+#define READ_SCRIPT_FIELD(FieldType, Type)                 \
+	case ScriptFieldType::FieldType:					   \
+	{													   \
 		Type data = scriptFieldNode["Data"].as<Type>();    \
-		fieldInstance.SetValue(data);                  \
-		break;                                         \
+		fieldInstance.SetValue(data);					   \
+		break;                                             \
 	}
 
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)

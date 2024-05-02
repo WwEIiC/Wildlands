@@ -19,7 +19,8 @@ project "WLEditor"
 		"%{IncludeDirs.glm}",
 		"%{IncludeDirs.ImGui}",
 		"%{IncludeDirs.entt}",
-		"%{IncludeDirs.ImGuizmo}"
+		"%{IncludeDirs.ImGuizmo}",
+		"%{IncludeDirs.filewatch}"
 	}
 
 	--link the Wildlands project to this project.

@@ -43,7 +43,6 @@ namespace Sandbox
 
             velocity *= speed * ts;
 
-            //m_Transform.Position = new Vector3(m_Transform.Position.X + velocity.X, m_Transform.Position.Y + velocity.Y, m_Transform.Position.Z);
             if (HasComponent<Rigidbody2DComponent>())
                 m_Rigidbody.ApplyLinearImpulse(velocity.XY, true);
 

@@ -35,7 +35,8 @@ project "Wildlands"
 		"%{IncludeDirs.yaml_cpp}",
 		"%{IncludeDirs.ImGuizmo}",
 		"%{IncludeDirs.Box2D}",
-		"%{IncludeDirs.Mono}"
+		"%{IncludeDirs.Mono}",
+		"%{IncludeDirs.filewatch}"
 	}
 
 	links {

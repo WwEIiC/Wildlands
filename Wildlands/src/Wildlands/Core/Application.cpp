@@ -79,8 +79,10 @@ namespace Wildlands
 			Timestep ts = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
-			//WLTODO: Move this to the Render thread.
-			//Render each layers
+			ExecuteMainThreadQueue();
+
+			// WLTODO: Move this to the Render thread.
+			// Render each layers
 			if (!m_Minimized)
 			{
 				{
@@ -89,7 +91,7 @@ namespace Wildlands
 						layer->Update(ts);
 				}
 
-				//Render UI for each layers
+				// Render UI for each layers
 				m_ImGuiLayer->Begin();
 				{
 					WL_PROFILE_SCOPE("ImGuiLayers Update");
@@ -103,36 +105,6 @@ namespace Wildlands
 		}
 	}
 
-#pragma region Push and Pop Layer
-	void Application::PushLayer(Layer* layer) 
-	{
-		WL_PROFILE_FUNCTION();
-
-		m_LayerStack.PushLayer(layer); 
-		layer->Attach();
-	}
-	void Application::PopLayer(Layer* layer) 
-	{
-		WL_PROFILE_FUNCTION();
-
-		layer->Detach();
-		m_LayerStack.PopLayer(layer); 
-	}
-	void Application::PushOverLayer(Layer* overlayer) 
-	{
-		WL_PROFILE_FUNCTION();
-
-		m_LayerStack.PushOverlay(overlayer); 
-		overlayer->Attach();
-	}
-	void Application::PopOverLayer(Layer* overlayer) 
-	{
-		WL_PROFILE_FUNCTION();
-
-		overlayer->Detach();
-		m_LayerStack.PopOverlay(overlayer); 
-	}
-#pragma endregion
 
 	bool Application::OnWindowClose(WindowCloseEvent& event)
 	{
@@ -151,5 +123,15 @@ namespace Wildlands
 		Renderer::OnWindowResize(event.GetWidth(), event.GetHeight());
 		m_Minimized = false;
 		return false;
+	}
+
+	void Application::ExecuteMainThreadQueue()
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+		for (auto& func : m_MainThreadQueue)
+			func();
+
+		m_MainThreadQueue.clear();
 	}
 }

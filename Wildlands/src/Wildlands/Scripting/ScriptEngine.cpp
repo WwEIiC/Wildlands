@@ -3,6 +3,9 @@
 
 #include "Wildlands/Scripting/ScriptGlue.h"
 
+#include "Wildlands/Core/Application.h"
+#include "FileWatch.hpp"
+
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
@@ -187,11 +190,29 @@ namespace Wildlands
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityScriptInstances;
 		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
+		// File watch to decide reload assembly
+		Unique<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
+		bool AppAssemblyFileChanged = false;
+
 		// Runtime
 		Scene* SceneContext = nullptr;
 	};
 
 	static ScriptEngineData* s_Data = nullptr;
+
+	static void OnAppAssemblyFileChanged(const std::string& path, const filewatch::Event change_type)
+	{
+		bool changed = s_Data->AppAssemblyFileChanged;
+		if (!s_Data->AppAssemblyFileChanged && change_type == filewatch::Event::modified)
+		{
+			s_Data->AppAssemblyFileChanged = true;
+
+			Application::Get().SubmitToMainThread([](){
+				s_Data->AppAssemblyFileWatcher.reset();
+				ScriptEngine::ReloadAssembly();
+			});
+		}
+	}
 
 	// ===========================================================================
 	// ======================= ScriptEngine ======================================
@@ -294,6 +315,9 @@ namespace Wildlands
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 		// Utils::PrintAssemblyTypes(s_Data->AppAssembly);
+
+		s_Data->AppAssemblyFileWatcher = CreateUnique<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileChanged);
+		s_Data->AppAssemblyFileChanged = false;
 	}
 
 	void ScriptEngine::ReloadAssembly()

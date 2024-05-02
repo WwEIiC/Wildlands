@@ -49,6 +49,8 @@ namespace Wildlands
 
 		const ApplicationSpecification& GetSpecification() const { return m_Specification; }
 
+		void SubmitToMainThread(const std::function<void()>& function);
+
 		// Push and Pop Layer to m_LayerStack
 		void PushLayer(Layer* layer);
 		void PopLayer(Layer* layer);
@@ -61,6 +63,8 @@ namespace Wildlands
 
 		bool OnWindowClose(class WindowCloseEvent& event);
 		bool OnWindowResize(class WindowResizeEvent& event);
+
+		void ExecuteMainThreadQueue();
 	private:
 		//WLTODO:Make this a singleton(Template or not).
 		static Application* s_Instance;
@@ -71,6 +75,9 @@ namespace Wildlands
 		Unique<Window> m_Window;
 		ApplicationSpecification m_Specification;
 
+		std::vector<std::function<void()>> m_MainThreadQueue;
+		std::mutex m_MainThreadQueueMutex;
+	private:
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
 
