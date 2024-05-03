@@ -20,6 +20,7 @@ Entities:
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [1, 0.254498303, 0.254498303, 1]
+      TexturePath: E:\Work\Projects\GraduationProject\Wildlands_Engine\WLEditor\SandboxProject\Assets\Textures\Texture1.png
       TilingFactor: 1
   - Entity: 671844605869708781
     TagComponent:

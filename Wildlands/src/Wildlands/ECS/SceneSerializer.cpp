@@ -4,6 +4,8 @@
 #include "Wildlands/ECS/Entity.h"
 #include "Wildlands/ECS/Components.h"
 
+#include "Wildlands/Project/Project.h"
+
 #include "Wildlands/Scripting/ScriptEngine.h"
 #include <yaml-cpp/yaml.h>
 
@@ -401,7 +403,11 @@ namespace Wildlands
 					auto& src = targetEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererNode["Color"].as<glm::vec4>();
 					if (spriteRendererNode["TexturePath"])
-						src.Texture = Texture2D::Create(spriteRendererNode["TexturePath"].as<std::string>());
+					{
+						std::string texturePath = spriteRendererNode["TexturePath"].as<std::string>();
+						auto path = Project::GetAssetFileSystemPath(texturePath);
+						src.Texture = Texture2D::Create(path.string());
+					}
 					if (spriteRendererNode["TilingFactor"])
 						src.TilingFactor = spriteRendererNode["TilingFactor"].as<float>();
 				}

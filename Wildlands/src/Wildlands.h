@@ -8,6 +8,8 @@
 #include "Wildlands/Core/Input.h"
 #include "Wildlands/Core/Layer.h"
 
+#include "Wildlands/Project/Project.h"
+
 #include "Wildlands/ImGui/ImGuiLayer.h"
 
 //----- Events -------------------------------------------------

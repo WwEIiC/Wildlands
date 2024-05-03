@@ -12,8 +12,6 @@
 
 namespace Wildlands
 {
-    extern const std::filesystem::path g_AssetPath;
-
     EditorLayer::EditorLayer()
         : Layer("Sandbox2D")
     {
@@ -47,14 +45,15 @@ namespace Wildlands
         auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
         if (commandLineArgs.Count > 1)
         {
-            auto sceneFilePath = commandLineArgs[1];
-            OpenScene(sceneFilePath);
+            auto projectFilePath = commandLineArgs[1];
+            OpenProject(projectFilePath);
+        }
+        else
+        {
+            if (!OpenProject()) { Application::Get().Close(); }
         }
 
         m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
-        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-        m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
         Renderer2D::SetLineWidth(0.95f);
     }
 
@@ -164,13 +163,23 @@ namespace Wildlands
         {
             if (ImGui::BeginMenu("File"))
             {
-                if (ImGui::MenuItem("Settings")) { m_SceneHierarchyPanel.m_ShowSettingsWindow = true; }
+                if (ImGui::MenuItem("Open Project...", "Ctrl+O")) { OpenProject(); }
+                ImGui::Separator();
+
                 if (ImGui::MenuItem("New Scene", "Ctrl+N")) { NewScene(); }
-                if (ImGui::MenuItem("Save", "Ctrl+S")) { SaveScene(); }
-                if (ImGui::MenuItem("Save as...", "Ctrl+Shift+S")) { SaveSceneAs(); }
-                if (ImGui::MenuItem("Open...", "Ctrl+O")) { OpenScene(); }
-                if (ImGui::MenuItem("FullScreen")) { Application::Get().GetWindow().SetFullScreen(); }
-                if (ImGui::MenuItem("ExitFullScreen")) { Application::Get().GetWindow().ExitFullScreen(); }
+                if (ImGui::MenuItem("Save Scene", "Ctrl+S")) { SaveScene(); }
+                if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S")) { SaveSceneAs(); }
+
+                ImGui::Separator();
+                if (ImGui::MenuItem("Settings")) { m_SceneHierarchyPanel.m_ShowSettingsWindow = true; }
+                if (!Application::Get().GetWindow().IsFullScreen())
+                {
+                    if (ImGui::MenuItem("FullScreen")) { Application::Get().GetWindow().SetFullScreen(); }
+                }
+                else
+                {
+					if (ImGui::MenuItem("ExitFullScreen")) { Application::Get().GetWindow().ExitFullScreen(); }
+                }
                 if (ImGui::MenuItem("Exit")) { Application::Get().Close(); }
                 ImGui::EndMenu();
             }
@@ -185,7 +194,8 @@ namespace Wildlands
 
         // Panels
         m_SceneHierarchyPanel.OnImGuiRender();
-        m_ContentBrowserPanel.OnImGuiRender();
+        if (m_ContentBrowserPanel)
+            m_ContentBrowserPanel->OnImGuiRender();
 
         ImGui::Begin("Render Stats");
 
@@ -234,7 +244,7 @@ namespace Wildlands
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
             {
                 const wchar_t* path = (const wchar_t*)payload->Data;
-                OpenScene(std::filesystem::path(g_AssetPath) / path);
+                OpenScene(path);
             }
             ImGui::EndDragDropTarget();
         }
@@ -492,7 +502,7 @@ namespace Wildlands
 			case Key::O:
 			{
 				if (ctrl)
-					OpenScene();
+					OpenProject();
 				break;
 			} 
             case Key::D:
@@ -553,6 +563,35 @@ namespace Wildlands
 
         Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
         if (selectedEntity) { m_ActiveScene->DupilcateEntity(selectedEntity); }
+    }
+
+    void EditorLayer::NewProject()
+    {
+        Project::New();
+    }
+
+    bool EditorLayer::OpenProject()
+    {
+        std::string filepath = FileDialogs::OpenFile("Wildlands Project (*.wproj)\0*.wproj\0");
+
+        if (filepath.empty()) { return false; }
+
+        OpenProject(filepath);
+        return true;
+    }
+
+    void EditorLayer::OpenProject(const std::filesystem::path& path)
+    {
+        if (Project::Load(path))
+        {
+            auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActiveProject()->GetConfig().StartScene);
+            OpenScene(startScenePath);
+            m_ContentBrowserPanel = CreateUnique<ContentBrowserPanel>();
+        }
+    }
+
+    void EditorLayer::SaveProject()
+    {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

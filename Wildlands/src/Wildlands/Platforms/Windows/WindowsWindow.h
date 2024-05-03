@@ -24,6 +24,7 @@ namespace Wildlands
 		virtual void SetVSync(bool enable) override;
 		virtual bool IsVSync() const override;
 
+		virtual bool IsFullScreen() const override { return m_IsFullScreen; }
 		virtual void SetFullScreen() override;
 		virtual void ExitFullScreen() override;
 
@@ -46,6 +47,7 @@ namespace Wildlands
 
 		GLFWwindow* m_Window;
 		Unique<RenderContext> m_RenderContext;
+		bool m_IsFullScreen = false;
 	};
 
 }

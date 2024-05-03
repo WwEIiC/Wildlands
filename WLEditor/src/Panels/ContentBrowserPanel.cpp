@@ -1,13 +1,13 @@
 #include "ContentBrowserPanel.h"
+
+#include "Wildlands/Project/Project.h"
+
 #include <imgui.h>
 
 namespace Wildlands
 {
-	/// <summary> temp </summary>
-	extern const std::filesystem::path g_AssetPath = "assets";
-
 	ContentBrowserPanel::ContentBrowserPanel()
-		: m_CurrentDirectory(g_AssetPath)
+		:m_BaseDirectory(Project::GetAssetDirectory()), m_CurrentDirectory(m_BaseDirectory)
 	{
 		m_FileFolderIcon = Texture2D::Create("resources/icons/ContentBrowser/FileFolderIcon.png");
 		m_FileIcon = Texture2D::Create("resources/icons/ContentBrowser/FileIcon.png");
@@ -16,7 +16,7 @@ namespace Wildlands
 	{
 		ImGui::Begin("Content Browser");
 
-		if (m_CurrentDirectory != std::filesystem::path(g_AssetPath))
+		if (m_CurrentDirectory != std::filesystem::path(m_BaseDirectory))
 		{
 			if (ImGui::Button("<--"))
 				m_CurrentDirectory = m_CurrentDirectory.parent_path();
@@ -47,7 +47,7 @@ namespace Wildlands
 			ImGui::ImageButton((ImTextureID)(uint64_t)icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 			if (ImGui::BeginDragDropSource())
 			{
-				std::filesystem::path relativePath = std::filesystem::relative(path, g_AssetPath);
+				std::filesystem::path relativePath(path);
 				const wchar_t* itemPath = relativePath.c_str();
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
 				ImGui::EndDragDropSource();

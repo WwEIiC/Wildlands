@@ -29,6 +29,12 @@ namespace Wildlands
 
 		void OnDuplicateEntity();
 	private:
+		// Project
+		void NewProject();
+		bool OpenProject();
+		void OpenProject(const std::filesystem::path& path);
+		void SaveProject();
+	private:
 		// Scene
 		void NewScene();
 		void SaveScene();
@@ -71,7 +77,7 @@ namespace Wildlands
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;
-		ContentBrowserPanel m_ContentBrowserPanel;
+		Unique<ContentBrowserPanel> m_ContentBrowserPanel;
 
 		Ref<Texture2D> m_PlayButtonIcon, m_SimulateButtonIcon, m_StopButtonIcon;
 		Ref<Texture2D> m_PauseButtonIcon, m_StepforwardButtonIcon;

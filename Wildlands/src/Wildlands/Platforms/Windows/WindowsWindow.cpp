@@ -223,6 +223,7 @@ namespace Wildlands
 
 	void WindowsWindow::SetFullScreen()
 	{
+		m_IsFullScreen = true;
 		GLFWmonitor* primary = glfwGetPrimaryMonitor();
 
 		const GLFWvidmode* mode = glfwGetVideoMode(primary);
@@ -230,6 +231,7 @@ namespace Wildlands
 	}
 	void WindowsWindow::ExitFullScreen()
 	{
+		m_IsFullScreen = false;
 		glfwSetWindowMonitor(m_Window, NULL, 60, 60, 1600, 900, GLFW_DONT_CARE);
 	}
 }
