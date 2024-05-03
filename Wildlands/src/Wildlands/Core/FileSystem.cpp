@@ -12,7 +12,7 @@ namespace Wildlands
 
 		if (!stream)
 		{
-			WL_CORE_ERROR("FileSystem::Failed to open file '{0}'", filepath.string());
+			WL_CORE_ERROR("[FileSystem] Failed to open file '{0}'", filepath.string());
 			return {};
 		}
 
@@ -22,7 +22,7 @@ namespace Wildlands
 
 		if (size == 0)
 		{
-			WL_CORE_TRACE("FileSystem::File '{0}' is empty", filepath.string());
+			WL_CORE_TRACE("[FileSystem] File '{0}' is empty", filepath.string());
 			return {};
 		}
 

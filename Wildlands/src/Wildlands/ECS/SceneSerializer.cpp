@@ -478,37 +478,40 @@ namespace Wildlands
 					if (scriptFieldsNode)
 					{
 						Ref<ScriptClass> entityScriptClass = ScriptEngine::GetEntityScriptClass(sc.ClassName);
-						const auto& classFields = entityScriptClass->GetFields();
-						auto& entityFields = ScriptEngine::GetScriptFieldMap(targetEntity);
-
-						for (auto scriptFieldNode : scriptFieldsNode)
+						if (entityScriptClass)
 						{
-							std::string name = scriptFieldNode["Name"].as<std::string>();
-							std::string typeString = scriptFieldNode["Type"].as<std::string>();
-							ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
+							const auto& classFields = entityScriptClass->GetFields();
+							auto& entityFields = ScriptEngine::GetScriptFieldMap(targetEntity);
 
-							ScriptFieldInstance& fieldInstance = entityFields[name];
-							if (entityFields.find(name) == entityFields.end()) { continue; }
-
-							fieldInstance.Field = classFields.at(name);
-							switch (type)
+							for (auto scriptFieldNode : scriptFieldsNode)
 							{
-								READ_SCRIPT_FIELD(Float, float);
-								READ_SCRIPT_FIELD(Double, double);
-								READ_SCRIPT_FIELD(Bool, bool);
-								READ_SCRIPT_FIELD(Char, char);
-								READ_SCRIPT_FIELD(Byte, int8_t);
-								READ_SCRIPT_FIELD(Short, int16_t);
-								READ_SCRIPT_FIELD(Int, int32_t);
-								READ_SCRIPT_FIELD(Long, int64_t);
-								READ_SCRIPT_FIELD(UByte, uint8_t);
-								READ_SCRIPT_FIELD(UShort, uint16_t);
-								READ_SCRIPT_FIELD(UInt, uint32_t);
-								READ_SCRIPT_FIELD(ULong, uint64_t);
-								READ_SCRIPT_FIELD(Vector2, glm::vec2);
-								READ_SCRIPT_FIELD(Vector3, glm::vec3);
-								READ_SCRIPT_FIELD(Vector4, glm::vec4);
-								READ_SCRIPT_FIELD(Entity, UUID);
+								std::string name = scriptFieldNode["Name"].as<std::string>();
+								std::string typeString = scriptFieldNode["Type"].as<std::string>();
+								ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
+
+								ScriptFieldInstance& fieldInstance = entityFields[name];
+								if (entityFields.find(name) == entityFields.end()) { continue; }
+
+								fieldInstance.Field = classFields.at(name);
+								switch (type)
+								{
+									READ_SCRIPT_FIELD(Float, float);
+									READ_SCRIPT_FIELD(Double, double);
+									READ_SCRIPT_FIELD(Bool, bool);
+									READ_SCRIPT_FIELD(Char, char);
+									READ_SCRIPT_FIELD(Byte, int8_t);
+									READ_SCRIPT_FIELD(Short, int16_t);
+									READ_SCRIPT_FIELD(Int, int32_t);
+									READ_SCRIPT_FIELD(Long, int64_t);
+									READ_SCRIPT_FIELD(UByte, uint8_t);
+									READ_SCRIPT_FIELD(UShort, uint16_t);
+									READ_SCRIPT_FIELD(UInt, uint32_t);
+									READ_SCRIPT_FIELD(ULong, uint64_t);
+									READ_SCRIPT_FIELD(Vector2, glm::vec2);
+									READ_SCRIPT_FIELD(Vector3, glm::vec3);
+									READ_SCRIPT_FIELD(Vector4, glm::vec4);
+									READ_SCRIPT_FIELD(Entity, UUID);
+								}
 							}
 						}
 					}

@@ -210,46 +210,23 @@ namespace Wildlands
 		InitMono();
 		ScriptGlue::RegisterFunctions();
 
-		LoadAssembly("resources/Scripts/Wildlands-ScriptCore.dll");
-		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+		bool succeed = LoadAssembly("resources/Scripts/Wildlands-ScriptCore.dll");
+		if (!succeed)
+		{
+			WL_CORE_ERROR("[ScriptEngine] failed to load Wildlands-ScriptCore assembly");
+			return;
+		}
+		succeed = LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+		if (!succeed)
+		{
+			WL_CORE_ERROR("[ScriptEngine] failed to load app assembly");
+			return;
+		}
 		LoadAssemblyClasses();
 
 		ScriptGlue::RegisterComponents();
 
 		s_Data->EntityClass = ScriptClass("Wildlands", "Entity", true);
-#if 0
-		// Example how to use mono.
-		// Retrieve and instantiate class (with constructor)
-		s_Data->EntityClass = ScriptClass("Wildlands", "Entity");
-
-		MonoObject* instance = s_Data->EntityClass.Instantiate();
-
-		// Call method
-		MonoMethod* printMessageFunc = s_Data->EntityClass.GetMethod("PrintMessage", 0);
-		s_Data->EntityClass.InvokeMethod(instance, printMessageFunc);
-
-		// Call method with param
-		MonoMethod* printIntFunc = s_Data->EntityClass.GetMethod("PrintInt", 1);
-
-		int value = 5;
-		void* param = &value;
-
-		s_Data->EntityClass.InvokeMethod(instance, printIntFunc, &param);
-
-		MonoMethod* printIntsFunc = s_Data->EntityClass.GetMethod("PrintInts", 2);
-		int value2 = 508;
-		void* params[2] =
-		{
-			&value,
-			&value2
-		};
-		s_Data->EntityClass.InvokeMethod(instance, printIntsFunc, params);
-
-		MonoString* monoString = mono_string_new(s_Data->AppDomain, "Hello World from C++!");
-		MonoMethod* printCustomMessageFunc = s_Data->EntityClass.GetMethod("PrintCustomMessage", 1);
-		void* stringParam = monoString;
-		s_Data->EntityClass.InvokeMethod(instance, printCustomMessageFunc, &stringParam);
-#endif
 	}
 
 	void ScriptEngine::Close()
@@ -298,7 +275,7 @@ namespace Wildlands
 		s_Data->RootDomain = nullptr;
 	}
 
-	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
 	{
 		// Create an App Domain
 		char name[] = "WildlandsJITRuntime";
@@ -308,19 +285,27 @@ namespace Wildlands
 		// Move this maybe
 		s_Data->CoreAssemblyFilepath = filepath;
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+		if (s_Data->CoreAssembly == nullptr) { return false; }
+
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 		// Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
+
+		return true;
 	}
 
-	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_Data->AppAssemblyFilepath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+		if (s_Data->AppAssembly == nullptr) { return false; }
+
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 		// Utils::PrintAssemblyTypes(s_Data->AppAssembly);
 
 		s_Data->AppAssemblyFileWatcher = CreateUnique<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileChanged);
 		s_Data->AppAssemblyFileChanged = false;
+
+		return true;
 	}
 
 	void ScriptEngine::ReloadAssembly()
@@ -382,10 +367,16 @@ namespace Wildlands
 	void ScriptEngine::UpdateEntity(Entity entity, Timestep ts)
 	{
 		UUID entityUUID = entity.GetUUID();
-		WL_CORE_ASSERT(s_Data->EntityScriptInstances.find(entityUUID) != s_Data->EntityScriptInstances.end(), "Entity isn't existed.");
+		if (s_Data->EntityScriptInstances.find(entityUUID) != s_Data->EntityScriptInstances.end())
+		{
+			Ref<ScriptInstance> instance = s_Data->EntityScriptInstances[entityUUID];
+			instance->InvokeOnUpdate((float)ts);
+		}
+		else
+		{
+			WL_CORE_ERROR("Entity {} doesn't have a script instance.", entityUUID);
+		}
 
-		Ref<ScriptInstance> instance = s_Data->EntityScriptInstances[entityUUID];
-		instance->InvokeOnUpdate((float)ts);
 	}
 
 	Scene* ScriptEngine::GetSceneContext()
