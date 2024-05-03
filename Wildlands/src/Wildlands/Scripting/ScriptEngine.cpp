@@ -4,12 +4,16 @@
 #include "Wildlands/Scripting/ScriptGlue.h"
 
 #include "Wildlands/Core/Application.h"
+#include "Wildlands/Core/FileSystem.h"
+
 #include "FileWatch.hpp"
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
 #include <mono/metadata/tabledefs.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/threads.h>
 
 namespace Wildlands
 {
@@ -36,43 +40,13 @@ namespace Wildlands
 
 	namespace Utils
 	{
-		// TODO: move to FileSystem class
-		static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
+		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPDB = false)
 		{
-			std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
-
-			if (!stream)
-			{
-				// Failed to open the file
-				return nullptr;
-			}
-
-			std::streampos end = stream.tellg();
-			stream.seekg(0, std::ios::beg);
-			uint64_t size = end - stream.tellg();
-
-			if (size == 0)
-			{
-				// File is empty
-				return nullptr;
-			}
-
-			char* buffer = new char[size];
-			stream.read((char*)buffer, size);
-			stream.close();
-
-			*outSize = (uint32_t)size;
-			return buffer;
-		}
-
-		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath)
-		{
-			uint32_t fileSize = 0;
-			char* fileData = ReadBytes(assemblyPath, &fileSize);
+			ScopeBuffer fileData = FileSystem::ReadFileBinary(assemblyPath);
 
 			// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
 			MonoImageOpenStatus status;
-			MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
+			MonoImage* image = mono_image_open_from_data_full(fileData.As<char>(), fileData.Size(), 1, &status, 0);
 
 			if (status != MONO_IMAGE_OK)
 			{
@@ -81,12 +55,22 @@ namespace Wildlands
 				return nullptr;
 			}
 
+			if (loadPDB)
+			{
+				std::filesystem::path pdbPath = assemblyPath;
+				pdbPath.replace_extension(".pdb");
+
+				if (std::filesystem::exists(pdbPath))
+				{
+					ScopeBuffer pdbFileData = FileSystem::ReadFileBinary(pdbPath);
+					mono_debug_open_image_from_memory(image, pdbFileData.As<const mono_byte>(), pdbFileData.Size());
+					WL_CORE_INFO("Loaded PDB {}", pdbPath);
+				}
+			}
+
 			std::string pathString = assemblyPath.string();
 			MonoAssembly* assembly = mono_assembly_load_from_full(image, pathString.c_str(), &status, 0);
 			mono_image_close(image);
-
-			// Don't forget to free the file data
-			delete[] fileData;
 
 			return assembly;
 		}
@@ -194,6 +178,8 @@ namespace Wildlands
 		Unique<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
 		bool AppAssemblyFileChanged = false;
 
+		bool EnableDebugging = true;
+
 		// Runtime
 		Scene* SceneContext = nullptr;
 	};
@@ -277,11 +263,28 @@ namespace Wildlands
 	{
 		mono_set_assemblies_path("mono/lib");
 
+		if (s_Data->EnableDebugging)
+		{
+			const char* argv[2] = {
+				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.log",
+				"--soft-breakpoints"
+			};
+
+			mono_jit_parse_options(2, (char**)argv);
+			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+		}
+
+
 		MonoDomain* rootDomain = mono_jit_init("WildlandsJITRuntime");
 		WL_CORE_ASSERT(rootDomain, "InitMono failed :: rootDomain doesn't exist.");
 
 		// Store the root domain pointer
 		s_Data->RootDomain = rootDomain;
+
+		if (s_Data->EnableDebugging)
+			mono_debug_domain_create(s_Data->RootDomain);
+
+		mono_thread_set_main(mono_thread_current());
 	}
 
 	void ScriptEngine::CloseMono()
@@ -304,7 +307,7 @@ namespace Wildlands
 
 		// Move this maybe
 		s_Data->CoreAssemblyFilepath = filepath;
-		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath);
+		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 		// Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
 	}
@@ -312,7 +315,7 @@ namespace Wildlands
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_Data->AppAssemblyFilepath = filepath;
-		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
+		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 		// Utils::PrintAssemblyTypes(s_Data->AppAssembly);
 
@@ -518,7 +521,8 @@ namespace Wildlands
 
 	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* method, void** params)
 	{
-		return mono_runtime_invoke(method, instance, params, nullptr);
+		MonoObject* exception = nullptr;
+		return mono_runtime_invoke(method, instance, params, &exception);
 	}
 
 	// ===========================================================================
