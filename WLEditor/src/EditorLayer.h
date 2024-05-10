@@ -74,6 +74,7 @@ namespace Wildlands
 			Simulate = 2
 		};
 		SceneState m_SceneState = SceneState::Edit;
+		float m_lastFrameTime;
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;

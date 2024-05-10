@@ -131,6 +131,7 @@ namespace Wildlands
 		{
 			// ------- Update Scripts ----------
 			{
+				WL_PROFILE_SCOPE("Scripts Update");
 				// ------- C# Entity ----------
 				auto view = m_Registry.view<ScriptComponent>();
 				for (auto entityID : view)
@@ -157,6 +158,7 @@ namespace Wildlands
 
 			// -------- Physics --------
 			{
+				WL_PROFILE_SCOPE("Physics Update");
 				const int32_t velocityIterations = 6;
 				const int32_t positionIterations = 2;
 				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
@@ -203,6 +205,7 @@ namespace Wildlands
 
 			// Draw Sprites.
 			{
+				WL_PROFILE_SCOPE("Draw Sprites");
 				auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 				for (auto entityID : group)
 				{
@@ -214,6 +217,7 @@ namespace Wildlands
 
 			// Draw Circles.
 			{
+				WL_PROFILE_SCOPE("Draw Circles");
 				auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
 				for (auto entityID : view)
 				{
@@ -221,6 +225,17 @@ namespace Wildlands
 
 					Renderer2D::DrawCircle(transform, circle.Color, circle.Thickness, circle.Fade, (uint32_t)entityID);
 				}
+			}
+
+			{
+				WL_PROFILE_SCOPE("Render Test");
+				// Render Test
+				int size = 200 * 0.05f;
+				for (float x = 0; x < size; x += 0.05f)
+					for (float y = 0; y < size / 2; y += 0.05f)
+					{
+						Renderer2D::DrawQuad(glm::vec2(x, y), glm::vec2(0.04f, 0.04f), glm::vec4((float)x / size, (float)y / size, 0.5f, 0.6f));
+					}
 			}
 
 			Renderer2D::EndScene();
@@ -280,8 +295,8 @@ namespace Wildlands
 
 	void Scene::DestoryEntity(Entity entity)
 	{
-		m_Registry.destroy(entity);
 		m_EntityMap.erase(entity.GetUUID());
+		m_Registry.destroy(entity);
 	}
 
 	Entity Scene::DupilcateEntity(Entity entity)

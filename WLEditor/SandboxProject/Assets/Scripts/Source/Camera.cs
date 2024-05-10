@@ -31,14 +31,14 @@ namespace Sandbox
             Vector3 velocity = Vector3.Zero;
 
             if (Input.IsKeyDown(KeyCode.Up))
-                velocity.Y = 1.0f;
+                velocity.Y = 0.2f * DistanceFromPlayer;
             else if (Input.IsKeyDown(KeyCode.Down))
-                velocity.Y = -1.0f;
+                velocity.Y = -0.2f * DistanceFromPlayer;
 
             if (Input.IsKeyDown(KeyCode.Left))
-                velocity.X = -1.0f;
+                velocity.X = -0.2f * DistanceFromPlayer;
             else if (Input.IsKeyDown(KeyCode.Right))
-                velocity.X = 1.0f;
+                velocity.X = 0.2f * DistanceFromPlayer;
 
             velocity *= speed;
 

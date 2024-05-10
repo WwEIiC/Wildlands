@@ -67,6 +67,9 @@ namespace Wildlands
     {
         WL_PROFILE_FUNCTION();
 
+        m_lastFrameTime = ts.GetMillisecondsTime();
+		//WL_CORE_INFO("Last Frame Time: {0}ms", m_lastFrameTime);
+		//WL_CORE_INFO("Frame: {0}", 1000.f / m_lastFrameTime);
         Renderer2D::ResetStats();
         {
             WL_PROFILE_SCOPE("Render Pre");

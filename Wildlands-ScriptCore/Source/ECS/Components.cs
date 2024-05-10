@@ -45,4 +45,8 @@ namespace Wildlands
     {
         public ulong ID { get; internal set; }
     }
+    public class TagComponent : Component
+    {
+        public string Tag { get; internal set; }
+    }
 }

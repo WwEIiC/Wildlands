@@ -27,7 +27,7 @@ namespace Wildlands
 
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
-		ImGui::Begin("Scene HierarchyPanel");
+		ImGui::Begin("Scene Hierarchy");
 
 		if (m_Context)
 		{

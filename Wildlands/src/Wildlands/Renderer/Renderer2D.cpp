@@ -44,7 +44,7 @@ namespace Wildlands
 	{
 		Renderer2D::Stats stats;
 
-		static const uint32_t MaxQuads = 10000;
+		static const uint32_t MaxQuads = 5000;
 		static const uint32_t MaxVertecies = MaxQuads * 4;
 		static const uint32_t MaxIndices = MaxQuads * 6;
 		static const uint32_t MaxTextures = 32;
@@ -577,8 +577,6 @@ namespace Wildlands
 	}
 	void Renderer2D::NextBatch()
 	{
-		EndScene();
-		
 		Flush();
 		StartBatch();
 	}
