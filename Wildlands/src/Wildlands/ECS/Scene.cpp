@@ -227,16 +227,16 @@ namespace Wildlands
 				}
 			}
 
-			{
-				WL_PROFILE_SCOPE("Render Test");
-				// Render Test
-				int size = 200 * 0.05f;
-				for (float x = 0; x < size; x += 0.05f)
-					for (float y = 0; y < size / 2; y += 0.05f)
-					{
-						Renderer2D::DrawQuad(glm::vec2(x, y), glm::vec2(0.04f, 0.04f), glm::vec4((float)x / size, (float)y / size, 0.5f, 0.6f));
-					}
-			}
+			//{
+			//	WL_PROFILE_SCOPE("Render Test");
+			//	// Render Test
+			//	int size = 200 * 0.05f;
+			//	for (float x = 0; x < size; x += 0.05f)
+			//		for (float y = 0; y < size / 2; y += 0.05f)
+			//		{
+			//			Renderer2D::DrawQuad(glm::vec2(x, y), glm::vec2(0.04f, 0.04f), glm::vec4((float)x / size, (float)y / size, 0.5f, 0.6f));
+			//		}
+			//}
 
 			Renderer2D::EndScene();
 		}
